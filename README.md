@@ -54,7 +54,9 @@ priority argument (Approximation / Requirements / Construction /
 The oracle model, `≤ᵀ`, and `CE` are project-local, so the priority proof
 cannot be contaminated by Mathlib's internal coding decisions; Mathlib is
 used strictly to discharge "this explicit stage function is computable"
-obligations, transferred through the bridge.
+obligations, transferred through the bridge layer (`MathlibBridge.lean`
+and `RunPrimrec.lean` — the only two files importing Mathlib
+computability).
 
 ### Foundation layer
 
@@ -66,7 +68,9 @@ obligations, transferred through the bridge.
 | `InfiniteEval.lean` | `Computes` as existential closure over fuel; uniqueness; finite↔infinite correspondence (`computes_iff_initialSegment`). | ✅ builds |
 | `Numbering.lean` | Explicit bijection `ℕ ≃ OracleCode`, both round-trips proved — enumeration adequacy for requirement indexing. | ✅ builds |
 | `Reducibility.lean` | `≤ᵀ`, `CE`, `ComputableSet`; reflexivity; computable ⇒ reducible to everything. | ✅ builds |
-| `MathlibBridge.lean` | `embed` + semantic preservation (`run_embed`); `Partrec` and c.e. transfer. Gate item 8 still open. | ✅ builds |
+| `MathlibBridge.lean` | `embed` + semantic preservation (`run_embed`); `Partrec` and c.e. transfer. | ✅ builds |
+| `RunPrimrec.lean` | `run` is primitive recursive in Mathlib's sense (`nrun_primrec`, the `primrec_evaln` analog), by memo-table strong recursion on ℕ-encoded codes/results. | ✅ builds |
+| `../Approximation.lean` | Monotone `Finset` stages, stabilization, snapshots, the restraint mechanism and true-stage lemmas. | ✅ builds |
 
 ### Foundation milestone gate
 
@@ -83,9 +87,11 @@ zero `sorry`:
 6. ✅ finite-to-infinite computation correspondence (`InfiniteEval.lean`)
 7. ✅ use principle: preservation under oracle agreement below the recorded
    use (`Use.lean`)
-8. ⬜ `run` (on snapshot oracles) is computable in Mathlib's sense — the
-   analog of Mathlib's `evaln_prim`, needed before "the constructed sets
-   are c.e." can be discharged; the largest single bridge item
+8. ✅ `run` (on snapshot oracles) is computable in Mathlib's sense
+   (`nrun_primrec` — the `evaln_prim` analog; memo-table strong recursion
+   with the snapshot as parameter, codes and results as naturals)
+
+**The foundation gate is closed** — the priority construction is unblocked.
 
 Off the critical path but part of "done": closure of `≤ᵀ` under
 composition/transitivity via a query-substitution operator (what makes the
