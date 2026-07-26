@@ -25,3 +25,4 @@ import FriedbergMuchnik.Foundation.InfiniteEval
 import FriedbergMuchnik.Foundation.Numbering
 import FriedbergMuchnik.Foundation.Reducibility
 import FriedbergMuchnik.Foundation.MathlibBridge
+import FriedbergMuchnik.Approximation
