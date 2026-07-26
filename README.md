@@ -72,6 +72,27 @@ computability).
 | `RunPrimrec.lean` | `run` is primitive recursive in Mathlib's sense (`nrun_primrec`, the `primrec_evaln` analog), by memo-table strong recursion on ℕ-encoded codes/results. | ✅ builds |
 | `../Approximation.lean` | Monotone `Finset` stages, stabilization, snapshots, the restraint mechanism and true-stage lemmas. | ✅ builds |
 
+### Priority argument
+
+| File | Content | Status |
+|---|---|---|
+| `Construction.lean` | The stage machine: per-requirement records, one attention per stage, freshness counter. | ✅ builds |
+| `StageDynamics.lean` | `attended` + leastness (priority discipline), the `step_cases` trichotomy, list-change and no-upward-injury lemmas. | ✅ builds |
+| `FiniteInjury.lean` | The rank argument: once superiors are quiet a requirement is attended ≤ 2 more times; `quiet_above`, stabilization package. | ✅ builds |
+| `Invariants.lean` | Ten-field `ConsInv` (freshness, distinctness, witness/restraint discipline, the preserved computation), by induction over the three transitions. | ✅ builds |
+| `Requirements.lean` | Satisfaction of every `R_e`/`S_e`; `not_A_le_B`, `not_B_le_A`. | ✅ builds |
+| `CE.lean` | Parallel tuple-implementation of the construction + simulation + `Primrec` derivation ⇒ `CE Aset`, `CE Bset`. | ✅ builds |
+| `Main.lean` | **`friedberg_muchnik : ∃ A B, CE A ∧ CE B ∧ ¬(A ≤ᵀ B) ∧ ¬(B ≤ᵀ A)`** | ✅ builds |
+
+**The theorem is fully proved.** `#print axioms friedberg_muchnik` reports
+only `propext`, `Classical.choice`, `Quot.sound` — no `sorry`, no added
+axioms.
+
+Build note: two declarations in `CE.lean` (`primrec_reqAttN` and the
+builder lemmas) carry raised `maxHeartbeats` — their `Primrec`
+unifications walk through the `Primcodable` pairing encodings and take a
+couple of minutes; everything else compiles quickly.
+
 ### Foundation milestone gate
 
 The priority construction does not start until all of these compile with
@@ -107,7 +128,8 @@ lake build
 ```
 
 Toolchain: Lean 4.26.0, Mathlib `v4.26.0`. Zero `sorry` policy: every commit
-builds with no `sorry`/`admit`/added axioms.
+builds with no `sorry`/`admit`/added axioms; the final theorem's axiom
+footprint is `propext`, `Classical.choice`, `Quot.sound`.
 
 ## Textbook correspondence
 
