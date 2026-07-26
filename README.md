@@ -66,7 +66,7 @@ obligations, transferred through the bridge.
 | `InfiniteEval.lean` | `Computes` as existential closure over fuel; uniqueness; finite↔infinite correspondence (`computes_iff_initialSegment`). | ✅ builds |
 | `Numbering.lean` | Explicit bijection `ℕ ≃ OracleCode`, both round-trips proved — enumeration adequacy for requirement indexing. | ✅ builds |
 | `Reducibility.lean` | `≤ᵀ`, `CE`, `ComputableSet`; reflexivity; computable ⇒ reducible to everything. | ✅ builds |
-| `MathlibBridge.lean` | See gate items 2–4, 8 below. | ⬜ next |
+| `MathlibBridge.lean` | `embed` + semantic preservation (`run_embed`); `Partrec` and c.e. transfer. Gate item 8 still open. | ✅ builds |
 
 ### Foundation milestone gate
 
@@ -74,9 +74,11 @@ The priority construction does not start until all of these compile with
 zero `sorry`:
 
 1. ✅ effective encoding/decoding of oracle programs (`Numbering.lean`)
-2. ⬜ embedding `Nat.Partrec.Code → OracleCode` (query-free image)
-3. ⬜ semantic preservation of that embedding (`run`/`evaln` correspondence)
-4. ⬜ transfer: `Nat.Partrec f` ⇒ `f` realized by a local oracle-free code
+2. ✅ embedding `Nat.Partrec.Code → OracleCode` (query-free image)
+3. ✅ semantic preservation of that embedding (`run_embed`: running an
+   embedded code against *any* oracle is `evaln`, lifted)
+4. ✅ transfer: `Nat.Partrec f` ⇒ `f` realized by a local oracle-free code
+   (`partrec_realized`, `ce_of_partrec_dom`)
 5. ✅ enumeration adequacy for the project's `≤ᵀ` (`Numbering.lean`)
 6. ✅ finite-to-infinite computation correspondence (`InfiniteEval.lean`)
 7. ✅ use principle: preservation under oracle agreement below the recorded
