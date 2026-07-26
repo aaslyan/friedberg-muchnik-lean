@@ -30,3 +30,4 @@ import FriedbergMuchnik.Approximation
 import FriedbergMuchnik.Construction
 import FriedbergMuchnik.StageDynamics
 import FriedbergMuchnik.FiniteInjury
+import FriedbergMuchnik.Invariants
