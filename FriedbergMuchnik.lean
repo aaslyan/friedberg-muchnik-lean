@@ -28,3 +28,4 @@ import FriedbergMuchnik.Foundation.MathlibBridge
 import FriedbergMuchnik.Foundation.RunPrimrec
 import FriedbergMuchnik.Approximation
 import FriedbergMuchnik.Construction
+import FriedbergMuchnik.StageDynamics
