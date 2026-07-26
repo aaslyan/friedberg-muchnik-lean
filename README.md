@@ -68,6 +68,7 @@ computability).
 | `InfiniteEval.lean` | `Computes` as existential closure over fuel; uniqueness; finite↔infinite correspondence (`computes_iff_initialSegment`). | ✅ builds |
 | `Numbering.lean` | Explicit bijection `ℕ ≃ OracleCode`, both round-trips proved — enumeration adequacy for requirement indexing. | ✅ builds |
 | `Reducibility.lean` | `≤ᵀ`, `CE`, `ComputableSet`; reflexivity; computable ⇒ reducible to everything. | ✅ builds |
+| `Composition.lean` | Query substitution `subst` + simulation ⇒ `≤ᵀ` transitivity (`≤ᵀ` is a preorder). | ✅ builds |
 | `MathlibBridge.lean` | `embed` + semantic preservation (`run_embed`); `Partrec` and c.e. transfer. | ✅ builds |
 | `RunPrimrec.lean` | `run` is primitive recursive in Mathlib's sense (`nrun_primrec`, the `primrec_evaln` analog), by memo-table strong recursion on ℕ-encoded codes/results. | ✅ builds |
 | `../Approximation.lean` | Monotone `Finset` stages, stabilization, snapshots, the restraint mechanism and true-stage lemmas. | ✅ builds |
@@ -114,11 +115,15 @@ zero `sorry`:
 
 **The foundation gate is closed** — the priority construction is unblocked.
 
-Off the critical path but part of "done": closure of `≤ᵀ` under
-composition/transitivity via a query-substitution operator (what makes the
-project-local `≤ᵀ` recognizably *standard* Turing reducibility), and a
-non-vacuity certificate (the model's own halting set is `CE` but not
-`ComputableSet`).
+Off the critical path but part of "done" — now closed:
+
+* ✅ closure of `≤ᵀ` under composition: **transitivity**
+  (`TuringReducible.trans`, `Foundation/Composition.lean`) via the
+  query-substitution operator `subst` and its simulation theorem; with
+  reflexivity, the project's `≤ᵀ` is a preorder (`Trans` instance);
+* ✅ non-vacuity: neither constructed set is computable
+  (`Aset_not_computable` / `Bset_not_computable`, `Main.lean`) — so the
+  theorem certifies in-model that c.e. strictly exceeds computable.
 
 ## Building
 

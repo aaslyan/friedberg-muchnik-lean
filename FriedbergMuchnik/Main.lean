@@ -28,4 +28,13 @@ theorem friedberg_muchnik :
     ∃ A B : Set ℕ, CE A ∧ CE B ∧ ¬ (A ≤ᵀ B) ∧ ¬ (B ≤ᵀ A) :=
   ⟨Aset, Bset, ce_Aset, ce_Bset, not_A_le_B, not_B_le_A⟩
 
+/-- Neither constructed set is computable (a computable set would reduce
+to everything, contradicting the incomparability) — so the theorem also
+certifies, inside the model, that c.e. strictly exceeds computable. -/
+theorem Aset_not_computable : ¬ ComputableSet Aset :=
+  fun h => not_A_le_B (h.turingReducible Bset)
+
+theorem Bset_not_computable : ¬ ComputableSet Bset :=
+  fun h => not_B_le_A (h.turingReducible Aset)
+
 end FriedbergMuchnik
