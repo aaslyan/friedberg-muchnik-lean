@@ -1,0 +1,90 @@
+\section{Artifact Evaluation and Proof Engineering}
+
+\subsection{Verified Artifact Facts}
+
+The following facts were checked locally in the repository before drafting.
+The command \texttt{lake build} completed successfully:
+
+\begin{verbatim}
+Build completed successfully (811 jobs).
+\end{verbatim}
+
+The final theorem and axiom footprint were checked with:
+
+\begin{lstlisting}
+import FriedbergMuchnik.Main
+
+#check FriedbergMuchnik.friedberg_muchnik
+#print axioms FriedbergMuchnik.friedberg_muchnik
+\end{lstlisting}
+
+Lean reported that \texttt{friedberg\_muchnik} depends on
+\texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}.  No
+additional project axiom appears in the final theorem's footprint.
+
+\begin{table}
+\centering
+\begin{tabular}{ll}
+\toprule
+Item & Value \\
+\midrule
+Lean toolchain & \texttt{leanprover/lean4:v4.26.0} \\
+Mathlib revision & \texttt{2df2f0150c275ad53cb3c90f7c98ec15a56a1a67} \\
+Lean files under \texttt{FriedbergMuchnik} plus root & 17 \\
+Lean source lines, including comments/blank lines & 4024 \\
+Top-level declarations counted by regex & 178 \\
+\texttt{lake build} & succeeds locally \\
+Final theorem axiom footprint & \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound} \\
+\texttt{sorry}/\texttt{admit}/escape-hatch grep & no source declarations found \\
+Repository license & no \texttt{LICENSE} file found \\
+CI workflow & no \texttt{.github} workflow found \\
+\bottomrule
+\end{tabular}
+\caption{Artifact facts verified from the repository.}
+\end{table}
+
+\subsection{Proof-Engineering Lessons}
+
+The development illustrates several representation lessons.
+
+First, c.e. approximations should be represented as finite positive
+information, not as prefix-fixed Boolean strings.  The latter representation
+would obscure the basic monotonicity of enumeration and risks proving the
+wrong theorem.
+
+Second, use should be recorded by the evaluator itself.  Proving after the
+fact that every successful computation has some finite use would add a
+continuity argument at exactly the point where the priority construction
+needs executable finite data.
+
+Third, finite and infinite semantics should be separated.  The construction
+acts only on finite snapshots and bounded runs; the final theorem speaks
+about total characteristic-function oracles.  The bridge lemmas in
+\texttt{InfiniteEval.lean} and \texttt{Approximation.lean} connect these
+layers without mixing them.
+
+Fourth, finite injury becomes tractable when the informal phrase "injured
+finitely often" is replaced by a bounded rank.  The rank \(0,1,2\) is small
+enough for arithmetic proof but expressive enough to capture appointment
+and action.
+
+Finally, the c.e. proof benefits from a second implementation of the stage
+function.  The mathematical state is convenient for the priority proof; the
+tuple state is convenient for primitive-recursive closure.  The simulation
+theorem keeps these two views synchronized.
+
+\begin{figure}
+\centering
+\input{figures/use-preservation}
+\caption{Use preservation: oracles may differ above the recorded use, but
+agreement below it preserves the same bounded computation.}
+\end{figure}
+
+\begin{figure}
+\centering
+\input{figures/priority-stage}
+\caption{One priority stage preserves higher-priority records, acts for
+the least requirement needing attention, and initializes lower-priority
+records.}
+\end{figure}
+

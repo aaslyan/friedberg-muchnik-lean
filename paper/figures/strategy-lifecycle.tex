@@ -1,0 +1,18 @@
+\begin{tikzpicture}[
+  node distance=12mm,
+  state/.style={draw, rounded corners, align=center, minimum width=32mm, minimum height=8mm, fill=green!6},
+  inj/.style={draw, rounded corners, align=center, minimum width=36mm, minimum height=8mm, fill=red!8},
+  arr/.style={-Latex, thick}
+]
+\node[state] (init) {blank\\\texttt{witness = none}};
+\node[state, right=of init] (wait) {waiting\\\texttt{some x}, unacted};
+\node[state, right=of wait] (acted) {acted\\restrained};
+\node[inj, below=of wait] (injury) {higher-priority action\\initializes lower records};
+
+\draw[arr] (init) -- node[above]{appoint fresh witness} (wait);
+\draw[arr] (wait) -- node[above]{see output \(0\)} (acted);
+\draw[arr] (injury) -- (init);
+\draw[arr] (wait) -- (injury);
+\draw[arr] (acted) -- (injury);
+\end{tikzpicture}
+

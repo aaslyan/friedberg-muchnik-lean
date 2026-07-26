@@ -1,0 +1,45 @@
+\section{Limitations and Future Work}
+\label{sec:limitations}
+
+\subsection{Transitivity of Local Reducibility}
+
+The repository proves the mutual nonreducibility theorem it states, but it
+does not yet develop the full algebra of the local reducibility relation.
+In particular, transitivity of \texttt{TuringReducible} is not currently
+proved.  The final theorem does not require transitivity: it directly shows
+that no local oracle program computes \(Aset\) from \(Bset\), and no local
+oracle program computes \(Bset\) from \(Aset\).
+
+For an internal theory of Turing degrees, transitivity should be added.  A
+natural route is query substitution: given a program computing \(A\) from
+\(B\) and a program computing \(B\) from \(C\), compile a new oracle program
+which replaces each query to \(B\) by the second program run against
+\(C\).  One must then prove correctness and use preservation for this
+compilation.
+
+\subsection{Equivalence With Other Semantics}
+
+The project defines its own oracle-machine model.  It proves an embedding
+of ordinary Mathlib partial recursive codes into the local query-free
+fragment, but it does not prove equivalence with a separate established
+relative-computability framework.  Such a theorem would strengthen the
+connection between the local model and other formalizations of Turing
+reducibility.
+
+\subsection{Reusable Priority Framework}
+
+The finite-injury proof is specialized to Friedberg--Muchnik.  Future work
+could abstract the common ingredients: requirements, strategies, priority
+order, initialization, restraints, and finite progress measures.  This
+could support formalizations of simple sets, splitting theorems, permitting
+arguments, minimal pairs, or infinite-injury constructions.  The current
+development should be seen as a case study and foundation, not a general
+priority library.
+
+\subsection{Artifact Packaging}
+
+No repository license or CI workflow was found at drafting time.  A
+submission artifact should add a license, reproducible build instructions,
+and continuous integration running at least \texttt{lake build} and the
+axiom-footprint check.
+

@@ -1,0 +1,36 @@
+\section{Related Work}
+
+Friedberg's 1957 paper constructed two recursively enumerable sets of
+incomparable degrees and solved Post's problem \cite{friedberg1957}.
+Muchnik independently obtained the same solution in 1956, with an expanded
+publication appearing later \cite{muchnik1956,muchnik1958}.  Soare's
+monograph remains a standard reference for recursively enumerable sets,
+degrees, and priority methods \cite{soare1987}.  The formalization follows
+the finite-injury presentation rather than a reformulation that avoids
+priority machinery.
+
+The Lean development builds on Mathlib's ordinary computability theory.
+Carneiro formalized primitive recursive and partial recursive functions in
+Lean, including universal partial recursive functions and the halting
+problem \cite{carneiro2019}.  Mathlib's current
+\texttt{Partrec} and \texttt{PartrecCode} libraries provide the closure
+theorems and code infrastructure reused here
+\cite{mathlibPartrec,mathlibPartrecCode}.  The present project differs by
+adding a local relative oracle-program semantics with explicit finite uses,
+which is tailored to priority reasoning.
+
+Other proof assistants also contain computability developments.  The
+Isabelle Archive of Formal Proofs includes a universal Turing machine
+formalization with undecidability and computability-theoretic material
+\cite{afpUTM}, building on Isabelle/HOL's mature theorem-proving
+infrastructure \cite{nipkow2002}.  Coq has been used to formalize abstract
+computability through Turing categories \cite{cockett2018}.  These works
+address foundational computability models; the contribution here is a
+direct mechanization of a finite-injury priority argument.
+
+We are not aware of another publicly available Lean formalization of the
+complete Friedberg--Muchnik finite-injury construction.  This claim should
+be treated cautiously: a submission should include a more systematic search
+of formalization archives and unpublished developments before making a
+strong priority claim.
+

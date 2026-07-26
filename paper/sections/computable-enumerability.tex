@@ -1,0 +1,85 @@
+\section{Proving Computable Enumerability}
+
+The final theorem requires more than abstract monotone limits.  The sets
+\texttt{Aset} and \texttt{Bset} must satisfy the repository definition
+\texttt{CE}, i.e. each must be the halting domain of an oracle-free local
+program.  The file \texttt{CE.lean} proves this by combining a
+computability-friendly encoded construction with the Mathlib bridge.
+
+\subsection{Encoded Construction}
+
+The mathematical construction state contains custom structures
+\texttt{ReqState} and \texttt{ConsState}.  Rather than building custom
+\texttt{Primcodable} instances for these types, \texttt{CE.lean} defines a
+parallel tuple representation:
+
+\begin{lstlisting}
+abbrev RS : Type := Option Nat * Bool * Nat
+abbrev St : Type := List Nat * List Nat * List RS * Nat
+
+def encReq (r : ReqState) : RS :=
+  (r.witness, r.acted, r.restraint)
+
+def encSt (st : ConsState) : St :=
+  (st.Alist, st.Blist, st.reqs.map encReq, st.fresh)
+\end{lstlisting}
+
+It then defines tuple-level versions of the convergence check, attention
+predicate, idle step, appointment step, action step, stage step, and full
+stage recursion: \texttt{convCheckN}, \texttt{reqAttN}, \texttt{idleSt},
+\texttt{appointSt}, \texttt{actSt}, \texttt{stepN}, and \texttt{stageN}.
+
+\subsection{Simulation}
+
+The key simulation theorem is:
+
+\begin{lstlisting}
+theorem encSt_stepState (st : ConsState) (s : Nat) :
+    encSt (stepState st s) = stepN (encSt st) s
+\end{lstlisting}
+
+By induction, \texttt{encSt_stage} proves that the encoded construction
+computes the encoding of the mathematical construction at every stage.
+The lemmas \texttt{mem_Alist_iff_stageN} and
+\texttt{mem_Blist_iff_stageN} transfer membership facts between the two
+representations.
+
+Two list-surgery lemmas, \texttt{map_range_set} and \texttt{map_range_act},
+explain how list update and lower-priority initialization are represented
+as maps over \texttt{List.range}.  This representation makes the operations
+amenable to Mathlib's primitive-recursive list combinators.
+
+\subsection{Primitive Recursiveness and Semidecision}
+
+\texttt{CE.lean} proves primitive recursiveness of the encoded transition
+and stage function.  The proof depends on \texttt{nrun_primrec}, the
+primitive-recursive evaluator on numbered oracle codes and finite
+snapshots.  The chain of results is:
+
+\[
+\begin{array}{c}
+\text{Mathlib Primrec/Partrec closure lemmas}\\
+\downarrow\\
+\text{\texttt{nrun\_primrec} and primitive-recursive encoded step}\\
+\downarrow\\
+\text{\texttt{stageN} is primitive recursive}\\
+\downarrow\\
+\text{membership in encoded stage lists is decidable computably}\\
+\downarrow\\
+\exists s,\ x\in A_s \text{ and } \exists s,\ x\in B_s
+\text{ are semidecidable.}
+\end{array}
+\]
+
+The final c.e. theorems are:
+
+\begin{lstlisting}
+theorem ce_Aset : CE Aset
+theorem ce_Bset : CE Bset
+\end{lstlisting}
+
+Each proof builds a Mathlib partial-recursive search over stages using
+\texttt{Partrec.rfind}, then applies \texttt{ce_of_partrec_dom} from
+\texttt{MathlibBridge.lean} to obtain the repository-local \texttt{CE}
+statement.
+

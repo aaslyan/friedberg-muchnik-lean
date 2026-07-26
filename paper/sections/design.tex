@@ -1,0 +1,68 @@
+\section{Design Choices}
+
+\subsection{A Finitary Oracle Model}
+
+The project deliberately does not start from a high-level semantic type of
+oracle functionals such as \(Set\ \N \to \N \to. \N\).  Such a choice would
+require substantial infrastructure before the priority construction could
+begin: an oracle-machine model, continuity or compactness theorems,
+extraction of finite uses from semantic computations, and a connection
+between semantic functionals and executable indices.
+
+Instead, finite execution is primary.  The evaluator runs a concrete
+program for bounded fuel against a partial oracle \(\N\to Option\ Bool\).
+Infinite computation is later defined by existence of a finite successful
+run against a total oracle.  This representation puts exactly the finite
+information used by a priority construction into the main semantic object.
+
+\subsection{Finite Sets Versus Boolean Prefixes}
+
+The construction represents evolving c.e. approximations as monotone finite
+sets:
+
+\begin{lstlisting}
+def StageMono (F : Nat -> Finset Nat) : Prop :=
+  forall s, F s subset F (s + 1)
+
+def limitSet (F : Nat -> Finset Nat) : Set Nat :=
+  {n | exists s, n in F s}
+\end{lstlisting}
+
+The actual syntax uses Lean's \texttt{\(\subseteq\)} and \texttt{\(\in\)}
+notation.  Boolean lists appear separately as snapshots.  This separation
+is one of the important design decisions: a stage set can enumerate new
+positive information at any later stage, while a snapshot merely supplies a
+finite window of answers to one bounded oracle computation.
+
+\subsection{Hybrid Use of Mathlib}
+
+The development separates project-local oracle reasoning from ordinary
+computability closure proofs.  Project-local files define oracle syntax,
+bounded evaluation, infinite semantics, reducibility, the construction,
+invariants, finite injury, and satisfaction of requirements.  Mathlib's
+computability library enters through \texttt{MathlibBridge.lean},
+\texttt{RunPrimrec.lean}, and the c.e. proof in \texttt{CE.lean}.  This
+boundary allows the priority proof to reason about explicit finite uses
+while still reusing Mathlib's closure theorems for primitive-recursive and
+partial-recursive functions \cite{carneiro2019,mathlibPartrec}.
+
+\subsection{Local Reducibility Vocabulary}
+
+The central reducibility definition is:
+
+\begin{lstlisting}
+def TuringReducible (A B : Set Nat) : Prop :=
+  exists c : OracleCode,
+    forall x : Nat,
+      Computes c (charFun B) x (natOfBool (charFun A x))
+\end{lstlisting}
+
+Thus \(A\leq_T B\) means that a project-local oracle program computes the
+characteristic function of \(A\) using the total characteristic function of
+\(B\) as oracle.  The development proves reflexivity
+\texttt{TuringReducible.refl}, that computable sets reduce to every oracle
+via \texttt{ComputableSet.turingReducible}, and an effective bijection
+between natural numbers and \texttt{OracleCode}.  It does not yet prove
+composition or transitivity of \texttt{TuringReducible}; that limitation is
+discussed in Section~\ref{sec:limitations}.
+

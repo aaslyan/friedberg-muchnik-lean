@@ -1,0 +1,53 @@
+\section{Artifact Reproduction}
+
+The repository is available at:
+
+\begin{verbatim}
+https://github.com/aaslyan/friedberg-muchnik-lean
+\end{verbatim}
+
+A fresh build should use:
+
+\begin{verbatim}
+git clone https://github.com/aaslyan/friedberg-muchnik-lean
+cd friedberg-muchnik-lean
+lake exe cache get
+lake build
+\end{verbatim}
+
+To check the final theorem and axiom footprint:
+
+\begin{verbatim}
+cat >/tmp/check_fm.lean <<'EOF'
+import FriedbergMuchnik.Main
+
+#check FriedbergMuchnik.friedberg_muchnik
+#print axioms FriedbergMuchnik.friedberg_muchnik
+EOF
+
+lake env lean /tmp/check_fm.lean
+\end{verbatim}
+
+At drafting time this reported:
+
+\begin{verbatim}
+FriedbergMuchnik.friedberg_muchnik :
+  exists A B,
+    FriedbergMuchnik.CE A /\
+      FriedbergMuchnik.CE B /\
+        not FriedbergMuchnik.TuringReducible A B /\
+        not FriedbergMuchnik.TuringReducible B A
+'FriedbergMuchnik.friedberg_muchnik' depends on axioms:
+  [propext, Classical.choice, Quot.sound]
+\end{verbatim}
+
+To search for common proof escape hatches:
+
+\begin{verbatim}
+rg -n "sorry|admit|axiom|unsafe|opaque|extern|implemented_by|native_decide" \
+  FriedbergMuchnik FriedbergMuchnik.lean lakefile.lean README.md STATUS.md
+\end{verbatim}
+
+At drafting time this command found only documentation mentions of
+\texttt{sorry}/\texttt{axiom}, not source declarations.
+

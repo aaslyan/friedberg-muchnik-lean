@@ -1,0 +1,65 @@
+\section{Introduction}
+
+Post's problem asks whether there is a computably enumerable set whose
+Turing degree is neither computable nor complete.  Friedberg and Muchnik
+answered this question independently by constructing two computably
+enumerable sets of incomparable degree \cite{friedberg1957,muchnik1956}.
+The method introduced in these proofs, now called the priority method, is
+one of the defining proof techniques of classical computability theory.
+
+Priority arguments are difficult formalization targets because their
+textbook presentation relies on disciplined but informal temporal
+reasoning.  A proof says to choose a fresh witness, wait until a computation
+converges, preserve the computation by restraining future enumeration below
+its use, initialize lower-priority strategies when a stronger strategy
+acts, and then argue that higher-priority strategies eventually stop
+acting.  In a proof assistant these phrases must become explicit data and
+theorems: a state component for witnesses and restraints, a decidable
+attention predicate, a deterministic transition function, a preserved
+invariant, and an induction proving eventual stability.
+
+This paper describes a Lean 4 formalization of the Friedberg--Muchnik
+theorem.  The central contribution is not a new mathematical proof of the
+classical theorem, but a machine-checked account of the finite-injury
+method in which finite oracle computations, uses, restraints,
+initialization, attention, injury, eventual stability, and effective stage
+construction are all represented directly.  The development is organized
+around a project-local oracle-machine model, with Mathlib used only for
+ordinary primitive-recursive and partial-recursive closure obligations.
+
+The final theorem is:
+
+\begin{lstlisting}
+theorem friedberg_muchnik :
+    exists A B : Set Nat,
+      CE A /\ CE B /\ not (A <=T B) /\ not (B <=T A)
+\end{lstlisting}
+
+In the actual Lean source the relation is named
+\texttt{TuringReducible} and displayed with scoped notation
+\texttt{\(\leq\)\textsuperscript{T}}.  The theorem is proved by taking the
+two limit sets \texttt{Aset} and \texttt{Bset}, proving them c.e. in
+\texttt{CE.lean}, and proving the two nonreducibilities in
+\texttt{Requirements.lean}.
+
+The contributions are:
+
+\begin{enumerate}
+\item an explicit finite oracle semantics with output and use tracking;
+\item a verified agreement-below-use preservation theorem;
+\item a complete stage-by-stage formalization of the Friedberg--Muchnik
+  priority construction;
+\item a finite-injury proof based on a formal rank and induction over
+  priority;
+\item a computability proof showing that the limiting sets are genuinely
+  c.e.; and
+\item a final theorem stated in set-theoretic computability vocabulary.
+\end{enumerate}
+
+The paper is careful about the scope of the local reducibility relation.
+The final theorem proves mutual nonreducibility in the project's
+oracle-machine model.  Reflexivity, the effective program numbering, and
+basic sanity lemmas are proved, but transitivity of the local reducibility
+relation is not currently part of the repository.  We therefore treat the
+full internal development of Turing degrees as future work.
+

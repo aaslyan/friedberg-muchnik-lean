@@ -1,0 +1,77 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage[strings]{underscore}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,calc}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!55!black,
+  citecolor=blue!55!black,
+  urlcolor=blue!55!black
+}
+
+\lstdefinelanguage{Lean}{
+  keywords={def,theorem,structure,inductive,where,namespace,end,by,if,then,else,match,with,let,fun,import,abbrev},
+  sensitive=true,
+  morecomment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  morestring=[b]"
+}
+\lstset{
+  language=Lean,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue!60!black},
+  commentstyle=\color{gray!70!black},
+  columns=fullflexible,
+  keepspaces=true,
+  frame=single,
+  breaklines=true
+}
+
+\title{A Machine-Checked Finite-Injury Priority Argument:\\
+The Friedberg--Muchnik Theorem in Lean 4}
+\author{Anonymous Artifact Draft}
+\date{}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\ce}{\mathrm{c.e.}}
+\newcommand{\leT}{\leq_T}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\input{sections/abstract}
+\end{abstract}
+
+\input{sections/introduction}
+\input{sections/background}
+\input{sections/design}
+\input{sections/oracle-semantics}
+\input{sections/construction}
+\input{sections/finite-injury}
+\input{sections/computable-enumerability}
+\input{sections/evaluation}
+\input{sections/related-work}
+\input{sections/limitations}
+\input{sections/conclusion}
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\appendix
+\input{appendix/theorem-map}
+\input{appendix/artifact}
+
+\end{document}
+

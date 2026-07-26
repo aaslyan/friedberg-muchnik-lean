@@ -1,0 +1,25 @@
+\section{Conclusion}
+
+The formalization demonstrates that a classical finite-injury priority
+argument can be represented directly in Lean 4.  The proof turns informal
+temporal reasoning into finite executable stages, explicit state
+components, preserved invariants, recorded semantic uses, bounded progress,
+and machine-checked stabilization.
+
+The central methodological lesson is that priority arguments are not
+inherently beyond current interactive theorem provers, but they require
+representations that expose finite information.  In this development,
+finite oracle snapshots coexist with monotone positive stage sets;
+successful computations carry their own uses; finite stage semantics and
+infinite oracle semantics are bridged by explicit theorems; and finite
+injury is reduced to a small rank argument after higher priorities become
+quiet.
+
+The final theorem establishes two computably enumerable limit sets which
+are mutually nonreducible in the project's oracle-machine model.  Extending
+the local reducibility relation with transitivity and connecting it to
+other relative-computability semantics would make the degree-theoretic
+interpretation fully internal.  Even in its present form, the artifact
+provides a detailed machine-checked account of the finite-injury method and
+a basis for further formalized computability theory.
+

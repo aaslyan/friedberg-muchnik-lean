@@ -1,0 +1,30 @@
+\begin{tikzpicture}[
+  node distance=7mm,
+  box/.style={draw, rounded corners, align=center, minimum width=35mm, minimum height=8mm, fill=blue!4},
+  mbox/.style={draw, rounded corners, align=center, minimum width=35mm, minimum height=8mm, fill=orange!12},
+  arr/.style={-Latex, thick}
+]
+\node[box] (oracle) {OracleCode\\FiniteEval};
+\node[box, right=of oracle] (use) {Use\\InfiniteEval};
+\node[box, below=of oracle] (approx) {Approximation};
+\node[box, below=of use] (construct) {Construction\\StageDynamics};
+\node[box, below=of construct] (inv) {Invariants\\FiniteInjury};
+\node[box, below=of inv] (req) {Requirements};
+\node[box, right=15mm of inv] (ce) {CE};
+\node[box, below=of req] (main) {Main theorem};
+\node[mbox, right=15mm of use] (mathlib) {Mathlib\\Primrec/Partrec};
+\node[box, below=of mathlib] (bridge) {MathlibBridge\\RunPrimrec};
+
+\draw[arr] (oracle) -- (use);
+\draw[arr] (oracle) -- (approx);
+\draw[arr] (use) -- (construct);
+\draw[arr] (approx) -- (construct);
+\draw[arr] (construct) -- (inv);
+\draw[arr] (inv) -- (req);
+\draw[arr] (req) -- (main);
+\draw[arr] (construct) -- (ce);
+\draw[arr] (bridge) -- (ce);
+\draw[arr] (ce) |- (main);
+\draw[arr] (mathlib) -- (bridge);
+\end{tikzpicture}
+

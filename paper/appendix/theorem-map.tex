@@ -1,0 +1,34 @@
+\section{Textbook-to-Lean Map}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{llll}
+\toprule
+Textbook concept & Lean representation & Main declaration & File \\
+\midrule
+Oracle program & program syntax & \texttt{OracleCode} & \texttt{Foundation/OracleCode.lean} \\
+Finite computation & bounded evaluator & \texttt{run} & \texttt{Foundation/FiniteEval.lean} \\
+Output/use & halting data & \texttt{HaltData} & \texttt{Foundation/FiniteEval.lean} \\
+Use preservation & agreement below use & \texttt{run\_halt\_mono} & \texttt{Foundation/Use.lean} \\
+Infinite computation & existential finite run & \texttt{Computes} & \texttt{Foundation/InfiniteEval.lean} \\
+Program enumeration & code numbering & \texttt{ofNatCode\_encodeCode} & \texttt{Foundation/Numbering.lean} \\
+c.e. approximation & monotone stages & \texttt{StageMono} & \texttt{Approximation.lean} \\
+Limit set & union of stages & \texttt{limitSet} & \texttt{Approximation.lean} \\
+Requirement state & strategy record & \texttt{ReqState} & \texttt{Construction.lean} \\
+Witness & strategy field & \texttt{witness} & \texttt{Construction.lean} \\
+Restraint & strategy field & \texttt{restraint} & \texttt{Construction.lean} \\
+Attention & stage predicate & \texttt{requiresAttention} & \texttt{Construction.lean} \\
+Priority action & deterministic step & \texttt{stepAt}, \texttt{stepState} & \texttt{Construction.lean} \\
+No upward injury & record preservation & \texttt{reqs\_getElem?\_succ\_of\_lt} & \texttt{StageDynamics.lean} \\
+Invariant package & construction invariant & \texttt{ConsInv}, \texttt{consInv\_stage} & \texttt{Invariants.lean} \\
+Finite injury & eventual quietness & \texttt{quiet\_above} & \texttt{FiniteInjury.lean} \\
+Stabilization & final record & \texttt{exists\_stable} & \texttt{FiniteInjury.lean} \\
+Diagonalization & requirement satisfaction & \texttt{R\_satisfied}, \texttt{S\_satisfied} & \texttt{Requirements.lean} \\
+c.e. limit set & semidecision & \texttt{ce\_Aset}, \texttt{ce\_Bset} & \texttt{CE.lean} \\
+Final theorem & assembly & \texttt{friedberg\_muchnik} & \texttt{Main.lean} \\
+\bottomrule
+\end{tabular}
+\caption{Mapping between textbook proof concepts and Lean declarations.}
+\end{table}
+

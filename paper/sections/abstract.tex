@@ -1,0 +1,26 @@
+The Friedberg--Muchnik theorem constructs two computably enumerable sets
+which are mutually nonreducible, giving the first solution to Post's
+problem.  Its classical proof is a finite-injury priority argument: it
+maintains evolving witnesses and restraints, initializes lower-priority
+strategies, and proves that every strategy is eventually stable.  We
+describe a Lean 4 formalization of this argument in the repository
+\texttt{friedberg-muchnik-lean}.  The development does not take oracle
+computation as a black-box semantic relation.  Instead, it defines an
+explicit language of oracle programs and a step-indexed evaluator over
+finite oracle information.  Successful bounded evaluations record both
+their output and a strict upper bound on the oracle positions queried; the
+central use theorem proves preservation of such computations under extra
+fuel and oracle agreement below the recorded use.  On this foundation, the
+project formalizes the stage construction, the priority ordering, the
+attention predicate, initialization, restraints, and limit sets.  Finite
+injury is proved by a rank argument after higher-priority requirements
+become quiet.  A separate computability layer gives an encoded
+implementation of the stage function, proves it primitive recursive using
+Mathlib's ordinary computability infrastructure, and derives that the two
+limits are computably enumerable.  The final Lean theorem states
+\[
+  \exists A B : \mathrm{Set}\ \N,\ CE(A)\wedge CE(B)\wedge
+  \neg(A \leq_T B)\wedge \neg(B \leq_T A)
+\]
+for the project's local oracle-machine reducibility relation.
+

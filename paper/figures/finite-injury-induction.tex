@@ -1,0 +1,16 @@
+\begin{tikzpicture}[
+  node distance=10mm,
+  box/.style={draw, rounded corners, align=center, minimum width=42mm, minimum height=9mm, fill=purple!6},
+  arr/.style={-Latex, thick}
+]
+\node[box] (ih) {all \(j<i\) eventually quiet};
+\node[box, below=of ih] (rank) {after that stage\\rank of \(i\) cannot decrease};
+\node[box, below=of rank] (att) {each attention to \(i\)\\strictly increases rank};
+\node[box, below=of att] (bound) {rank \(\le 2\)};
+\node[box, below=of bound] (quiet) {therefore \(i\) eventually quiet};
+\draw[arr] (ih) -- (rank);
+\draw[arr] (rank) -- (att);
+\draw[arr] (att) -- (bound);
+\draw[arr] (bound) -- (quiet);
+\end{tikzpicture}
+
