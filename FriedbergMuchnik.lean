@@ -27,6 +27,7 @@ import FriedbergMuchnik.Foundation.Reducibility
 import FriedbergMuchnik.Foundation.Composition
 import FriedbergMuchnik.Foundation.MathlibBridge
 import FriedbergMuchnik.Foundation.RunPrimrec
+import FriedbergMuchnik.Foundation.MathlibOracleBridge
 import FriedbergMuchnik.Approximation
 import FriedbergMuchnik.Construction
 import FriedbergMuchnik.StageDynamics
