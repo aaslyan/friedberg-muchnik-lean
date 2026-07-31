@@ -258,10 +258,17 @@ theorem mem_Blist_iff_stageN (x s : ℕ) :
   rw [← encSt_stage]
   exact Iff.rfl
 
-/-! ### Primitive recursiveness of the parallel implementation -/
+/-! ### Generic `Primrec` helpers
 
+The next three lemmas say nothing about this construction: `List.find?`,
+list membership and `snapshotOf` are primitive recursive.  They are stated
+publicly because any priority construction built on this development needs
+them — a stage function that consults a priority list and a snapshot oracle
+cannot be shown computable without them. -/
 
-private theorem primrec_find? {α β : Type _} [Primcodable α] [Primcodable β]
+/-- `List.find?` is primitive recursive (as a `foldr` accumulating the
+first hit). -/
+theorem primrec_find? {α β : Type _} [Primcodable α] [Primcodable β]
     {f : α → List β} {p : α → β → Bool} (hf : Primrec f) (hp : Primrec₂ p) :
     Primrec fun a => (f a).find? (p a) := by
   have h : Primrec fun a => (f a).foldr
@@ -278,7 +285,8 @@ private theorem primrec_find? {α β : Type _} [Primcodable α] [Primcodable β]
     | true => simp [hpb]
     | false => simp [hpb, ih]
 
-private theorem primrec_memDecide :
+/-- Membership in a list of naturals is primitive recursive. -/
+theorem primrec_memDecide :
     Primrec₂ fun (x : ℕ) (l : List ℕ) => decide (x ∈ l) := by
   have heqd : Primrec fun q : (ℕ × List ℕ) × ℕ × Bool =>
       decide (q.1.1 = q.2.1) :=
@@ -294,7 +302,10 @@ private theorem primrec_memDecide :
   | nil => simp
   | cons b l ih => simp [List.mem_cons, ih]
 
-private theorem primrec_snapshotOf : Primrec₂ snapshotOf := by
+/-- The Boolean snapshot of a list is primitive recursive in the list and
+the bound — so a stage function may feed the current enumeration to the
+evaluator as an oracle and stay computable. -/
+theorem primrec_snapshotOf : Primrec₂ snapshotOf := by
   have h : Primrec fun q : List ℕ × ℕ =>
       (List.range q.2).map fun j => decide (j ∈ q.1) :=
     Primrec.list_map (Primrec.list_range.comp Primrec.snd)
