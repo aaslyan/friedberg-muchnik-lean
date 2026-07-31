@@ -273,14 +273,14 @@ open scoped OracleComputability in
 /-- `A` is not Turing reducible to `B`: any candidate reduction is
 `ofNatCode e` for its own number `e` (enumeration adequacy), and `R_e`
 kills it. -/
-theorem not_A_le_B : ¬ TuringReducible Aset Bset := by
+theorem not_A_le_B : ¬ OracleComputability.TuringReducible Aset Bset := by
   rintro ⟨c, hc⟩
   refine R_satisfied (OracleCode.encodeCode c) (fun x => ?_)
   rw [OracleCode.ofNatCode_encodeCode]
   exact hc x
 
 /-- `B` is not Turing reducible to `A`. -/
-theorem not_B_le_A : ¬ TuringReducible Bset Aset := by
+theorem not_B_le_A : ¬ OracleComputability.TuringReducible Bset Aset := by
   rintro ⟨c, hc⟩
   refine S_satisfied (OracleCode.encodeCode c) (fun x => ?_)
   rw [OracleCode.ofNatCode_encodeCode]

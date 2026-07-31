@@ -36,6 +36,9 @@ Contents:
 * `Reducibility` — `≤ᵀ`, `CE`, `ComputableSet` and their hygiene lemmas;
 * `Composition` — `≤ᵀ` is transitive, by query substitution;
 * `MathlibBridge` — transfer of ordinary computability into the model;
+* `MathlibOracleBridge` — the *oracle*-level counterpart: Mathlib's
+  `RecursiveIn` model from `Mathlib.Computability.TuringDegree`, related to
+  the local semantics without changing them;
 * `RunPrimrec` — the evaluator is primitive recursive (`nrun_primrec`),
   plus the generic `Primrec` helpers a stage function needs;
 * `Approximation` — monotone finite stages, snapshots, and **the restraint
@@ -49,6 +52,7 @@ import OracleComputability.InfiniteEval
 import OracleComputability.Numbering
 import OracleComputability.Reducibility
 import OracleComputability.Composition
+import OracleComputability.MathlibOracleBridge
 import OracleComputability.MathlibBridge
 import OracleComputability.RunPrimrec
 import OracleComputability.Priority

@@ -70,6 +70,6 @@ theorem halfSet_ne {ec i : ℕ} (hA : ¬ ComputableSet (enumSet ec)) (hi : i < 2
   intro h
   refine not_reducible_half hA hi ?_
   rw [h]
-  exact TuringReducible.refl _
+  exact OracleComputability.TuringReducible.refl _
 
 end SacksSplitting
