@@ -61,15 +61,6 @@ theorem sacks_splitting :
   obtain ⟨ec, rfl⟩ := ce_eq_enumSet hce
   exact sacks_splitting_core ec hnc
 
-/-- **Non-vacuity**, and a direct consumer of Friedberg–Muchnik: the set
-`Aset` built by FM's priority construction is c.e. (`ce_Aset`) and not
-computable (`Aset_not_computable`), so it satisfies the hypotheses and
-splits.  Both facts are imported from the FM package unchanged. -/
-theorem sacks_splitting_friedbergMuchnik :
-    ∃ A₀ A₁ : Set ℕ, CE A₀ ∧ CE A₁ ∧ Disjoint A₀ A₁ ∧ A₀ ∪ A₁ = Aset ∧
-      ¬ (Aset ≤ᵀ A₀) ∧ ¬ (Aset ≤ᵀ A₁) :=
-  sacks_splitting Aset ce_Aset Aset_not_computable
-
 /-- The split is non-trivial: neither half is all of `A`.  (If it were,
 reflexivity of `≤ᵀ` would hand back the reduction the requirements just
 ruled out — the same sanity check FM makes with

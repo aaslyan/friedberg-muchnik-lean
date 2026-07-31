@@ -24,7 +24,7 @@ only ever *produced* `CE` facts and never *consumed* one.
 Everything in this file is deliberately built from `nrun`, the numbered-code
 form of the evaluator, so that `CE.lean` can show it primitive recursive.
 -/
-import FriedbergMuchnik
+import OracleComputability
 
 namespace SacksSplitting
 

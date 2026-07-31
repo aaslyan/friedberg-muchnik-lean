@@ -26,9 +26,10 @@ derivation and the `Partrec.rfind` + `ce_of_partrec_dom` ending are FM's,
 in shape and in tactic.
 
 Three generic helpers — `primrec_find?`, `primrec_memDecide`,
-`primrec_snapshotOf` — are imported from `FriedbergMuchnik.CE`.  They were
-`private` there; de-privatising them was the only change the FM repo
-needed to serve as a foundation.
+`primrec_snapshotOf` — come from `OracleComputability.PrimrecTools`.  They
+began life `private` inside Friedberg–Muchnik's own `CE.lean`, invisible to
+anything downstream; that they are now shared foundation is the whole
+point of the split.
 -/
 import SacksSplitting.Construction
 

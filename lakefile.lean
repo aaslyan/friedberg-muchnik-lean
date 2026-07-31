@@ -26,6 +26,11 @@ lean_lib «OracleComputability» where
 @[default_target]
 lean_lib «FriedbergMuchnik» where
 
-/-- The Sacks Splitting Theorem, built on the same foundation. -/
+/-- The Sacks Splitting Theorem, built on the same foundation.  Does *not*
+depend on `FriedbergMuchnik`; that independence is the point. -/
 @[default_target]
 lean_lib «SacksSplitting» where
+
+/-- The root: the one place the two priority arguments meet. -/
+@[default_target]
+lean_lib «PriorityArguments» where
