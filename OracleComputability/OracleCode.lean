@@ -12,7 +12,7 @@ computability library.  In particular, changes to Mathlib's internal coding
 decisions cannot contaminate the priority argument.
 -/
 
-namespace FriedbergMuchnik
+namespace OracleComputability
 
 /-- Programs of the oracle machine model.
 
@@ -59,4 +59,4 @@ inductive OracleCode : Type where
   | rfind (f : OracleCode)
   deriving DecidableEq, Repr
 
-end FriedbergMuchnik
+end OracleComputability

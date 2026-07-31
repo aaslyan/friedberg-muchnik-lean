@@ -21,6 +21,8 @@ import FriedbergMuchnik.StageDynamics
 
 namespace FriedbergMuchnik
 
+open OracleComputability
+
 /-! ### The encoded state -/
 
 /-- Encoded requirement record: (witness, acted, restraint). -/

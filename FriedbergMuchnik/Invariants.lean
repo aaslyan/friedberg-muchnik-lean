@@ -28,6 +28,8 @@ import FriedbergMuchnik.StageDynamics
 
 namespace FriedbergMuchnik
 
+open OracleComputability
+
 /-! ### Record access in the three transition shapes -/
 
 theorem append_singleton_getElem?_cases {α : Type _} {l : List α} {b : α}

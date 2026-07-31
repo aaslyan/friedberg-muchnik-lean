@@ -32,7 +32,7 @@ import Mathlib.Computability.Primrec
 import OracleComputability.FiniteEval
 import OracleComputability.Numbering
 
-namespace FriedbergMuchnik
+namespace OracleComputability
 
 /-! ### Results as naturals -/
 
@@ -594,4 +594,4 @@ theorem nrun_primrec :
   exact (Primrec.option_getD.comp htab (Primrec.const 0)).of_eq
     fun p => (nrun_eq_tabRow _ _ _ _).symm
 
-end FriedbergMuchnik
+end OracleComputability

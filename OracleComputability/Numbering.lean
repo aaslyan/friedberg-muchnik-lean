@@ -20,7 +20,7 @@ the `n + 5` pattern of the decoder matches syntactically in proofs.
 import Mathlib.Data.Nat.Pairing
 import OracleComputability.OracleCode
 
-namespace FriedbergMuchnik
+namespace OracleComputability
 
 namespace OracleCode
 
@@ -166,4 +166,4 @@ theorem encodeCode_injective : Function.Injective encodeCode :=
 
 end OracleCode
 
-end FriedbergMuchnik
+end OracleComputability

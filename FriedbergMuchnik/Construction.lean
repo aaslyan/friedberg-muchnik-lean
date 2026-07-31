@@ -37,6 +37,8 @@ import OracleComputability.Approximation
 
 namespace FriedbergMuchnik
 
+open OracleComputability
+
 /-! ### Construction state -/
 
 /-- The record the construction keeps for one requirement. -/

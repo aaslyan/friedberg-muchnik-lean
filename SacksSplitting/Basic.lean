@@ -28,7 +28,7 @@ import OracleComputability
 
 namespace SacksSplitting
 
-open FriedbergMuchnik
+open OracleComputability
 
 /-! ### A Boolean filter written as a `foldr`
 

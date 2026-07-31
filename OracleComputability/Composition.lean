@@ -19,7 +19,7 @@ bound rather than preserving the original one; outputs — the only thing
 -/
 import OracleComputability.Reducibility
 
-namespace FriedbergMuchnik
+namespace OracleComputability
 
 /-- Substitute the program `q` for every `query` node of a code:
 relativized composition at the syntax level. -/
@@ -196,4 +196,4 @@ theorem TuringReducible.trans {A B C : Set ℕ}
 instance : Trans TuringReducible TuringReducible TuringReducible :=
   ⟨TuringReducible.trans⟩
 
-end FriedbergMuchnik
+end OracleComputability

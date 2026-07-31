@@ -25,7 +25,7 @@ semantics by a single structural induction.
 import Mathlib.Data.Nat.Pairing
 import OracleComputability.OracleCode
 
-namespace FriedbergMuchnik
+namespace OracleComputability
 
 /-- The data recorded by a halting bounded computation: the `output`, and a
 strict upper bound `use` on the oracle positions that were queried.  A
@@ -249,4 +249,4 @@ theorem run_halt_input_lt {k : ℕ} {O : PartOracle} {c : OracleCode} {x : ℕ}
     · rw [run_input_guard O c hx] at h
       exact absurd h (by simp)
 
-end FriedbergMuchnik
+end OracleComputability

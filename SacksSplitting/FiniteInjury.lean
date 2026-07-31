@@ -44,7 +44,7 @@ import SacksSplitting.CE
 
 namespace SacksSplitting
 
-open FriedbergMuchnik
+open OracleComputability
 
 /-! ### Small bridges between `decide`, `natOfBool` and `charFun` -/
 

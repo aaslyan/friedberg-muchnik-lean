@@ -12,7 +12,7 @@ are immediate corollaries of the master use theorem `run_halt_mono`.
 -/
 import OracleComputability.Use
 
-namespace FriedbergMuchnik
+namespace OracleComputability
 
 /-- `Computes c X x y`: program `c`, run with the total oracle `X`, halts on
 input `x` with output `y` (for some — equivalently, all sufficiently large —
@@ -72,4 +72,4 @@ theorem computes_iff_initialSegment {c : OracleCode} {X : ℕ → Bool} {x y : �
   · rintro ⟨k, u, d, h, rfl⟩
     exact ⟨k, d, run_halt_of_consistent (consistent_initialSegment X u) h, rfl⟩
 
-end FriedbergMuchnik
+end OracleComputability

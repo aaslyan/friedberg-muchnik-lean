@@ -30,7 +30,7 @@ Corollaries proved here:
 -/
 import OracleComputability.FiniteEval
 
-namespace FriedbergMuchnik
+namespace OracleComputability
 
 /-- Auxiliary, fully-explicit form of the use principle; the recursion
 mirrors the recursion defining `run` (fuel first, then code), so the
@@ -235,4 +235,4 @@ theorem run_halt_unique {k k' : ℕ} {O O' : PartOracle} {X : ℕ → Bool}
   rw [h₁] at h₂
   exact RunResult.halt.inj h₂
 
-end FriedbergMuchnik
+end OracleComputability

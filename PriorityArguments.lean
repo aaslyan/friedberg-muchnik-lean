@@ -31,8 +31,8 @@ import SacksSplitting
 
 namespace PriorityArguments
 
+open OracleComputability
 open FriedbergMuchnik
-open scoped FriedbergMuchnik
 
 /-- **The two theorems, composed.**  `Aset` — one of the incomparable c.e.
 sets built by the Friedberg–Muchnik construction — is c.e. (`ce_Aset`) and

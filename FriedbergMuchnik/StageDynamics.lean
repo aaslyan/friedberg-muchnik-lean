@@ -22,6 +22,8 @@ import FriedbergMuchnik.Construction
 
 namespace FriedbergMuchnik
 
+open OracleComputability
+
 /-! ### The attended requirement -/
 
 /-- The stage-`(s+1)` pre-state: the stage-`s` state with the blank record

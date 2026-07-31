@@ -25,8 +25,8 @@ import SacksSplitting.FiniteInjury
 
 namespace SacksSplitting
 
-open FriedbergMuchnik
-open scoped FriedbergMuchnik
+open OracleComputability
+open scoped OracleComputability
 
 /-- Neither half computes the set it splits.  A candidate reduction is an
 oracle program `c`; requirement `2 * encodeCode c + i` is the one that

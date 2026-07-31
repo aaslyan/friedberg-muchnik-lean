@@ -39,7 +39,7 @@ import SacksSplitting.Basic
 
 namespace SacksSplitting
 
-open FriedbergMuchnik
+open OracleComputability
 
 /-! ### The construction state
 

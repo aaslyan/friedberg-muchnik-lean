@@ -29,7 +29,7 @@ import Mathlib.Computability.PartrecCode
 import OracleComputability.Use
 import OracleComputability.Reducibility
 
-namespace FriedbergMuchnik
+namespace OracleComputability
 
 open Nat.Partrec (Code)
 
@@ -239,4 +239,4 @@ theorem ce_of_partrec_dom {f : ℕ →. ℕ} (hf : Nat.Partrec f) {A : Set ℕ}
         Code.evaln_complete.mpr ⟨k, Option.mem_def.mpr hev⟩
       exact Part.dom_iff_mem.mpr ⟨y, hy⟩
 
-end FriedbergMuchnik
+end OracleComputability

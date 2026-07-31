@@ -15,7 +15,7 @@ started.
 import OracleComputability.RunPrimrec
 import OracleComputability.Approximation
 
-namespace FriedbergMuchnik
+namespace OracleComputability
 
 /-- `List.find?` is primitive recursive (as a `foldr` accumulating the
 first hit). -/
@@ -63,4 +63,4 @@ theorem primrec_snapshotOf : Primrec₂ snapshotOf := by
       (primrec_memDecide.comp Primrec.snd (Primrec.fst.comp Primrec.fst))
   exact h
 
-end FriedbergMuchnik
+end OracleComputability

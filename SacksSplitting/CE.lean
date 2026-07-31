@@ -35,7 +35,7 @@ import SacksSplitting.Construction
 
 namespace SacksSplitting
 
-open FriedbergMuchnik
+open OracleComputability
 
 /-! ### Filtering -/
 

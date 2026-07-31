@@ -29,7 +29,7 @@ import Mathlib.Data.Finset.Basic
 import OracleComputability.Use
 import OracleComputability.Reducibility
 
-namespace FriedbergMuchnik
+namespace OracleComputability
 
 /-- A monotone stage sequence: stages only ever grow (enumeration without
 removal).  This, and not prefix-monotonicity of strings, is what "c.e.
@@ -236,4 +236,4 @@ theorem run_halt_toFinset_snapshot {l : List ℕ} {k s : ℕ} {c : OracleCode}
   rw [PartOracle.ofSnapshot_apply, snapshotOf_getElem? (by omega)]
   simp [List.mem_toFinset]
 
-end FriedbergMuchnik
+end OracleComputability

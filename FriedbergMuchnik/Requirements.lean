@@ -26,6 +26,8 @@ import FriedbergMuchnik.Invariants
 
 namespace FriedbergMuchnik
 
+open OracleComputability
+
 /-! ### Small helpers -/
 
 theorem requiresAttention_of_no_witness {st : ConsState} {s i : ℕ}
@@ -267,7 +269,7 @@ theorem S_satisfied (e : ℕ) :
 
 /-! ### The two non-reducibilities -/
 
-open scoped FriedbergMuchnik in
+open scoped OracleComputability in
 /-- `A` is not Turing reducible to `B`: any candidate reduction is
 `ofNatCode e` for its own number `e` (enumeration adequacy), and `R_e`
 kills it. -/

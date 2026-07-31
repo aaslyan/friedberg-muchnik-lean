@@ -41,7 +41,7 @@ import SacksSplitting.Requirements
 
 namespace SacksSplitting
 
-open FriedbergMuchnik
+open OracleComputability
 
 /-! ### Indexing a list of per-requirement data -/
 

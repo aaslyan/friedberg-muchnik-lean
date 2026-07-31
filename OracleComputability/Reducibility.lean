@@ -21,7 +21,7 @@ part of the project's foundation obligations, not afterthoughts.
 import Mathlib.Data.Set.Basic
 import OracleComputability.InfiniteEval
 
-namespace FriedbergMuchnik
+namespace OracleComputability
 
 open Classical in
 /-- The characteristic function of a set of naturals (classical: sets are
@@ -91,4 +91,4 @@ composition layer and is deferred there.  It is not needed for the
 Friedberg–Muchnik theorem: the constructed sets are proved c.e. directly
 from their monotone stage enumerations. -/
 
-end FriedbergMuchnik
+end OracleComputability

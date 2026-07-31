@@ -26,6 +26,8 @@ import FriedbergMuchnik.StageDynamics
 
 namespace FriedbergMuchnik
 
+open OracleComputability
+
 /-! ### Record stability -/
 
 /-- One quiet step: if nothing of priority `≤ i` receives attention at

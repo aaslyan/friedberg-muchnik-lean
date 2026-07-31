@@ -15,7 +15,7 @@ so it belongs to neither of them.
 -/
 import Mathlib.Data.List.Basic
 
-namespace FriedbergMuchnik
+namespace OracleComputability
 
 /-- `List.find?` over a `range` finds the least satisfying index, and every
 index below it fails the test. -/
@@ -47,4 +47,4 @@ theorem range_find?_least {n : ℕ} {p : ℕ → Bool} {i : ℕ}
     exact hj
   simpa using hfail j hjas
 
-end FriedbergMuchnik
+end OracleComputability

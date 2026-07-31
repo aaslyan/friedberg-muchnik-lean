@@ -20,6 +20,8 @@ import FriedbergMuchnik.CE
 
 namespace FriedbergMuchnik
 
+open OracleComputability
+
 /-- **The Friedberg–Muchnik theorem** (Friedberg 1957, Muchnik 1956;
 Soare VII.2), solving Post's problem: there exist computably enumerable
 sets `A, B ⊆ ℕ` with `¬(A ≤ᵀ B)` and `¬(B ≤ᵀ A)` — two incomparable
