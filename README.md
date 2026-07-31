@@ -1,129 +1,95 @@
-# Friedberg–Muchnik in Lean 4
+# Finite-injury priority arguments in Lean 4
 
-A formalization of the Friedberg–Muchnik theorem: **there exist computably
-enumerable sets `A, B ⊆ ℕ` with `¬(A ≤ᵀ B)` and `¬(B ≤ᵀ A)`** — two
-incomparable c.e. Turing degrees, solving Post's problem, by the classical
-finite-injury priority argument.
+Two classical theorems of computability theory, formalized over one oracle
+machine model:
 
-Everything is finitary ("Track B"): computations are run by a fuel-bounded
-evaluator against *finite* oracle information, the two sets are built as
-monotone sequences of finite sets, and the infinite objects appear only at
-the very end via the use principle.
+```lean
+theorem FriedbergMuchnik.friedberg_muchnik :
+    ∃ A B : Set ℕ, CE A ∧ CE B ∧ ¬ (A ≤ᵀ B) ∧ ¬ (B ≤ᵀ A)
 
-## Corrected design decisions
-
-This project deliberately deviates from the original brief in three places
-where the brief was wrong or underestimated; these are load-bearing.
-
-1. **Stage approximations are `⊆`-monotone finite sets, not prefix-monotone
-   strings.** `Astage : ℕ → Finset ℕ` with `Astage s ⊆ Astage (s+1)`, limit
-   `n ∈ A ↔ ∃ s, n ∈ Astage s`. A bit may flip `false → true` (enumeration)
-   but never back. Prefix-monotone `List Bool` stages would freeze every bit
-   at first write, making the limit sets computable — and computable sets
-   reduce to every oracle (`ComputableSet.turingReducible`), contradicting
-   the theorem. `List Bool` survives only as a *snapshot* of a stage set up
-   to a bound, fed to the finite evaluator.
-
-2. **The evaluator records output *and* use.** `run k O c x` returns
-   `halt ⟨output, use⟩`, `stuck` (insufficient oracle information — distinct
-   from divergence), or `timeout`. The use principle is stated for *partial*
-   oracles once (`run_halt_mono`) and everything else — restraint
-   preservation, snapshot adequacy, finite↔infinite transfer, determinism —
-   is a corollary.
-
-3. **Injury counts are proved finite inductively** (each requirement acts
-   finitely often given that all higher-priority ones do), with no
-   closed-form bound baked into any statement.
-
-## Architecture and dependency direction
-
-```
-Mathlib (ordinary, non-oracle computability: Primrec/Partrec closure)
-        │
-        ▼
-FriedbergMuchnik/Foundation/MathlibBridge.lean     (the ONLY file importing
-        │                                           Mathlib computability)
-        ▼
-FriedbergMuchnik/Foundation/…  (project-local oracle semantics)
-        │
-        ▼
-priority argument (Approximation / Requirements / Construction /
-                   FiniteInjury / Main)
+theorem SacksSplitting.sacks_splitting :
+    ∀ A : Set ℕ, CE A → ¬ ComputableSet A →
+      ∃ A₀ A₁ : Set ℕ, CE A₀ ∧ CE A₁ ∧ Disjoint A₀ A₁ ∧ A₀ ∪ A₁ = A ∧
+        ¬ (A ≤ᵀ A₀) ∧ ¬ (A ≤ᵀ A₁)
 ```
 
-The oracle model, `≤ᵀ`, and `CE` are project-local, so the priority proof
-cannot be contaminated by Mathlib's internal coding decisions; Mathlib is
-used strictly to discharge "this explicit stage function is computable"
-obligations, transferred through the bridge layer (`MathlibBridge.lean`
-and `RunPrimrec.lean` — the only two files importing Mathlib
-computability).
+**Friedberg–Muchnik** (1956/57), solving Post's problem: two incomparable
+c.e. Turing degrees. **Sacks Splitting** (1963), in its
+splitting-with-non-reducibility form: every non-computable c.e. set splits
+into two c.e. halves, neither of which computes it.
 
-### Foundation layer
+`lake build` succeeds with zero `sorry`. Every headline theorem reports
+exactly `[propext, Classical.choice, Quot.sound]`.
 
-| File | Content | Status |
-|---|---|---|
-| `OracleCode.lean` | Syntax only: Kleene schemata + `query`. No imports. | ✅ builds |
-| `FiniteEval.lean` | `run : fuel → PartOracle → OracleCode → ℕ → RunResult`, mirroring `Nat.Partrec.Code.evaln`'s fuel discipline; named step lemmas. | ✅ builds |
-| `Use.lean` | **Use principle** (`run_halt_mono`, master form for partial oracles); fuel monotonicity, oracle extension, consistency transfer, determinism. | ✅ builds |
-| `InfiniteEval.lean` | `Computes` as existential closure over fuel; uniqueness; finite↔infinite correspondence (`computes_iff_initialSegment`). | ✅ builds |
-| `Numbering.lean` | Explicit bijection `ℕ ≃ OracleCode`, both round-trips proved — enumeration adequacy for requirement indexing. | ✅ builds |
-| `Reducibility.lean` | `≤ᵀ`, `CE`, `ComputableSet`; reflexivity; computable ⇒ reducible to everything. | ✅ builds |
-| `Composition.lean` | Query substitution `subst` + simulation ⇒ `≤ᵀ` transitivity (`≤ᵀ` is a preorder). | ✅ builds |
-| `MathlibBridge.lean` | `embed` + semantic preservation (`run_embed`); `Partrec` and c.e. transfer. | ✅ builds |
-| `RunPrimrec.lean` | `run` is primitive recursive in Mathlib's sense (`nrun_primrec`, the `primrec_evaln` analog), by memo-table strong recursion on ℕ-encoded codes/results. | ✅ builds |
-| `../Approximation.lean` | Monotone `Finset` stages, stabilization, snapshots, the restraint mechanism and true-stage lemmas. | ✅ builds |
+Lowness of the Sacks halves — the full theorem's additional conclusion —
+needs infinite-injury machinery and is deliberately out of scope.
 
-### Priority argument
+## Structure
 
-| File | Content | Status |
-|---|---|---|
-| `Construction.lean` | The stage machine: per-requirement records, one attention per stage, freshness counter. | ✅ builds |
-| `StageDynamics.lean` | `attended` + leastness (priority discipline), the `step_cases` trichotomy, list-change and no-upward-injury lemmas. | ✅ builds |
-| `FiniteInjury.lean` | The rank argument: once superiors are quiet a requirement is attended ≤ 2 more times; `quiet_above`, stabilization package. | ✅ builds |
-| `Invariants.lean` | Ten-field `ConsInv` (freshness, distinctness, witness/restraint discipline, the preserved computation), by induction over the three transitions. | ✅ builds |
-| `Requirements.lean` | Satisfaction of every `R_e`/`S_e`; `not_A_le_B`, `not_B_le_A`. | ✅ builds |
-| `CE.lean` | Parallel tuple-implementation of the construction + simulation + `Primrec` derivation ⇒ `CE Aset`, `CE Bset`. | ✅ builds |
-| `Main.lean` | **`friedberg_muchnik : ∃ A B, CE A ∧ CE B ∧ ¬(A ≤ᵀ B) ∧ ¬(B ≤ᵀ A)`** | ✅ builds |
+```
+OracleComputability/     the machine model, the use principle, ≤ᵀ / CE,
+        │                the Mathlib bridge, the restraint mechanism
+        ├───────────────┐
+        ▼               ▼
+FriedbergMuchnik/   SacksSplitting/
+        └───────┬───────┘
+                ▼
+       PriorityArguments.lean
+```
 
-**The theorem is fully proved.** `#print axioms friedberg_muchnik` reports
-only `propext`, `Classical.choice`, `Quot.sound` — no `sorry`, no added
-axioms.
+Four Lake libraries. `FriedbergMuchnik` and `SacksSplitting` are
+**siblings**: neither imports the other, and the build enforces that.
 
-Build note: two declarations in `CE.lean` (`primrec_reqAttN` and the
-builder lemmas) carry raised `maxHeartbeats` — their `Primrec`
-unifications walk through the `Primcodable` pairing encodings and take a
-couple of minutes; everything else compiles quickly.
+That independence is the development's main structural claim, not a
+tidiness point. Sacks splitting was written against this foundation as a
+test of whether the foundation *is* one, and it turned out to need nothing
+from Friedberg–Muchnik's proof — only from the shared layer. The import
+graph is the evidence, and `PriorityArguments.lean` is the single place the
+two theorems meet: Friedberg–Muchnik produces a c.e. non-computable set,
+which is exactly the hypothesis Sacks splitting consumes, so the first
+theorem certifies that the second is not vacuous.
 
-### Foundation milestone gate
+| Library | Content |
+|---|---|
+| `OracleComputability` | `OracleCode` syntax and its numbering; the fuel-bounded evaluator `run` recording output **and use**; the use principle `run_halt_mono` and `run_halt_unique`; `≤ᵀ`, `CE`, `ComputableSet` with reflexivity and transitivity; the Mathlib bridge; `nrun_primrec`; monotone-stage approximation with `run_halt_limit_of_restraint`; `Priority.lean`; `PrimrecTools.lean`. |
+| `FriedbergMuchnik` | The stage machine with per-requirement records; the priority discipline; the **rank** injury argument; the ten-field state invariant; satisfaction of every requirement; `CE` of both sets. |
+| `SacksSplitting` | `A`'s enumeration as a watchable stage sequence; agreement length and cumulative restraint; the routing machine; the priority induction; `CE` of both halves. |
+| `PriorityArguments` | The two theorems composed. |
 
-The priority construction does not start until all of these compile with
-zero `sorry`:
+## What the second theorem cost
 
-1. ✅ effective encoding/decoding of oracle programs (`Numbering.lean`)
-2. ✅ embedding `Nat.Partrec.Code → OracleCode` (query-free image)
-3. ✅ semantic preservation of that embedding (`run_embed`: running an
-   embedded code against *any* oracle is `evaln`, lifted)
-4. ✅ transfer: `Nat.Partrec f` ⇒ `f` realized by a local oracle-free code
-   (`partrec_realized`, `ce_of_partrec_dom`)
-5. ✅ enumeration adequacy for the project's `≤ᵀ` (`Numbering.lean`)
-6. ✅ finite-to-infinite computation correspondence (`InfiniteEval.lean`)
-7. ✅ use principle: preservation under oracle agreement below the recorded
-   use (`Use.lean`)
-8. ✅ `run` (on snapshot oracles) is computable in Mathlib's sense
-   (`nrun_primrec` — the `evaln_prim` analog; memo-table strong recursion
-   with the snapshot as parameter, codes and results as naturals)
+`SacksSplitting/STATUS.md` carries the component-by-component **reuse
+inventory**, written before any Sacks construction code existed: for every
+foundation component, a verdict of *reused as-is*, *generalized*, or
+*rebuilt*, with the reason. Two findings are worth the front page.
 
-**The foundation gate is closed** — the priority construction is unblocked.
+**The foundation transferred whole.** In particular
+`run_halt_limit_of_restraint` — preservation of a computation whose use is
+protected — was already stated generically in the stage sequence, so the
+restraint argument at the heart of Sacks reuses it verbatim. And
+`run_halt_unique` turned out to matter more for Sacks than for
+Friedberg–Muchnik: it is what makes "the use of the limit computation at
+`y`" a well-defined number, which is what bounds the restraint. Recording
+the use rather than just the output was a design decision made for the
+first theorem, and it paid off for a theorem it was not designed for.
 
-Off the critical path but part of "done" — now closed:
+**The priority layer did not transfer, and no generalization would have
+helped.** Friedberg–Muchnik's injury induction counts *events*: a
+requirement's record has a rank in `{0,1,2}`, receiving attention raises
+it, so once the superiors go quiet it acts at most twice more. A splitting
+requirement generates no events — it never acts, and its restraint moves
+continuously with the length of agreement. Its replacement is a three-part
+induction along the priority order (bounded restraints below `j` ⇒ finite
+injury to `j` ⇒ `j` satisfied ⇒ `j`'s restraint bounded). The two files
+share a shape and no content.
 
-* ✅ closure of `≤ᵀ` under composition: **transitivity**
-  (`TuringReducible.trans`, `Foundation/Composition.lean`) via the
-  query-substitution operator `subst` and its simulation theorem; with
-  reflexivity, the project's `≤ᵀ` is a preorder (`Trans` instance);
-* ✅ non-vacuity: neither constructed set is computable
-  (`Aset_not_computable` / `Bset_not_computable`, `Main.lean`) — so the
-  theorem certifies in-model that c.e. strictly exceeds computable.
+The one genuinely new piece of mathematics is
+`SacksSplitting.unsatisfied_requirement_computes`: if a requirement is
+never injured after some stage and the reduction nevertheless computes
+`χ_A` everywhere, then `A` is computable. Friedberg–Muchnik has no
+analogue — its requirements are satisfiable because their witnesses are
+fresh, which is a property of the construction, whereas a splitting
+requirement is satisfiable only because of a property of the *given* set.
 
 ## Building
 
@@ -132,15 +98,29 @@ lake exe cache get   # fetch Mathlib olean cache (first time)
 lake build
 ```
 
-Toolchain: Lean 4.26.0, Mathlib `v4.26.0`. Zero `sorry` policy: every commit
-builds with no `sorry`/`admit`/added axioms; the final theorem's axiom
-footprint is `propext`, `Classical.choice`, `Quot.sound`.
+Toolchain: Lean 4.26.0, Mathlib `v4.26.0`. A handful of declarations in the
+two `CE.lean` files carry raised `maxHeartbeats`: their `Primrec`
+unifications walk the `Primcodable` pairing encodings.
+`FriedbergMuchnik/CE.lean` is the slow one at roughly 100s; everything else
+compiles quickly.
 
 ## Textbook correspondence
 
-Soare, *Recursively Enumerable Sets and Degrees* (1987): the use principle
-is VII.2; the construction and injury bookkeeping follow VII.2's
-Friedberg–Muchnik presentation with requirements
-`R_{2e} : A ≠ Φ_e^B`, `R_{2e+1} : B ≠ Φ_e^A` in priority order. Each
-requirement/injury lemma cites the classical step it formalizes in its
-docstring.
+Soare, *Recursively Enumerable Sets and Degrees* (1987). The use principle
+is VII.2; Friedberg–Muchnik follows VII.2 with requirements
+`R_{2e} : A ≠ Φ_e^B`, `R_{2e+1} : B ≠ Φ_e^A`; Sacks splitting follows
+VII.3, with the cumulative (running-maximum) restraint made explicit,
+because the raw stage restraint is not monotone and a restraint that can
+drop preserves nothing.
+
+## Status documents
+
+* `STATUS.md` — Friedberg–Muchnik's completion report.
+* `SacksSplitting/STATUS.md` — the reuse inventory and the honest
+  accounting of what transferred.
+* `STATUS_ONE.md` — an independent verification report of an earlier
+  Friedberg–Muchnik commit, kept as a record of that check.
+* `paper/` — a paper drafted when this repository held only
+  Friedberg–Muchnik. Its file paths have been updated, but it does not yet
+  cover the second theorem or the foundation/clients split; that rewrite is
+  the obvious next job.

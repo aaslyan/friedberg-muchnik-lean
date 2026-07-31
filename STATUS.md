@@ -33,7 +33,21 @@ own lemma fixed it; two declarations still carry raised heartbeat budgets
 - ✅ `CE` of both sets via the computable construction; final theorem in
   clean vocabulary, every file docstringed with its Soare VII.2
   correspondence
-- ⬜ One open item: **`≤ᵀ` composition/transitivity** (query-substitution
-  operator) — the off-critical-path hygiene extension making the project's
-  `≤ᵀ` recognizably standard, plus the optional halting-set non-vacuity
-  certificate. A self-contained follow-up.
+- ✅ **`≤ᵀ` composition/transitivity** (`TuringReducible.trans`, by the
+  query-substitution operator `subst`) — with reflexivity, `≤ᵀ` is a
+  preorder. Closed in commit `247ecef`; this file previously listed it as
+  open.
+
+## Since then
+
+This repository now holds a second theorem, the Sacks Splitting Theorem,
+and the foundation this development built has been extracted into its own
+library, `OracleComputability`, which both priority arguments import and
+neither owns. See `README.md` for the layout and
+`SacksSplitting/STATUS.md` for the component-by-component account of what
+transferred and what had to be rebuilt.
+
+The one open item inherited from here: `≤ᵀ` has not been proved equivalent
+to an external formulation such as Mathlib's `RecursiveIn`, so
+"not reducible" means "not reducible in this model", for a model whose
+adequacy rests on the foundation gate above.

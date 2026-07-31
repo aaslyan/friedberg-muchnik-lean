@@ -2,7 +2,7 @@
 
 \subsection{Oracle Program Syntax}
 
-The file \texttt{Foundation/OracleCode.lean} defines the program language:
+The file \texttt{OracleComputability/OracleCode.lean} defines the program language:
 
 \begin{lstlisting}
 inductive OracleCode : Type where
@@ -109,7 +109,7 @@ at a finite stage is preserved if future enumeration avoids its use.
 
 \subsection{Infinite Semantics}
 
-The file \texttt{Foundation/InfiniteEval.lean} defines:
+The file \texttt{OracleComputability/InfiniteEval.lean} defines:
 
 \begin{lstlisting}
 def Computes (c : OracleCode) (X : Nat -> Bool)
@@ -130,7 +130,7 @@ eventually become visible at a finite stage.
 
 \subsection{Program Numbering}
 
-\texttt{Foundation/Numbering.lean} defines an explicit coding
+\texttt{OracleComputability/Numbering.lean} defines an explicit coding
 \texttt{encodeCode : OracleCode -> Nat} and decoding
 \texttt{ofNatCode : Nat -> OracleCode}.  The two round-trip theorems
 \texttt{ofNatCode_encodeCode} and \texttt{encodeCode_ofNatCode} prove that

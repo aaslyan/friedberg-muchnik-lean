@@ -82,19 +82,19 @@ Stage construction:
 
 Oracle semantics:
 
-- `OracleCode` in `Foundation/OracleCode.lean`.
-- `HaltData`, `RunResult`, `PartOracle`, `run` in `Foundation/FiniteEval.lean`.
-- `run_halt_mono` in `Foundation/Use.lean`.
+- `OracleCode` in `OracleComputability/OracleCode.lean`.
+- `HaltData`, `RunResult`, `PartOracle`, `run` in `OracleComputability/FiniteEval.lean`.
+- `run_halt_mono` in `OracleComputability/Use.lean`.
 - `Computes`, `computes_iff_initialSegment` in
-  `Foundation/InfiniteEval.lean`.
+  `OracleComputability/InfiniteEval.lean`.
 - `TuringReducible`, `CE`, `ComputableSet` in
-  `Foundation/Reducibility.lean`.
+  `OracleComputability/Reducibility.lean`.
 
 Computability bridge:
 
 - `embed`, `run_embed`, `partrec_realized`, `ce_of_partrec_dom` in
-  `Foundation/MathlibBridge.lean`.
-- `nrun`, `nrun_primrec` in `Foundation/RunPrimrec.lean`.
+  `OracleComputability/MathlibBridge.lean`.
+- `nrun`, `nrun_primrec` in `OracleComputability/RunPrimrec.lean`.
 - `stageN`, `encSt_stepState`, `encSt_stage` in `CE.lean`.
 
 ## Semantic Model Summary

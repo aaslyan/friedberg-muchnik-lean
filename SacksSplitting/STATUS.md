@@ -9,10 +9,21 @@ theorem sacks_splitting :
         ¬ (A ≤ᵀ A₀) ∧ ¬ (A ≤ᵀ A₁)
 ```
 
-stated in `FriedbergMuchnik`'s own vocabulary (`CE`, `ComputableSet`, `≤ᵀ`),
-imported, not redefined. `FriedbergMuchnik` is a Lake **path dependency**
-(`require FriedbergMuchnik from "../friedberg-muchnik-lean"`); no FM file is
-copied into this project.
+stated in the shared foundation's vocabulary (`CE`, `ComputableSet`, `≤ᵀ`),
+imported, not redefined.
+
+**A note on where this document sits.** It was written when the
+Friedberg–Muchnik development lived in a separate repository and was
+consumed here as a Lake path dependency, and the inventory below was
+written *before* any construction code, exactly as the brief required. The
+two developments have since been merged into one repository, and the
+foundation the inventory is about has been extracted into its own library,
+`OracleComputability`, imported by both priority arguments and owned by
+neither. The verdicts are unchanged — the merge was in fact carried out on
+the strength of them — but where the inventory says "FM's
+`Foundation/…`" the file now lives in `OracleComputability/`, and the
+"changes made to the FM repo" section below records what was needed *at
+the time*, before the split made those lemmas shared by construction.
 
 ---
 
@@ -47,8 +58,8 @@ Sacks needs its own version, with the reason stated.
 | `snapshot`, `snapshot_getElem?`, `ofSnapshot_snapshot_some` | **as-is** | |
 | **`run_halt_limit_of_restraint`** | **as-is** | This is the lemma the brief hoped could be reused directly for the restraint argument, and it can be, verbatim: its statement is already generic in the stage sequence `F`, so it applies to the Sacks halves with no generalization. Sacks is a pure preservation argument, so this single lemma carries more of the proof here than it does in FM. |
 | `run_halt_snapshot_of_limit` | **as-is** | The "true stage" step: a limit computation is visible from some stage on. |
-| `snapshotOf`, `snapshotOf_eq_snapshot`, `snapshotOf_getElem?`, `run_halt_toFinset_snapshot` | **as-is** | All generic in the list; they live in FM's construction files (`Construction.lean`, `Requirements.lean`) but none of them mentions the FM construction. |
-| `range_find?_least` (`StageDynamics.lean`) | **as-is** | "`List.find?` over a range finds the least index." FM uses it for the priority discipline (which requirement receives attention); Sacks uses it for the routing rule (which requirement's restraint wins). Same lemma, different priority mechanism. |
+| `snapshotOf`, `snapshotOf_eq_snapshot`, `snapshotOf_getElem?`, `run_halt_toFinset_snapshot` | **as-is** | All generic in the list; they lived in FM's construction files (`Construction.lean`, `Requirements.lean`) though none of them mentions the FM construction. Having to import an entire priority argument to reach them is what the merge fixed: they are now in `OracleComputability/Approximation.lean`. |
+| `range_find?_least` (then `StageDynamics.lean`) | **as-is** | "`List.find?` over a range finds the least index." FM uses it for the priority discipline (which requirement receives attention); Sacks uses it for the routing rule (which requirement's restraint wins). Same lemma, different priority mechanism — which is why it now has its own home, `OracleComputability/Priority.lean`. |
 
 ### Priority layer — the FM-specific files
 
@@ -60,7 +71,7 @@ Sacks needs its own version, with the reason stated.
 | `rank`, `reqRank`, `reqRank_incr`, `quiet_above`, `exists_stable`, `stable_not_requires` (`FiniteInjury.lean`) | **rebuilt** — the sharpest finding | FM's injury induction is a **rank** argument: a requirement's record has rank in `{0,1,2}`, attention strictly raises it, only injury resets it, so once superiors are quiet a requirement acts at most twice more. That argument cannot be restated for Sacks, because **Sacks requirements never act**: their restraint moves continuously with the length of agreement, and there is no discrete event to count. See Part 2 for what replaces it. Same *shape* (induction along the priority order, no closed-form bound), disjoint content. No generalization of FM's file would have helped; the two are siblings, not instances of a common lemma. |
 | `R_satisfied` / `S_satisfied`, `restraint_respected_A` / `_B`, `not_A_le_B` / `not_B_le_A` (`Requirements.lean`) | **rebuilt** | Different strategy ⇒ different satisfaction proof. The final two-line step (*any candidate reduction is `ofNatCode e` for its own number `e`, so requirement `e` kills it*) is reused in shape, via `ofNatCode_encodeCode`. |
 | `CE.lean`'s parallel-implementation technique (`St`, `RS`, `encSt`, `encSt_stage`, `map_range_set`, `map_range_act`) | **deliberately not needed** | FM had to build a shadow implementation on plain tuples because `ConsState`/`ReqState` are custom structures with no `Primcodable` instance. Sacks defines its state as a plain tuple type from the outset, so the shadow layer and its simulation theorem disappear entirely. The `Primrec` derivation and the `Partrec.rfind` + `ce_of_partrec_dom` ending have the same shape as FM's. |
-| `primrec_find?`, `primrec_memDecide`, `primrec_snapshotOf` (in FM's `CE.lean`) | **generalized in FM** | These three are entirely generic — nothing about them mentions the FM construction — but they were `private`, so they were invisible to any downstream package. De-privatising them (plus docstrings) is the **only change FM needed** to serve as a foundation here. Committed separately in the FM repo. |
+| `primrec_find?`, `primrec_memDecide`, `primrec_snapshotOf` (then in FM's `CE.lean`) | **generalized in FM** | These three are entirely generic — nothing about them mentions the FM construction — but they were `private`, so they were invisible to any downstream package. De-privatising them (plus docstrings) was the **only change FM needed** to serve as a foundation here. They now live in `OracleComputability/PrimrecTools.lean`, which is where the merge concluded they always belonged. |
 
 ### One defect found and fixed in FM
 
