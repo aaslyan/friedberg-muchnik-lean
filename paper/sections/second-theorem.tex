@@ -1,0 +1,97 @@
+\section{A Second Theorem on the Same Foundation}
+\label{sec:second}
+
+The foundation described above was built for one theorem.  To test whether
+it is a foundation rather than scaffolding, we formalized a second
+finite-injury theorem against it: the Sacks Splitting Theorem
+\cite{sacks1963}, in its splitting-with-non-reducibility form.
+
+\begin{lstlisting}
+theorem sacks_splitting :
+    forall A : Set Nat, CE A -> not (ComputableSet A) ->
+      exists A0 A1, CE A0 /\ CE A1 /\ Disjoint A0 A1 /\ A0 union A1 = A
+        /\ not (A <=T A0) /\ not (A <=T A1)
+\end{lstlisting}
+
+Lowness of the halves, the full theorem's additional conclusion, requires
+infinite-injury machinery and is out of scope.
+
+The two developments are \emph{siblings}: neither imports the other, and
+Lake enforces this.  Both import a shared library
+\texttt{OracleComputability} holding the machine model, the use principle,
+the reducibility vocabulary, the Mathlib bridge, and the monotone-stage
+approximation layer.  Building the Sacks library from a clean tree compiles
+no module of the Friedberg--Muchnik library.  A single root module joins
+them, and contains the only declaration depending on both: the
+Friedberg--Muchnik construction yields a c.e.\ non-computable set, which is
+precisely the hypothesis Sacks splitting consumes, so the first theorem
+certifies that the second is not vacuous.
+
+\paragraph{What transferred.}
+The entire foundation transferred unchanged.  Two items are worth naming.
+The restraint lemma---a computation seen halting against a stage snapshot
+survives to the limit provided nothing below its recorded use is later
+enumerated---was already stated generically in the stage sequence, so the
+preservation argument at the heart of Sacks reuses it verbatim.  More
+interestingly, the determinism lemma \texttt{run\_halt\_unique} carries
+more weight in the second theorem than in the first.  In
+Friedberg--Muchnik it says only that a computation has one output.  In
+Sacks it is what makes \emph{the use of the limit computation at $y$} a
+well-defined number, and that number is what bounds the restraint
+function.  Recording the use rather than only the output was a design
+decision taken for the first theorem; it paid for a theorem it was not
+designed for.
+
+\paragraph{What did not.}
+The priority layer did not transfer, and no generalization of it would
+have.  The Friedberg--Muchnik injury argument counts \emph{events}: a
+requirement's record carries a rank in $\{0,1,2\}$, receiving attention
+raises it strictly, and only injury resets it, so once the superiors go
+quiet a requirement acts at most twice more.  A splitting requirement
+generates no events.  It never acts---the elements are not ours to
+choose---and its restraint moves continuously with the length of
+agreement, so there is nothing to count.  Its replacement is a three-part
+simultaneous induction along the priority order: bounded restraints below
+$j$ give finite injury to $j$; finite injury to $j$ gives satisfaction of
+$j$; satisfaction of $j$ bounds $j$'s restraint.  The two arguments share a
+shape---induction along the priority order, no closed-form injury
+bound---and no content.  We record this as a negative result about
+reuse: ``finite injury'' names a family of arguments, not a single lemma.
+
+\paragraph{Where the hypothesis is spent.}
+The one genuinely new piece of mathematics is the step at which
+non-computability of $A$ is consumed.  If a requirement is never injured
+after some stage and its reduction nevertheless computes $\chi_A$
+everywhere, then $A$ is computable: to decide $y \in A$, search for a stage
+past the last injury whose length of agreement exceeds $y$ and report
+$y \in A_s$.  Such a stage exists because the reduction is total; the
+answer is correct because past the last injury the agreeing computation is
+frozen by the restraint lemma, so it \emph{is} the true value; and the
+search is effective because the whole construction is primitive recursive.
+Friedberg--Muchnik has no analogue: its requirements are satisfiable
+because their witnesses are fresh, which is a property of the
+construction, whereas a splitting requirement is satisfiable only because
+of a property of the \emph{given} set.
+
+\paragraph{Cost.}
+The second theorem is roughly 1{,}600 lines against the first
+development's 4{,}250.  The ratio is the point: the expensive
+part---model, evaluator, use principle, Mathlib bridge---was already
+present.  Two components of the first development turned out to be
+artifacts of its own design rather than necessities.  Its ten-field state
+invariant exists to keep freely chosen witnesses fresh, distinct and clear
+of higher-priority restraints; a construction that does not choose its
+elements needs none of it, and the two invariants that remain (the halves
+stay disjoint, and their union is the current stage of $A$) are one
+induction.  Its computability layer needed a shadow implementation on
+plain tuples because its state types are custom structures without a
+\texttt{Primcodable} instance; defining the splitting state as a tuple from
+the outset removes that layer entirely.
+
+Finally, three generic \texttt{Primrec} helpers had been declared
+\texttt{private} inside the first development's computability file.
+Nothing in them mentions either construction---they are what any stage
+function needs to be shown computable---but \texttt{private} made them
+invisible downstream.  Nothing needed generalizing; they needed exporting.
+This is the kind of reusability defect that is invisible until a second
+client exists.
