@@ -26,8 +26,8 @@ Both preservation lemmas are corollaries of the master use principle
 `run_halt_mono`.
 -/
 import Mathlib.Data.Finset.Basic
-import FriedbergMuchnik.Foundation.Use
-import FriedbergMuchnik.Foundation.Reducibility
+import OracleComputability.Use
+import OracleComputability.Reducibility
 
 namespace FriedbergMuchnik
 

@@ -19,7 +19,7 @@ the program enumeration in `Numbering.lean`, the Mathlib correspondence in
 part of the project's foundation obligations, not afterthoughts.
 -/
 import Mathlib.Data.Set.Basic
-import FriedbergMuchnik.Foundation.InfiniteEval
+import OracleComputability.InfiniteEval
 
 namespace FriedbergMuchnik
 

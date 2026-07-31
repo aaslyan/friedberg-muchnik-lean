@@ -18,7 +18,7 @@ where `tag < 4` selects the constructor and `payload` codes the children via
 the `n + 5` pattern of the decoder matches syntactically in proofs.
 -/
 import Mathlib.Data.Nat.Pairing
-import FriedbergMuchnik.Foundation.OracleCode
+import OracleComputability.OracleCode
 
 namespace FriedbergMuchnik
 

@@ -32,8 +32,8 @@ encoded results), so the whole step function is built from primitive
 recursive pieces; that is what will make `A` and `B` computably
 enumerable.
 -/
-import FriedbergMuchnik.Foundation.RunPrimrec
-import FriedbergMuchnik.Approximation
+import OracleComputability.RunPrimrec
+import OracleComputability.Approximation
 
 namespace FriedbergMuchnik
 

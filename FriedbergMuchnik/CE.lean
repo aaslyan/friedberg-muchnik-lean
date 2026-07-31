@@ -15,7 +15,7 @@ operations of the construction (`set`, and take-cons-replicate) are
 re-expressed as maps over `List.range`, which is what the bridge lemmas
 `map_range_set` / `map_range_act` justify.
 -/
-import FriedbergMuchnik.Foundation.MathlibBridge
+import OracleComputability.MathlibBridge
 import FriedbergMuchnik.StageDynamics
 
 namespace FriedbergMuchnik

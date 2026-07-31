@@ -29,8 +29,8 @@ exactly the input guard's behavior (`run_timeout_of_ge`), so no special
 guard handling is needed — the same trick as Mathlib's `evaln_map`.
 -/
 import Mathlib.Computability.Primrec
-import FriedbergMuchnik.Foundation.FiniteEval
-import FriedbergMuchnik.Foundation.Numbering
+import OracleComputability.FiniteEval
+import OracleComputability.Numbering
 
 namespace FriedbergMuchnik
 

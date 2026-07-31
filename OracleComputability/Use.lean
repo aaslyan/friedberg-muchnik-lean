@@ -28,7 +28,7 @@ Corollaries proved here:
   consistent with a total `X` is also a halting run against `X` itself;
 * `run_halt_unique` — determinism across fuels and consistent oracles.
 -/
-import FriedbergMuchnik.Foundation.FiniteEval
+import OracleComputability.FiniteEval
 
 namespace FriedbergMuchnik
 

@@ -17,7 +17,7 @@ need their own fuel), which is why the simulation produces *some* fuel
 bound rather than preserving the original one; outputs — the only thing
 `Computes` cares about — are preserved on the nose.
 -/
-import FriedbergMuchnik.Foundation.Reducibility
+import OracleComputability.Reducibility
 
 namespace FriedbergMuchnik
 

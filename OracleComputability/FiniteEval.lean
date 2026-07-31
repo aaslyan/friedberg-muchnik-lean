@@ -23,7 +23,7 @@ recursive calls of `prec` and `rfind`) deliberately mirrors Mathlib's
 semantics by a single structural induction.
 -/
 import Mathlib.Data.Nat.Pairing
-import FriedbergMuchnik.Foundation.OracleCode
+import OracleComputability.OracleCode
 
 namespace FriedbergMuchnik
 

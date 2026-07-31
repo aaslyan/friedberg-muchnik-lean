@@ -10,7 +10,7 @@ says this loses nothing: a computation converges against the total oracle
 initial segment of length the recorded use always suffices.  Both directions
 are immediate corollaries of the master use theorem `run_halt_mono`.
 -/
-import FriedbergMuchnik.Foundation.Use
+import OracleComputability.Use
 
 namespace FriedbergMuchnik
 

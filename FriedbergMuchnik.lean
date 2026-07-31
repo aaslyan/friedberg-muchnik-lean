@@ -1,33 +1,23 @@
 /-
 Root module of the Friedberg–Muchnik formalization.
 
-Foundation layer (see README.md for the architecture and the milestone
-gate):
-* `OracleCode` — syntax of oracle programs (no imports);
-* `FiniteEval` — fuel-bounded evaluation with output/use recording against
-  partial oracles;
-* `Use` — the use principle (master monotonicity/agreement theorem) and
-  determinism;
-* `InfiniteEval` — semantics against a total oracle as existential closure;
-  finite-to-infinite correspondence;
-* `Numbering` — effective bijection `ℕ ≃ OracleCode` (enumeration
-  adequacy);
-* `Reducibility` — the project's `≤ᵀ`, `CE`, `ComputableSet` vocabulary and
-  hygiene lemmas;
-* `MathlibBridge` — embedding of Mathlib's partial recursive codes with
-  semantic preservation; transfer of `Nat.Partrec` witnesses and c.e.-ness
-  into the local model (the only file importing Mathlib computability).
+The oracle model, the use principle, `≤ᵀ`/`CE`, the Mathlib bridge and the
+monotone-stage approximation layer live in the `OracleComputability`
+library, which this one is a client of; see `OracleComputability.lean` for
+the dependency direction.  What follows is only the priority argument:
+
+* `Construction` — the stage machine: per-requirement records, one
+  attention per stage, freshness counter;
+* `StageDynamics` — `attended` and the priority discipline; the
+  `step_cases` trichotomy;
+* `FiniteInjury` — the rank argument: once superiors are quiet a
+  requirement is attended at most twice more;
+* `Invariants` — the ten-field `ConsInv` of every reachable state;
+* `Requirements` — satisfaction of every `R_e`/`S_e`;
+* `CE` — the constructed sets are computably enumerable;
+* `Main` — the theorem.
 -/
-import FriedbergMuchnik.Foundation.OracleCode
-import FriedbergMuchnik.Foundation.FiniteEval
-import FriedbergMuchnik.Foundation.Use
-import FriedbergMuchnik.Foundation.InfiniteEval
-import FriedbergMuchnik.Foundation.Numbering
-import FriedbergMuchnik.Foundation.Reducibility
-import FriedbergMuchnik.Foundation.Composition
-import FriedbergMuchnik.Foundation.MathlibBridge
-import FriedbergMuchnik.Foundation.RunPrimrec
-import FriedbergMuchnik.Approximation
+import OracleComputability
 import FriedbergMuchnik.Construction
 import FriedbergMuchnik.StageDynamics
 import FriedbergMuchnik.FiniteInjury

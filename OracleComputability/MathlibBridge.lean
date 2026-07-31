@@ -26,8 +26,8 @@ single structural induction rather than a simulation argument with fuel
 translation.
 -/
 import Mathlib.Computability.PartrecCode
-import FriedbergMuchnik.Foundation.Use
-import FriedbergMuchnik.Foundation.Reducibility
+import OracleComputability.Use
+import OracleComputability.Reducibility
 
 namespace FriedbergMuchnik
 
