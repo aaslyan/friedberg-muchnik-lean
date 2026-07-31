@@ -51,7 +51,7 @@ theorem certifies that the second is not vacuous.
 
 | Library | Content |
 |---|---|
-| `OracleComputability` | `OracleCode` syntax and its numbering; the fuel-bounded evaluator `run` recording output **and use**; the use principle `run_halt_mono` and `run_halt_unique`; `≤ᵀ`, `CE`, `ComputableSet` with reflexivity and transitivity; the Mathlib bridge; `nrun_primrec`; monotone-stage approximation with `run_halt_limit_of_restraint`; `Priority.lean`; `PrimrecTools.lean`. |
+| `OracleComputability` | `OracleCode` syntax and its numbering; the fuel-bounded evaluator `run` recording output **and use**; the use principle `run_halt_mono` and `run_halt_unique`; `≤ᵀ`, `CE`, `ComputableSet` with reflexivity and transitivity; the Mathlib bridge; `nrun_primrec`; monotone-stage approximation with `run_halt_limit_of_restraint`; `Priority.lean`; `PrimrecTools.lean`; `MathlibOracleBridge.lean` (partial — see below). |
 | `FriedbergMuchnik` | The stage machine with per-requirement records; the priority discipline; the **rank** injury argument; the ten-field state invariant; satisfaction of every requirement; `CE` of both sets. |
 | `SacksSplitting` | `A`'s enumeration as a watchable stage sequence; agreement length and cumulative restraint; the routing machine; the priority induction; `CE` of both halves. |
 | `PriorityArguments` | The two theorems composed. |
@@ -90,6 +90,32 @@ never injured after some stage and the reduction nevertheless computes
 analogue — its requirements are satisfiable because their witnesses are
 fresh, which is a property of the construction, whereas a splitting
 requirement is satisfiable only because of a property of the *given* set.
+
+## The Mathlib oracle bridge (in progress)
+
+`OracleComputability/MathlibOracleBridge.lean` relates the local semantics
+to Mathlib's `RecursiveIn` model from `Mathlib.Computability.TuringDegree`,
+without changing the local definitions: `mathlibOracle`,
+`MathlibTuringReducible`, `LocallyRealizes`, and realization lemmas for the
+base codes together with `pair` and `comp`.
+
+Neither transfer theorem is proved yet. What remains is `realizes_prec` and
+`realizes_rfind` — the two `RecursiveIn` constructors not yet covered — and
+the induction over `RecursiveIn` that assembles them into
+
+```lean
+MathlibTuringReducible A B → A ≤ᵀ B
+```
+
+That is the direction worth having. Both headline theorems are *negations*
+of reducibility, so the risk to guard against is that the local `≤ᵀ` is too
+**weak** — too few reductions would make the negations cheap. This implication
+says every genuine reduction is captured by an `OracleCode`, and with it both
+theorems restate over Mathlib's `TuringDegree`.
+
+Note that adding this file makes Mathlib's root-namespace `TuringReducible`
+visible alongside ours, so the two now have to be distinguished explicitly
+at the few sites that name the relation rather than the `≤ᵀ` notation.
 
 ## Building
 
