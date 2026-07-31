@@ -39,19 +39,6 @@ theorem requiresAttention_eq_true {st : ConsState} {s i : ℕ} {r : ReqState}
     st.requiresAttention s i = true := by
   simp [ConsState.requiresAttention, hr, hw, ha, hc]
 
-/-- Transfer a halting run from the `Finset`-snapshot of length the use to
-the full-length list snapshot of the same stage (more fuel, more oracle —
-the use principle). -/
-theorem run_halt_toFinset_snapshot {l : List ℕ} {k s : ℕ} {c : OracleCode}
-    {x : ℕ} {d : HaltData} (hk : k ≤ s) (hu : d.use ≤ s)
-    (h : run k (PartOracle.ofSnapshot (snapshot l.toFinset d.use)) c x = .halt d) :
-    run s (PartOracle.ofSnapshot (snapshotOf l s)) c x = .halt d := by
-  refine run_halt_mono hk (fun p hp b hb => ?_) h
-  obtain ⟨hpu, hb'⟩ := ofSnapshot_snapshot_some hb
-  subst hb'
-  rw [PartOracle.ofSnapshot_apply, snapshotOf_getElem? (by omega)]
-  simp [List.mem_toFinset]
-
 /-- After stabilization, numbers below the stable restraint never enter
 `B` again (quiet tail + `wit_ge`: later actors are of lower priority and
 use fresh witnesses `≥` the restraint). -/

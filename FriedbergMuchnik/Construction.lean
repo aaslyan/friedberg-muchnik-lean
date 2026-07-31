@@ -37,26 +37,6 @@ import OracleComputability.Approximation
 
 namespace FriedbergMuchnik
 
-/-! ### Snapshots of enumeration lists -/
-
-/-- Boolean snapshot of (the set of elements of) a list: position `j < u`
-holds the membership bit of `j`. -/
-def snapshotOf (l : List ℕ) (u : ℕ) : List Bool :=
-  (List.range u).map fun j => decide (j ∈ l)
-
-@[simp] theorem snapshotOf_length (l : List ℕ) (u : ℕ) :
-    (snapshotOf l u).length = u := by
-  simp [snapshotOf]
-
-/-- The list snapshot agrees with the `Finset` snapshot of the
-approximation layer. -/
-theorem snapshotOf_eq_snapshot (l : List ℕ) (u : ℕ) :
-    snapshotOf l u = snapshot l.toFinset u := by
-  apply List.ext_getElem
-  · simp
-  · intro j h1 h2
-    simp [snapshotOf, snapshot]
-
 /-! ### Construction state -/
 
 /-- The record the construction keeps for one requirement. -/

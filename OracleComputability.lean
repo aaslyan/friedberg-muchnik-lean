@@ -51,4 +51,6 @@ import OracleComputability.Reducibility
 import OracleComputability.Composition
 import OracleComputability.MathlibBridge
 import OracleComputability.RunPrimrec
+import OracleComputability.Priority
 import OracleComputability.Approximation
+import OracleComputability.PrimrecTools

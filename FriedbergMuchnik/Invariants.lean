@@ -28,38 +28,6 @@ import FriedbergMuchnik.StageDynamics
 
 namespace FriedbergMuchnik
 
-/-! ### Snapshot helpers for list oracles -/
-
-theorem snapshotOf_getElem? {l : List ℕ} {u p : ℕ} (h : p < u) :
-    (snapshotOf l u)[p]? = some (decide (p ∈ l)) := by
-  have hlen : p < (snapshotOf l u).length := by simpa using h
-  rw [List.getElem?_eq_getElem hlen]
-  simp [snapshotOf]
-
-theorem ofSnapshot_snapshotOf_some {l : List ℕ} {u p : ℕ} {b : Bool}
-    (h : PartOracle.ofSnapshot (snapshotOf l u) p = some b) :
-    p < u ∧ b = decide (p ∈ l) := by
-  rw [PartOracle.ofSnapshot_apply] at h
-  by_cases hp : p < u
-  · rw [snapshotOf_getElem? hp] at h
-    exact ⟨hp, (Option.some.inj h).symm⟩
-  · rw [List.getElem?_eq_none (by simpa using Nat.le_of_not_lt hp)] at h
-    exact absurd h (by simp)
-
-/-- Enumerating a number `≥` the use of a halting computation into the
-oracle list does not disturb the computation (the use principle in the
-form the invariant maintenance needs). -/
-theorem run_halt_cons_snapshot {l : List ℕ} {x k len w : ℕ} {c : OracleCode}
-    {d : HaltData} (hx : d.use ≤ x)
-    (h : run k (PartOracle.ofSnapshot (snapshotOf l len)) c w = .halt d) :
-    run k (PartOracle.ofSnapshot (snapshotOf (x :: l) len)) c w = .halt d := by
-  refine run_halt_mono le_rfl (fun p hp b hb => ?_) h
-  obtain ⟨hpl, hb'⟩ := ofSnapshot_snapshotOf_some hb
-  subst hb'
-  rw [PartOracle.ofSnapshot_apply, snapshotOf_getElem? hpl]
-  have hpx : p ≠ x := by omega
-  simp [List.mem_cons, hpx]
-
 /-! ### Record access in the three transition shapes -/
 
 theorem append_singleton_getElem?_cases {α : Type _} {l : List α} {b : α}

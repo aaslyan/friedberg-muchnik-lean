@@ -170,4 +170,70 @@ theorem run_halt_snapshot_of_limit {F : ℕ → Finset ℕ} {k x : ℕ}
   · rw [decide_eq_false hmem]
     exact (charFun_eq_false.mpr (fun hl => hmem (hiff.mpr hl))).symm
 
+/-! ### Snapshots of enumeration *lists*
+
+A construction that enumerates into a `List ℕ` rather than a `Finset` needs
+the same snapshot vocabulary, and needs it in a form the computability
+layer can digest.  None of this mentions any particular construction. -/
+
+/-- Boolean snapshot of (the set of elements of) a list: position `j < u`
+holds the membership bit of `j`. -/
+def snapshotOf (l : List ℕ) (u : ℕ) : List Bool :=
+  (List.range u).map fun j => decide (j ∈ l)
+
+@[simp] theorem snapshotOf_length (l : List ℕ) (u : ℕ) :
+    (snapshotOf l u).length = u := by
+  simp [snapshotOf]
+
+/-- The list snapshot agrees with the `Finset` snapshot. -/
+theorem snapshotOf_eq_snapshot (l : List ℕ) (u : ℕ) :
+    snapshotOf l u = snapshot l.toFinset u := by
+  apply List.ext_getElem
+  · simp
+  · intro j h1 h2
+    simp [snapshotOf, snapshot]
+
+theorem snapshotOf_getElem? {l : List ℕ} {u p : ℕ} (h : p < u) :
+    (snapshotOf l u)[p]? = some (decide (p ∈ l)) := by
+  have hlen : p < (snapshotOf l u).length := by simpa using h
+  rw [List.getElem?_eq_getElem hlen]
+  simp [snapshotOf]
+
+theorem ofSnapshot_snapshotOf_some {l : List ℕ} {u p : ℕ} {b : Bool}
+    (h : PartOracle.ofSnapshot (snapshotOf l u) p = some b) :
+    p < u ∧ b = decide (p ∈ l) := by
+  rw [PartOracle.ofSnapshot_apply] at h
+  by_cases hp : p < u
+  · rw [snapshotOf_getElem? hp] at h
+    exact ⟨hp, (Option.some.inj h).symm⟩
+  · rw [List.getElem?_eq_none (by simpa using Nat.le_of_not_lt hp)] at h
+    exact absurd h (by simp)
+
+/-- Enumerating a number `≥` the use of a halting computation into the
+oracle list does not disturb the computation — the use principle in the
+form a stage-by-stage invariant needs. -/
+theorem run_halt_cons_snapshot {l : List ℕ} {x k len w : ℕ} {c : OracleCode}
+    {d : HaltData} (hx : d.use ≤ x)
+    (h : run k (PartOracle.ofSnapshot (snapshotOf l len)) c w = .halt d) :
+    run k (PartOracle.ofSnapshot (snapshotOf (x :: l) len)) c w = .halt d := by
+  refine run_halt_mono le_rfl (fun p hp b hb => ?_) h
+  obtain ⟨hpl, hb'⟩ := ofSnapshot_snapshotOf_some hb
+  subst hb'
+  rw [PartOracle.ofSnapshot_apply, snapshotOf_getElem? hpl]
+  have hpx : p ≠ x := by omega
+  simp [List.mem_cons, hpx]
+
+/-- Transfer a halting run from the `Finset` snapshot of length the use to
+the full-length list snapshot of the same stage (more fuel, more oracle —
+the use principle again). -/
+theorem run_halt_toFinset_snapshot {l : List ℕ} {k s : ℕ} {c : OracleCode}
+    {x : ℕ} {d : HaltData} (hk : k ≤ s) (hu : d.use ≤ s)
+    (h : run k (PartOracle.ofSnapshot (snapshot l.toFinset d.use)) c x = .halt d) :
+    run s (PartOracle.ofSnapshot (snapshotOf l s)) c x = .halt d := by
+  refine run_halt_mono hk (fun p hp b hb => ?_) h
+  obtain ⟨hpu, hb'⟩ := ofSnapshot_snapshot_some hb
+  subst hb'
+  rw [PartOracle.ofSnapshot_apply, snapshotOf_getElem? (by omega)]
+  simp [List.mem_toFinset]
+
 end FriedbergMuchnik
