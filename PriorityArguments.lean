@@ -55,4 +55,29 @@ theorem friedbergMuchnik_set_splits' :
       ¬ (Bset ≤ᵀ B₀) ∧ ¬ (Bset ≤ᵀ B₁) :=
   SacksSplitting.sacks_splitting Bset ce_Bset Bset_not_computable
 
+/-! ### Both theorems in Mathlib's oracle model
+
+`turingReducible_of_mathlib` says every reduction in Mathlib's `RecursiveIn`
+model is captured by an `OracleCode` — so the project-local `≤ᵀ` is not too
+weak, which is the only direction that matters when the conclusions are
+*negations* of reducibility.  Both results therefore transfer. -/
+
+/-- Friedberg–Muchnik, stated over Mathlib's `RecursiveIn` model. -/
+theorem friedberg_muchnik_mathlib :
+    ∃ A B : Set ℕ, CE A ∧ CE B ∧
+      ¬ MathlibTuringReducible A B ∧ ¬ MathlibTuringReducible B A :=
+  ⟨Aset, Bset, ce_Aset, ce_Bset,
+    not_mathlibTuringReducible not_A_le_B,
+    not_mathlibTuringReducible not_B_le_A⟩
+
+/-- Sacks splitting, stated over Mathlib's `RecursiveIn` model. -/
+theorem sacks_splitting_mathlib :
+    ∀ A : Set ℕ, CE A → ¬ ComputableSet A →
+      ∃ A₀ A₁ : Set ℕ, CE A₀ ∧ CE A₁ ∧ Disjoint A₀ A₁ ∧ A₀ ∪ A₁ = A ∧
+        ¬ MathlibTuringReducible A A₀ ∧ ¬ MathlibTuringReducible A A₁ := by
+  intro A hce hnc
+  obtain ⟨A₀, A₁, h0, h1, hd, hu, hn0, hn1⟩ := SacksSplitting.sacks_splitting A hce hnc
+  exact ⟨A₀, A₁, h0, h1, hd, hu,
+    not_mathlibTuringReducible hn0, not_mathlibTuringReducible hn1⟩
+
 end PriorityArguments

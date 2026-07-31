@@ -47,19 +47,9 @@ neither owns. See `README.md` for the layout and
 `SacksSplitting/STATUS.md` for the component-by-component account of what
 transferred and what had to be rebuilt.
 
-The one open item inherited from here is **partly** addressed:
-`OracleComputability/MathlibOracleBridge.lean` now relates the local
-semantics to Mathlib's `RecursiveIn` model — `mathlibOracle`,
-`MathlibTuringReducible`, `LocallyRealizes`, and realization lemmas for the
-base codes plus `pair` and `comp`.  What is *not* yet proved is either
-transfer theorem: neither `A ≤ᵀ B → MathlibTuringReducible A B` nor its
-converse.  Until the converse is proved, "not reducible" still means "not
-reducible in this model".
-
-Concretely, what remains is `realizes_prec` and `realizes_rfind` — the two
-`RecursiveIn` constructors the bridge does not yet cover — and then the
-induction over `RecursiveIn` that assembles them into
-`MathlibTuringReducible A B → A ≤ᵀ B`.  That is the direction that upgrades
-both theorems, because both conclusions are negations: it is the claim that
-every genuine reduction is captured by an `OracleCode`, and hence that the
-local `≤ᵀ` is not too weak.
+The open item inherited from here is now **closed**.
+`OracleComputability/MathlibOracleBridge.lean` proves
+`turingReducible_of_mathlib : MathlibTuringReducible A B → A ≤ᵀ B` — every
+reduction in Mathlib's `RecursiveIn` model is captured by an `OracleCode`,
+so the local `≤ᵀ` is not too weak and the negative results transfer. Both
+theorems are restated over Mathlib's model in `PriorityArguments.lean`.

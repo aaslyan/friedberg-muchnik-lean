@@ -91,31 +91,38 @@ analogue — its requirements are satisfiable because their witnesses are
 fresh, which is a property of the construction, whereas a splitting
 requirement is satisfiable only because of a property of the *given* set.
 
-## The Mathlib oracle bridge (in progress)
+## The Mathlib oracle bridge
 
 `OracleComputability/MathlibOracleBridge.lean` relates the local semantics
 to Mathlib's `RecursiveIn` model from `Mathlib.Computability.TuringDegree`,
-without changing the local definitions: `mathlibOracle`,
-`MathlibTuringReducible`, `LocallyRealizes`, and realization lemmas for the
-base codes together with `pair` and `comp`.
-
-Neither transfer theorem is proved yet. What remains is `realizes_prec` and
-`realizes_rfind` — the two `RecursiveIn` constructors not yet covered — and
-the induction over `RecursiveIn` that assembles them into
+without changing the local definitions, and closes the loop:
 
 ```lean
-MathlibTuringReducible A B → A ≤ᵀ B
+theorem turingReducible_of_mathlib : MathlibTuringReducible A B → A ≤ᵀ B
 ```
 
-That is the direction worth having. Both headline theorems are *negations*
-of reducibility, so the risk to guard against is that the local `≤ᵀ` is too
-**weak** — too few reductions would make the negations cheap. This implication
-says every genuine reduction is captured by an `OracleCode`, and with it both
-theorems restate over Mathlib's `TuringDegree`.
+Every reduction in Mathlib's model is captured by an `OracleCode`. That is
+the direction that matters here: both headline theorems are *negations* of
+reducibility, so the risk to guard against is the local `≤ᵀ` being too
+**weak** — too few reductions would make the negations cheap. It isn't, and
+both results therefore restate over Mathlib's model, as
+`PriorityArguments.friedberg_muchnik_mathlib` and
+`PriorityArguments.sacks_splitting_mathlib`.
 
-Note that adding this file makes Mathlib's root-namespace `TuringReducible`
-visible alongside ours, so the two now have to be distinguished explicitly
-at the few sites that name the relation rather than the `≤ᵀ` notation.
+The proof is an induction over `RecursiveIn`, one `OracleCode` per
+constructor. The base cases and `pair`/`comp` are direct; `prec` goes
+through `Computes`-level step lemmas so the fuel bookkeeping is discharged
+once; `rfind` needs the most care, because our `rfind` is the *primed* form
+(it searches upward from the input's second component, matching
+`Nat.Partrec.Code.rfind'`) while `RecursiveIn.rfind` searches from `0`. The
+primed search is therefore characterized first without `Nat.rfind` at all —
+forward by induction on fuel, backward by induction on the distance to the
+target — then converted, then composed with an input adapter `a ↦ ⟨a, 0⟩`
+obtained from the ordinary Mathlib bridge.
+
+Note that this file makes Mathlib's root-namespace `TuringReducible`
+visible alongside ours, so the two are distinguished explicitly at the few
+sites that name the relation rather than using the `≤ᵀ` notation.
 
 ## Building
 
