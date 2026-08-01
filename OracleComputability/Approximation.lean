@@ -1,4 +1,8 @@
-/-
+import Mathlib.Data.Finset.Basic
+import OracleComputability.Use
+import OracleComputability.Reducibility
+
+/-!
 # Monotone finite-stage approximations and their limits
 
 The two c.e. sets of the Friedberg–Muchnik construction are built as
@@ -8,7 +12,7 @@ file provides everything the priority argument needs to pass between a
 stage, its Boolean snapshot, and the limit set:
 
 * `StageMono`, `limitSet` — monotone stage sequences and their union;
-* `StageMono.stabilizesBelow` — below any fixed bound, membership agrees
+* `StageMono.stabilizes_below` — below any fixed bound, membership agrees
   with the limit from some stage on (proved by induction on the bound, no
   appeal to finiteness of the limit set is needed);
 * `snapshot` — the Boolean string of a stage set up to a bound: the *only*
@@ -25,9 +29,6 @@ stage, its Boolean snapshot, and the limit set:
 Both preservation lemmas are corollaries of the master use principle
 `run_halt_mono`.
 -/
-import Mathlib.Data.Finset.Basic
-import OracleComputability.Use
-import OracleComputability.Reducibility
 
 namespace OracleComputability
 
@@ -60,15 +61,15 @@ finitely many positions below `u` that ever gets enumerated is enumerated
 at some stage; the induction on `u` takes maxima as it goes.)  This is the
 "sufficiently late stage" that every requirement-satisfaction argument
 appeals to. -/
-theorem stabilizesBelow {F : ℕ → Finset ℕ} (hF : StageMono F) (u : ℕ) :
+theorem stabilizes_below {F : ℕ → Finset ℕ} (hF : StageMono F) (u : ℕ) :
     ∃ s₀ : ℕ, ∀ s, s₀ ≤ s → ∀ n, n < u → (n ∈ F s ↔ n ∈ limitSet F) := by
   induction u with
-  | zero => exact ⟨0, fun s _ n hn => absurd hn (Nat.not_lt_zero n)⟩
+  | zero => exact ⟨0, fun s _ n hn ↦ absurd hn (Nat.not_lt_zero n)⟩
   | succ u IH =>
     obtain ⟨s₀, hs₀⟩ := IH
     by_cases hu : u ∈ limitSet F
     · obtain ⟨t, ht⟩ := hu
-      refine ⟨max s₀ t, fun s hs n hn => ?_⟩
+      refine ⟨max s₀ t, fun s hs n hn ↦ ?_⟩
       rcases Nat.lt_or_ge n u with h | h
       · exact hs₀ s (le_trans (le_max_left _ _) hs) n h
       · have hn_eq : n = u := by omega
@@ -78,7 +79,7 @@ theorem stabilizesBelow {F : ℕ → Finset ℕ} (hF : StageMono F) (u : ℕ) :
           exact ⟨s, hmem⟩
         · intro _
           exact hF.subset_of_le (le_trans (le_max_right _ _) hs) ht
-    · refine ⟨s₀, fun s hs n hn => ?_⟩
+    · refine ⟨s₀, fun s hs n hn ↦ ?_⟩
       rcases Nat.lt_or_ge n u with h | h
       · exact hs₀ s hs n h
       · have hn_eq : n = u := by omega
@@ -95,7 +96,7 @@ end StageMono
 holds the membership bit of `i`.  This is the only place `List Bool`
 appears in the construction — always derived, never primary. -/
 def snapshot (F : Finset ℕ) (u : ℕ) : List Bool :=
-  List.ofFn fun i : Fin u => decide (i.val ∈ F)
+  List.ofFn fun i : Fin u ↦ decide (i.val ∈ F)
 
 @[simp] theorem snapshot_length (F : Finset ℕ) (u : ℕ) :
     (snapshot F u).length = u := by
@@ -131,7 +132,7 @@ theorem run_halt_limit_of_restraint {F : ℕ → Finset ℕ} {k u s x : ℕ}
     (h : run k (PartOracle.ofSnapshot (snapshot (F s) u)) c x = .halt d)
     (hres : ∀ t, s ≤ t → ∀ n, n < d.use → n ∈ F t → n ∈ F s) :
     run k (PartOracle.ofFun (charFun (limitSet F))) c x = .halt d := by
-  refine run_halt_mono le_rfl (fun i hi b hb => ?_) h
+  refine run_halt_mono le_rfl (fun i hi b hb ↦ ?_) h
   obtain ⟨hiu, hb'⟩ := ofSnapshot_snapshot_some hb
   subst hb'
   rw [PartOracle.ofFun_apply]
@@ -155,9 +156,9 @@ theorem run_halt_snapshot_of_limit {F : ℕ → Finset ℕ} {k x : ℕ}
     (h : run k (PartOracle.ofFun (charFun (limitSet F))) c x = .halt d) :
     ∃ s₀ : ℕ, ∀ s, s₀ ≤ s →
       run k (PartOracle.ofSnapshot (snapshot (F s) d.use)) c x = .halt d := by
-  obtain ⟨s₀, hs₀⟩ := hF.stabilizesBelow d.use
-  refine ⟨s₀, fun s hs => ?_⟩
-  refine run_halt_mono le_rfl (fun i hi b hb => ?_) h
+  obtain ⟨s₀, hs₀⟩ := hF.stabilizes_below d.use
+  refine ⟨s₀, fun s hs ↦ ?_⟩
+  refine run_halt_mono le_rfl (fun i hi b hb ↦ ?_) h
   rw [PartOracle.ofFun_apply] at hb
   have hb' : b = charFun (limitSet F) i := (Option.some.inj hb).symm
   subst hb'
@@ -168,7 +169,7 @@ theorem run_halt_snapshot_of_limit {F : ℕ → Finset ℕ} {k x : ℕ}
   · rw [decide_eq_true hmem]
     exact (charFun_eq_true.mpr (hiff.mp hmem)).symm
   · rw [decide_eq_false hmem]
-    exact (charFun_eq_false.mpr (fun hl => hmem (hiff.mpr hl))).symm
+    exact (charFun_eq_false.mpr (fun hl ↦ hmem (hiff.mpr hl))).symm
 
 /-! ### Snapshots of enumeration *lists*
 
@@ -179,7 +180,7 @@ layer can digest.  None of this mentions any particular construction. -/
 /-- Boolean snapshot of (the set of elements of) a list: position `j < u`
 holds the membership bit of `j`. -/
 def snapshotOf (l : List ℕ) (u : ℕ) : List Bool :=
-  (List.range u).map fun j => decide (j ∈ l)
+  (List.range u).map fun j ↦ decide (j ∈ l)
 
 @[simp] theorem snapshotOf_length (l : List ℕ) (u : ℕ) :
     (snapshotOf l u).length = u := by
@@ -216,7 +217,7 @@ theorem run_halt_cons_snapshot {l : List ℕ} {x k len w : ℕ} {c : OracleCode}
     {d : HaltData} (hx : d.use ≤ x)
     (h : run k (PartOracle.ofSnapshot (snapshotOf l len)) c w = .halt d) :
     run k (PartOracle.ofSnapshot (snapshotOf (x :: l) len)) c w = .halt d := by
-  refine run_halt_mono le_rfl (fun p hp b hb => ?_) h
+  refine run_halt_mono le_rfl (fun p hp b hb ↦ ?_) h
   obtain ⟨hpl, hb'⟩ := ofSnapshot_snapshotOf_some hb
   subst hb'
   rw [PartOracle.ofSnapshot_apply, snapshotOf_getElem? hpl]
@@ -230,7 +231,7 @@ theorem run_halt_toFinset_snapshot {l : List ℕ} {k s : ℕ} {c : OracleCode}
     {x : ℕ} {d : HaltData} (hk : k ≤ s) (hu : d.use ≤ s)
     (h : run k (PartOracle.ofSnapshot (snapshot l.toFinset d.use)) c x = .halt d) :
     run s (PartOracle.ofSnapshot (snapshotOf l s)) c x = .halt d := by
-  refine run_halt_mono hk (fun p hp b hb => ?_) h
+  refine run_halt_mono hk (fun p hp b hb ↦ ?_) h
   obtain ⟨hpu, hb'⟩ := ofSnapshot_snapshot_some hb
   subst hb'
   rw [PartOracle.ofSnapshot_apply, snapshotOf_getElem? (by omega)]

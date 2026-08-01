@@ -1,4 +1,7 @@
-/-
+import Mathlib.Data.Set.Basic
+import OracleComputability.InfiniteEval
+
+/-!
 # Turing reducibility and computable enumerability, project vocabulary
 
 This file fixes the computability-theoretic vocabulary in which the final
@@ -18,8 +21,6 @@ the program enumeration in `Numbering.lean`, the Mathlib correspondence in
 `MathlibBridge.lean`, and closure under composition in a later file — are
 part of the project's foundation obligations, not afterthoughts.
 -/
-import Mathlib.Data.Set.Basic
-import OracleComputability.InfiniteEval
 
 namespace OracleComputability
 
@@ -27,7 +28,7 @@ open Classical in
 /-- The characteristic function of a set of naturals (classical: sets are
 arbitrary `Set ℕ`, no decidability assumed). -/
 noncomputable def charFun (A : Set ℕ) : ℕ → Bool :=
-  fun n => decide (n ∈ A)
+  fun n ↦ decide (n ∈ A)
 
 open Classical in
 @[simp] theorem charFun_eq_true {A : Set ℕ} {n : ℕ} :
@@ -68,7 +69,7 @@ def ComputableSet (A : Set ℕ) : Prop :=
 (Sanity: the reduction relation is about oracle access, not a triviality of
 the encoding.) -/
 theorem TuringReducible.refl (A : Set ℕ) : A ≤ᵀ A := by
-  refine ⟨.query, fun x => ⟨x + 2, ⟨natOfBool (charFun A x), x + 1⟩, ?_, rfl⟩⟩
+  refine ⟨.query, fun x ↦ ⟨x + 2, ⟨natOfBool (charFun A x), x + 1⟩, ?_, rfl⟩⟩
   exact run_query_some (by omega) rfl
 
 /-- A computable set is Turing reducible to *every* oracle: the reduction
@@ -78,10 +79,10 @@ computable, they would in particular have been reducible to each other.) -/
 theorem ComputableSet.turingReducible {A : Set ℕ} (h : ComputableSet A)
     (B : Set ℕ) : A ≤ᵀ B := by
   obtain ⟨c, hc⟩ := h
-  refine ⟨c, fun x => ?_⟩
+  refine ⟨c, fun x ↦ ?_⟩
   obtain ⟨k, d, hr, hout⟩ := hc x
   refine ⟨k, d, ?_, hout⟩
-  refine run_halt_mono le_rfl (fun i _ b hb => ?_) hr
+  refine run_halt_mono le_rfl (fun i _ b hb ↦ ?_) hr
   rw [PartOracle.empty_apply] at hb
   exact absurd hb (by simp)
 

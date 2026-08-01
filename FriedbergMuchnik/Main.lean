@@ -1,4 +1,7 @@
-/-
+import FriedbergMuchnik.Requirements
+import FriedbergMuchnik.CE
+
+/-!
 # The Friedberg–Muchnik theorem
 
 Final assembly.  Everything below is stated in the project's ordinary
@@ -15,8 +18,6 @@ c.e.-ness is `CE.lean` (the construction is computable); the two
 non-reducibilities are `Requirements.lean` (every requirement of the
 priority argument is satisfied).
 -/
-import FriedbergMuchnik.Requirements
-import FriedbergMuchnik.CE
 
 namespace FriedbergMuchnik
 
@@ -34,9 +35,9 @@ theorem friedberg_muchnik :
 to everything, contradicting the incomparability) — so the theorem also
 certifies, inside the model, that c.e. strictly exceeds computable. -/
 theorem Aset_not_computable : ¬ ComputableSet Aset :=
-  fun h => not_A_le_B (h.turingReducible Bset)
+  fun h ↦ not_A_le_B (h.turingReducible Bset)
 
 theorem Bset_not_computable : ¬ ComputableSet Bset :=
-  fun h => not_B_le_A (h.turingReducible Aset)
+  fun h ↦ not_B_le_A (h.turingReducible Aset)
 
 end FriedbergMuchnik

@@ -1,4 +1,8 @@
-/-
+import OracleComputability.MathlibBridge
+import OracleComputability.PrimrecTools
+import FriedbergMuchnik.StageDynamics
+
+/-!
 # The constructed sets are computably enumerable
 
 The last obligation of the construction: `Aset` and `Bset` are `CE` in the
@@ -15,9 +19,6 @@ operations of the construction (`set`, and take-cons-replicate) are
 re-expressed as maps over `List.range`, which is what the bridge lemmas
 `map_range_set` / `map_range_act` justify.
 -/
-import OracleComputability.MathlibBridge
-import OracleComputability.PrimrecTools
-import FriedbergMuchnik.StageDynamics
 
 namespace FriedbergMuchnik
 
@@ -46,8 +47,8 @@ def convCheckN (Al Bl : List ℕ) (s i x : ℕ) : Option ℕ :=
 
 /-- Parallel form of `ConsState.requiresAttention`. -/
 def reqAttN (Al Bl : List ℕ) (rs : List RS) (s i : ℕ) : Bool :=
-  (rs[i]?).casesOn false fun r =>
-    r.1.casesOn true fun x => !r.2.1 && (convCheckN Al Bl s i x).isSome
+  (rs[i]?).casesOn false fun r ↦
+    r.1.casesOn true fun x ↦ !r.2.1 && (convCheckN Al Bl s i x).isSome
 
 /-- The unchanged-state builder (idle stages and failed convergence
 checks): the pre-state with the newborn blank record. -/
@@ -57,7 +58,7 @@ def idleSt (st : St) : St :=
 /-- The appointment state: requirement `i` takes the counter as witness. -/
 def appointSt (st : St) (i : ℕ) : St :=
   (st.1, st.2.1,
-    (List.range (st.2.2.1 ++ [initRS]).length).map fun j =>
+    (List.range (st.2.2.1 ++ [initRS]).length).map fun j ↦
       if j = i then
         (some st.2.2.2,
          ((st.2.2.1 ++ [initRS]).getD i initRS).2.1,
@@ -70,7 +71,7 @@ initializing everything below it. -/
 def actSt (st : St) (i x u : ℕ) : St :=
   ((if i % 2 = 0 then x :: st.1 else st.1),
    (if i % 2 = 0 then st.2.1 else x :: st.2.1),
-   (List.range (st.2.2.1 ++ [initRS]).length).map fun j =>
+   (List.range (st.2.2.1 ++ [initRS]).length).map fun j ↦
      if j < i then (st.2.2.1 ++ [initRS]).getD j initRS
      else if j = i then (some x, true, u) else initRS,
    max st.2.2.2 (u + 1))
@@ -79,15 +80,15 @@ def actSt (st : St) (i x u : ℕ) : St :=
 builders above, so that the computability proof only ever manipulates
 small, named heads. -/
 def stepN (st : St) (s : ℕ) : St :=
-  ((List.range (st.2.2.1 ++ [initRS]).length).find? fun i =>
+  ((List.range (st.2.2.1 ++ [initRS]).length).find? fun i ↦
       reqAttN st.1 st.2.1 (st.2.2.1 ++ [initRS]) s i).casesOn
     (idleSt st)
-    fun i =>
+    fun i ↦
       (((st.2.2.1 ++ [initRS]).getD i initRS).1).casesOn
         (appointSt st i)
-        fun x =>
+        fun x ↦
           (convCheckN st.1 st.2.1 s i x).casesOn (idleSt st)
-            fun u => actSt st i x u
+            fun u ↦ actSt st i x u
 
 /-- Parallel form of `stageState`. -/
 def stageN : ℕ → St
@@ -131,7 +132,7 @@ theorem encReq_restraint (r : ReqState) : (encReq r).2.2 = r.restraint := rfl
 
 theorem map_range_set {α : Type _} (l : List α) (d v : α) (i n : ℕ)
     (hn : n = l.length) (hi : i < l.length) :
-    ((List.range n).map fun j => if j = i then v else l.getD j d) =
+    ((List.range n).map fun j ↦ if j = i then v else l.getD j d) =
       l.set i v := by
   subst hn
   apply List.ext_getElem?
@@ -150,7 +151,7 @@ theorem map_range_set {α : Type _} (l : List α) (d v : α) (i n : ℕ)
 
 theorem map_range_act {α : Type _} (l : List α) (rec init' : α) (i n : ℕ)
     (hn : n = l.length) (hi : i < l.length) :
-    ((List.range n).map fun j =>
+    ((List.range n).map fun j ↦
       if j < i then l.getD j init' else if j = i then rec else init') =
       l.take i ++ rec :: List.replicate (l.length - (i + 1)) init' := by
   subst hn
@@ -189,15 +190,15 @@ theorem encSt_stepState (st : ConsState) (s : ℕ) :
       (st.reqs ++ [ReqState.init]).map encReq := by
     simp [encSt, encReq, ReqState.init, initRS]
   simp only [stepState, stepN, idleSt, appointSt, actSt, hmap, List.length_map]
-  have hpred : (fun i => reqAttN (encSt st).1 (encSt st).2.1
+  have hpred : (fun i ↦ reqAttN (encSt st).1 (encSt st).2.1
       ((st.reqs ++ [ReqState.init]).map encReq) s i) =
-      fun i => ConsState.requiresAttention
+      fun i ↦ ConsState.requiresAttention
         { st with reqs := st.reqs ++ [ReqState.init] } s i :=
-    funext fun i =>
+    funext fun i ↦
       reqAttN_eq { st with reqs := st.reqs ++ [ReqState.init] } s i
   rw [hpred]
   cases hfind : (List.range (st.reqs ++ [ReqState.init]).length).find?
-      (fun i => ConsState.requiresAttention
+      (fun i ↦ ConsState.requiresAttention
         { st with reqs := st.reqs ++ [ReqState.init] } s i) with
   | none => simp [encSt]
   | some i =>
@@ -263,25 +264,25 @@ theorem mem_Blist_iff_stageN (x s : ℕ) :
 
 set_option maxHeartbeats 1600000 in
 private theorem primrec_convCheckN :
-    Primrec fun q : ((List ℕ × List ℕ) × ℕ × ℕ) × ℕ =>
+    Primrec fun q : ((List ℕ × List ℕ) × ℕ × ℕ) × ℕ ↦
       convCheckN q.1.1.1 q.1.1.2 q.1.2.1 q.1.2.2 q.2 := by
-  have hAl : Primrec fun q : ((List ℕ × List ℕ) × ℕ × ℕ) × ℕ => q.1.1.1 :=
+  have hAl : Primrec fun q : ((List ℕ × List ℕ) × ℕ × ℕ) × ℕ ↦ q.1.1.1 :=
     Primrec.fst.comp (Primrec.fst.comp Primrec.fst)
-  have hBl : Primrec fun q : ((List ℕ × List ℕ) × ℕ × ℕ) × ℕ => q.1.1.2 :=
+  have hBl : Primrec fun q : ((List ℕ × List ℕ) × ℕ × ℕ) × ℕ ↦ q.1.1.2 :=
     Primrec.snd.comp (Primrec.fst.comp Primrec.fst)
-  have hs : Primrec fun q : ((List ℕ × List ℕ) × ℕ × ℕ) × ℕ => q.1.2.1 :=
+  have hs : Primrec fun q : ((List ℕ × List ℕ) × ℕ × ℕ) × ℕ ↦ q.1.2.1 :=
     Primrec.fst.comp (Primrec.snd.comp Primrec.fst)
-  have hii : Primrec fun q : ((List ℕ × List ℕ) × ℕ × ℕ) × ℕ => q.1.2.2 :=
+  have hii : Primrec fun q : ((List ℕ × List ℕ) × ℕ × ℕ) × ℕ ↦ q.1.2.2 :=
     Primrec.snd.comp (Primrec.snd.comp Primrec.fst)
-  have hx : Primrec fun q : ((List ℕ × List ℕ) × ℕ × ℕ) × ℕ => q.2 :=
+  have hx : Primrec fun q : ((List ℕ × List ℕ) × ℕ × ℕ) × ℕ ↦ q.2 :=
     Primrec.snd
-  have horacle : Primrec fun q : ((List ℕ × List ℕ) × ℕ × ℕ) × ℕ =>
+  have horacle : Primrec fun q : ((List ℕ × List ℕ) × ℕ × ℕ) × ℕ ↦
       if q.1.2.2 % 2 = 0 then q.1.1.2 else q.1.1.1 :=
     Primrec.ite
       (PrimrecRel.comp Primrec.eq
         (Primrec.nat_mod.comp hii (Primrec.const 2)) (Primrec.const 0))
       hBl hAl
-  have hv : Primrec fun q : ((List ℕ × List ℕ) × ℕ × ℕ) × ℕ =>
+  have hv : Primrec fun q : ((List ℕ × List ℕ) × ℕ × ℕ) × ℕ ↦
       nrun q.1.2.1 (snapshotOf (if q.1.2.2 % 2 = 0 then q.1.1.2 else q.1.1.1)
         q.1.2.1) (q.1.2.2 / 2) q.2 :=
     nrun_primrec.comp
@@ -297,24 +298,24 @@ private theorem primrec_convCheckN :
     (Primrec.option_some.comp
       (Primrec.snd.comp (Primrec.unpair.comp
         (Primrec.nat_sub.comp hv (Primrec.const 2)))))
-    (Primrec.const none)).of_eq fun q => by simp only [convCheckN]
+    (Primrec.const none)).of_eq fun q ↦ by simp only [convCheckN]
 
 
 set_option maxHeartbeats 16000000 in
 private theorem primrec_reqAttN :
-    Primrec fun q : ((List ℕ × List ℕ) × List RS) × ℕ × ℕ =>
+    Primrec fun q : ((List ℕ × List ℕ) × List RS) × ℕ × ℕ ↦
       reqAttN q.1.1.1 q.1.1.2 q.1.2 q.2.1 q.2.2 := by
-  have hAl : Primrec fun q : ((List ℕ × List ℕ) × List RS) × ℕ × ℕ => q.1.1.1 :=
+  have hAl : Primrec fun q : ((List ℕ × List ℕ) × List RS) × ℕ × ℕ ↦ q.1.1.1 :=
     Primrec.fst.comp (Primrec.fst.comp Primrec.fst)
-  have hBl : Primrec fun q : ((List ℕ × List ℕ) × List RS) × ℕ × ℕ => q.1.1.2 :=
+  have hBl : Primrec fun q : ((List ℕ × List ℕ) × List RS) × ℕ × ℕ ↦ q.1.1.2 :=
     Primrec.snd.comp (Primrec.fst.comp Primrec.fst)
-  have hrs : Primrec fun q : ((List ℕ × List ℕ) × List RS) × ℕ × ℕ => q.1.2 :=
+  have hrs : Primrec fun q : ((List ℕ × List ℕ) × List RS) × ℕ × ℕ ↦ q.1.2 :=
     Primrec.snd.comp Primrec.fst
-  have hs : Primrec fun q : ((List ℕ × List ℕ) × List RS) × ℕ × ℕ => q.2.1 :=
+  have hs : Primrec fun q : ((List ℕ × List ℕ) × List RS) × ℕ × ℕ ↦ q.2.1 :=
     Primrec.fst.comp Primrec.snd
-  have hii : Primrec fun q : ((List ℕ × List ℕ) × List RS) × ℕ × ℕ => q.2.2 :=
+  have hii : Primrec fun q : ((List ℕ × List ℕ) × List RS) × ℕ × ℕ ↦ q.2.2 :=
     Primrec.snd.comp Primrec.snd
-  have hopt : Primrec fun q : ((List ℕ × List ℕ) × List RS) × ℕ × ℕ =>
+  have hopt : Primrec fun q : ((List ℕ × List ℕ) × List RS) × ℕ × ℕ ↦
       q.1.2[q.2.2]? :=
     Primrec.list_getElem?.comp hrs hii
   have hinner2 : Primrec fun p :
@@ -332,35 +333,35 @@ private theorem primrec_reqAttN :
               (hii.comp (Primrec.fst.comp Primrec.fst)))).pair Primrec.snd)))
   have hinner : Primrec fun p :
       (((List ℕ × List ℕ) × List RS) × ℕ × ℕ) × RS =>
-      (p.2.1.casesOn true fun x => !p.2.2.1 &&
+      (p.2.1.casesOn true fun x ↦ !p.2.2.1 &&
         (convCheckN p.1.1.1.1 p.1.1.1.2 p.1.2.1 p.1.2.2 x).isSome : Bool) :=
     Primrec.option_casesOn (Primrec.fst.comp Primrec.snd)
       (Primrec.const true) hinner2.to₂
   exact (Primrec.option_casesOn hopt (Primrec.const false) hinner.to₂).of_eq
-    fun q => by simp only [reqAttN]
+    fun q ↦ by simp only [reqAttN]
 
 private theorem primrec_idleSt : Primrec idleSt := by
-  have h : Primrec fun st : St =>
+  have h : Primrec fun st : St ↦
       ((st.1, st.2.1, st.2.2.1 ++ [initRS], st.2.2.2) : St) :=
     Primrec.fst.pair ((Primrec.fst.comp Primrec.snd).pair
       ((Primrec.list_append.comp
         (Primrec.fst.comp (Primrec.snd.comp Primrec.snd))
         (Primrec.const [initRS])).pair
       (Primrec.snd.comp (Primrec.snd.comp Primrec.snd))))
-  exact h.of_eq fun st => by simp only [idleSt]
+  exact h.of_eq fun st ↦ by simp only [idleSt]
 
 set_option maxHeartbeats 3200000 in
 private theorem primrec_appointSt : Primrec₂ appointSt := by
-  have hrs : Primrec fun p : St × ℕ => p.1.2.2.1 ++ [initRS] :=
+  have hrs : Primrec fun p : St × ℕ ↦ p.1.2.2.1 ++ [initRS] :=
     Primrec.list_append.comp
       (Primrec.fst.comp (Primrec.snd.comp (Primrec.snd.comp Primrec.fst)))
       (Primrec.const [initRS])
-  have hfr : Primrec fun p : St × ℕ => p.1.2.2.2 :=
+  have hfr : Primrec fun p : St × ℕ ↦ p.1.2.2.2 :=
     Primrec.snd.comp (Primrec.snd.comp (Primrec.snd.comp Primrec.fst))
-  have hgetD : Primrec fun p : St × ℕ =>
+  have hgetD : Primrec fun p : St × ℕ ↦
       (p.1.2.2.1 ++ [initRS]).getD p.2 initRS :=
     (Primrec.list_getD initRS).comp hrs Primrec.snd
-  have hmapf : Primrec fun pp : (St × ℕ) × ℕ =>
+  have hmapf : Primrec fun pp : (St × ℕ) × ℕ ↦
       if pp.2 = pp.1.2 then
         (some pp.1.1.2.2.2,
          ((pp.1.1.2.2.1 ++ [initRS]).getD pp.1.2 initRS).2.1,
@@ -373,9 +374,9 @@ private theorem primrec_appointSt : Primrec₂ appointSt := by
         ((Primrec.fst.comp (Primrec.snd.comp (hgetD.comp Primrec.fst))).pair
           (Primrec.snd.comp (Primrec.snd.comp (hgetD.comp Primrec.fst)))))
       ((Primrec.list_getD initRS).comp (hrs.comp Primrec.fst) Primrec.snd)
-  have h : Primrec fun p : St × ℕ =>
+  have h : Primrec fun p : St × ℕ ↦
       ((p.1.1, p.1.2.1,
-        (List.range (p.1.2.2.1 ++ [initRS]).length).map fun j =>
+        (List.range (p.1.2.2.1 ++ [initRS]).length).map fun j ↦
           if j = p.2 then
             (some p.1.2.2.2,
              ((p.1.2.2.1 ++ [initRS]).getD p.2 initRS).2.1,
@@ -388,38 +389,38 @@ private theorem primrec_appointSt : Primrec₂ appointSt := by
           (Primrec.list_range.comp (Primrec.list_length.comp hrs))
           hmapf.to₂).pair
         (Primrec.succ.comp hfr)))
-  exact h.of_eq fun p => by simp only [appointSt]
+  exact h.of_eq fun p ↦ by simp only [appointSt]
 
 set_option maxHeartbeats 3200000 in
 private theorem primrec_actSt :
-    Primrec fun w : ((St × ℕ) × ℕ) × ℕ => actSt w.1.1.1 w.1.1.2 w.1.2 w.2 := by
-  have hst : Primrec fun w : ((St × ℕ) × ℕ) × ℕ => w.1.1.1 :=
+    Primrec fun w : ((St × ℕ) × ℕ) × ℕ ↦ actSt w.1.1.1 w.1.1.2 w.1.2 w.2 := by
+  have hst : Primrec fun w : ((St × ℕ) × ℕ) × ℕ ↦ w.1.1.1 :=
     Primrec.fst.comp (Primrec.fst.comp Primrec.fst)
-  have hi : Primrec fun w : ((St × ℕ) × ℕ) × ℕ => w.1.1.2 :=
+  have hi : Primrec fun w : ((St × ℕ) × ℕ) × ℕ ↦ w.1.1.2 :=
     Primrec.snd.comp (Primrec.fst.comp Primrec.fst)
-  have hx : Primrec fun w : ((St × ℕ) × ℕ) × ℕ => w.1.2 :=
+  have hx : Primrec fun w : ((St × ℕ) × ℕ) × ℕ ↦ w.1.2 :=
     Primrec.snd.comp Primrec.fst
-  have hu : Primrec fun w : ((St × ℕ) × ℕ) × ℕ => w.2 := Primrec.snd
-  have hAl : Primrec fun w : ((St × ℕ) × ℕ) × ℕ => w.1.1.1.1 :=
+  have hu : Primrec fun w : ((St × ℕ) × ℕ) × ℕ ↦ w.2 := Primrec.snd
+  have hAl : Primrec fun w : ((St × ℕ) × ℕ) × ℕ ↦ w.1.1.1.1 :=
     Primrec.fst.comp hst
-  have hBl : Primrec fun w : ((St × ℕ) × ℕ) × ℕ => w.1.1.1.2.1 :=
+  have hBl : Primrec fun w : ((St × ℕ) × ℕ) × ℕ ↦ w.1.1.1.2.1 :=
     Primrec.fst.comp (Primrec.snd.comp hst)
-  have hrs : Primrec fun w : ((St × ℕ) × ℕ) × ℕ =>
+  have hrs : Primrec fun w : ((St × ℕ) × ℕ) × ℕ ↦
       w.1.1.1.2.2.1 ++ [initRS] :=
     Primrec.list_append.comp
       (Primrec.fst.comp (Primrec.snd.comp (Primrec.snd.comp hst)))
       (Primrec.const [initRS])
-  have hfr : Primrec fun w : ((St × ℕ) × ℕ) × ℕ => w.1.1.1.2.2.2 :=
+  have hfr : Primrec fun w : ((St × ℕ) × ℕ) × ℕ ↦ w.1.1.1.2.2.2 :=
     Primrec.snd.comp (Primrec.snd.comp (Primrec.snd.comp hst))
-  have heven : PrimrecPred fun w : ((St × ℕ) × ℕ) × ℕ => w.1.1.2 % 2 = 0 :=
+  have heven : PrimrecPred fun w : ((St × ℕ) × ℕ) × ℕ ↦ w.1.1.2 % 2 = 0 :=
     PrimrecRel.comp Primrec.eq (Primrec.nat_mod.comp hi (Primrec.const 2))
       (Primrec.const 0)
-  have hmapf : Primrec fun ww : (((St × ℕ) × ℕ) × ℕ) × ℕ =>
+  have hmapf : Primrec fun ww : (((St × ℕ) × ℕ) × ℕ) × ℕ ↦
       if ww.2 < ww.1.1.1.2 then
         (ww.1.1.1.1.2.2.1 ++ [initRS]).getD ww.2 initRS
       else if ww.2 = ww.1.1.1.2 then
         (some ww.1.1.2, true, ww.1.2) else initRS := by
-    have hi' : Primrec fun ww : (((St × ℕ) × ℕ) × ℕ) × ℕ => ww.1.1.1.2 :=
+    have hi' : Primrec fun ww : (((St × ℕ) × ℕ) × ℕ) × ℕ ↦ ww.1.1.1.2 :=
       hi.comp Primrec.fst
     exact Primrec.ite
       (PrimrecRel.comp Primrec.nat_lt Primrec.snd hi')
@@ -429,10 +430,10 @@ private theorem primrec_actSt :
         ((Primrec.option_some.comp (hx.comp Primrec.fst)).pair
           ((Primrec.const true).pair (hu.comp Primrec.fst)))
         (Primrec.const initRS))
-  have h : Primrec fun w : ((St × ℕ) × ℕ) × ℕ =>
+  have h : Primrec fun w : ((St × ℕ) × ℕ) × ℕ ↦
       (((if w.1.1.2 % 2 = 0 then w.1.2 :: w.1.1.1.1 else w.1.1.1.1),
         (if w.1.1.2 % 2 = 0 then w.1.1.1.2.1 else w.1.2 :: w.1.1.1.2.1),
-        (List.range (w.1.1.1.2.2.1 ++ [initRS]).length).map fun j =>
+        (List.range (w.1.1.1.2.2.1 ++ [initRS]).length).map fun j ↦
           if j < w.1.1.2 then (w.1.1.1.2.2.1 ++ [initRS]).getD j initRS
           else if j = w.1.1.2 then (some w.1.2, true, w.2) else initRS,
         max w.1.1.1.2.2.2 (w.2 + 1)) : St) :=
@@ -442,40 +443,40 @@ private theorem primrec_actSt :
           (Primrec.list_range.comp (Primrec.list_length.comp hrs))
           hmapf.to₂).pair
         (Primrec.nat_max.comp hfr (Primrec.succ.comp hu))))
-  exact h.of_eq fun w => by simp only [actSt]
+  exact h.of_eq fun w ↦ by simp only [actSt]
 
 set_option maxHeartbeats 3200000 in
 private theorem primrec_stepN : Primrec₂ stepN := by
-  have hAl : Primrec fun q : St × ℕ => q.1.1 := Primrec.fst.comp Primrec.fst
-  have hBl : Primrec fun q : St × ℕ => q.1.2.1 :=
+  have hAl : Primrec fun q : St × ℕ ↦ q.1.1 := Primrec.fst.comp Primrec.fst
+  have hBl : Primrec fun q : St × ℕ ↦ q.1.2.1 :=
     Primrec.fst.comp (Primrec.snd.comp Primrec.fst)
-  have hrs : Primrec fun q : St × ℕ => q.1.2.2.1 ++ [initRS] :=
+  have hrs : Primrec fun q : St × ℕ ↦ q.1.2.2.1 ++ [initRS] :=
     Primrec.list_append.comp
       (Primrec.fst.comp (Primrec.snd.comp (Primrec.snd.comp Primrec.fst)))
       (Primrec.const [initRS])
-  have hs : Primrec fun q : St × ℕ => q.2 := Primrec.snd
-  have hfind : Primrec fun q : St × ℕ =>
-      (List.range (q.1.2.2.1 ++ [initRS]).length).find? fun i =>
+  have hs : Primrec fun q : St × ℕ ↦ q.2 := Primrec.snd
+  have hfind : Primrec fun q : St × ℕ ↦
+      (List.range (q.1.2.2.1 ++ [initRS]).length).find? fun i ↦
         reqAttN q.1.1 q.1.2.1 (q.1.2.2.1 ++ [initRS]) q.2 i :=
     primrec_find? (Primrec.list_range.comp (Primrec.list_length.comp hrs))
       (primrec_reqAttN.comp
         ((((hAl.comp Primrec.fst).pair (hBl.comp Primrec.fst)).pair
           (hrs.comp Primrec.fst)).pair
           ((hs.comp Primrec.fst).pair Primrec.snd))).to₂
-  have hwit : Primrec fun p : (St × ℕ) × ℕ =>
+  have hwit : Primrec fun p : (St × ℕ) × ℕ ↦
       ((p.1.1.2.2.1 ++ [initRS]).getD p.2 initRS).1 :=
     Primrec.fst.comp
       ((Primrec.list_getD initRS).comp (hrs.comp Primrec.fst) Primrec.snd)
-  have hconv2 : Primrec fun p : ((St × ℕ) × ℕ) × ℕ =>
+  have hconv2 : Primrec fun p : ((St × ℕ) × ℕ) × ℕ ↦
       convCheckN p.1.1.1.1 p.1.1.1.2.1 p.1.1.2 p.1.2 p.2 :=
     primrec_convCheckN.comp
       ((((hAl.comp (Primrec.fst.comp Primrec.fst)).pair
           (hBl.comp (Primrec.fst.comp Primrec.fst))).pair
         ((hs.comp (Primrec.fst.comp Primrec.fst)).pair
           (Primrec.snd.comp Primrec.fst))).pair Primrec.snd)
-  have hactB : Primrec fun p : ((St × ℕ) × ℕ) × ℕ =>
+  have hactB : Primrec fun p : ((St × ℕ) × ℕ) × ℕ ↦
       ((convCheckN p.1.1.1.1 p.1.1.1.2.1 p.1.1.2 p.1.2 p.2).casesOn
-        (idleSt p.1.1.1) (fun u => actSt p.1.1.1 p.1.2 p.2 u) : St) :=
+        (idleSt p.1.1.1) (fun u ↦ actSt p.1.1.1 p.1.2 p.2 u) : St) :=
     Primrec.option_casesOn hconv2
       (primrec_idleSt.comp
         (Primrec.fst.comp (Primrec.fst.comp Primrec.fst)))
@@ -484,28 +485,28 @@ private theorem primrec_stepN : Primrec₂ stepN := by
             (Primrec.fst.comp Primrec.fst))).pair
            (Primrec.snd.comp (Primrec.fst.comp Primrec.fst))).pair
           (Primrec.snd.comp Primrec.fst)).pair Primrec.snd)).to₂
-  have hbranch : Primrec fun p : (St × ℕ) × ℕ =>
+  have hbranch : Primrec fun p : (St × ℕ) × ℕ ↦
       ((((p.1.1.2.2.1 ++ [initRS]).getD p.2 initRS).1).casesOn
         (appointSt p.1.1 p.2)
-        (fun x =>
+        (fun x ↦
           ((convCheckN p.1.1.1 p.1.1.2.1 p.1.2 p.2 x).casesOn
-            (idleSt p.1.1) (fun u => actSt p.1.1 p.2 x u) : St)) : St) :=
+            (idleSt p.1.1) (fun u ↦ actSt p.1.1 p.2 x u) : St)) : St) :=
     Primrec.option_casesOn hwit
       (primrec_appointSt.comp (Primrec.fst.comp Primrec.fst) Primrec.snd)
       hactB.to₂
   exact (Primrec.option_casesOn hfind
-    (primrec_idleSt.comp Primrec.fst) hbranch.to₂).of_eq fun q => by
+    (primrec_idleSt.comp Primrec.fst) hbranch.to₂).of_eq fun q ↦ by
       simp only [stepN]
 
 private theorem primrec_stageN : Primrec stageN := by
   have h : Primrec (Nat.rec (([], [], [], 0) : St)
-      fun s ih => stepN ih s : ℕ → St) :=
+      fun s ih ↦ stepN ih s : ℕ → St) :=
     Primrec.nat_rec₁ _ primrec_stepN.swap
-  refine h.of_eq fun s => ?_
+  refine h.of_eq fun s ↦ ?_
   induction s with
   | zero => rfl
   | succ s ih =>
-    show stepN (Nat.rec (([], [], [], 0) : St) (fun s ih => stepN ih s) s) s =
+    show stepN (Nat.rec (([], [], [], 0) : St) (fun s ih ↦ stepN ih s) s) s =
       stageN (s + 1)
     rw [ih]
     rfl
@@ -513,12 +514,12 @@ private theorem primrec_stageN : Primrec stageN := by
 /-! ### The two sets are computably enumerable -/
 
 private theorem primrec_memA :
-    Primrec fun p : ℕ × ℕ => decide (p.1 ∈ (stageN p.2).1) :=
+    Primrec fun p : ℕ × ℕ ↦ decide (p.1 ∈ (stageN p.2).1) :=
   primrec_memDecide.comp Primrec.fst
     (Primrec.fst.comp (primrec_stageN.comp Primrec.snd))
 
 private theorem primrec_memB :
-    Primrec fun p : ℕ × ℕ => decide (p.1 ∈ (stageN p.2).2.1) :=
+    Primrec fun p : ℕ × ℕ ↦ decide (p.1 ∈ (stageN p.2).2.1) :=
   primrec_memDecide.comp Primrec.fst
     ((Primrec.fst.comp Primrec.snd).comp (primrec_stageN.comp Primrec.snd))
 
@@ -526,18 +527,18 @@ private theorem primrec_memB :
 bridge): the stage construction is computable, so searching for a stage
 containing `x` is a partial recursive semi-decider for `Aset`. -/
 theorem ce_Aset : CE Aset := by
-  have hpart : Partrec₂ fun (x s : ℕ) =>
+  have hpart : Partrec₂ fun (x s : ℕ) ↦
       (Part.some (decide (x ∈ (stageN s).1)) : Part Bool) :=
     (primrec_memA.to_comp).partrec
-  have hrf : Partrec fun x : ℕ =>
-      Nat.rfind fun s => (Part.some (decide (x ∈ (stageN s).1)) : Part Bool) :=
+  have hrf : Partrec fun x : ℕ ↦
+      Nat.rfind fun s ↦ (Part.some (decide (x ∈ (stageN s).1)) : Part Bool) :=
     Partrec.rfind hpart
-  refine ce_of_partrec_dom (Partrec.nat_iff.mp hrf) fun x => ?_
+  refine ce_of_partrec_dom (Partrec.nat_iff.mp hrf) fun x ↦ ?_
   rw [Nat.rfind_dom]
   constructor
   · intro hmem
     obtain ⟨s, hs⟩ := mem_limitSet.mp hmem
-    refine ⟨s, ?_, fun _ => trivial⟩
+    refine ⟨s, ?_, fun _ ↦ trivial⟩
     rw [Part.mem_some_iff, eq_comm, decide_eq_true_iff]
     rw [AstageF, List.mem_toFinset] at hs
     exact (mem_Alist_iff_stageN x s).mp hs
@@ -549,18 +550,18 @@ theorem ce_Aset : CE Aset := by
 
 /-- **`B` is computably enumerable**. -/
 theorem ce_Bset : CE Bset := by
-  have hpart : Partrec₂ fun (x s : ℕ) =>
+  have hpart : Partrec₂ fun (x s : ℕ) ↦
       (Part.some (decide (x ∈ (stageN s).2.1)) : Part Bool) :=
     (primrec_memB.to_comp).partrec
-  have hrf : Partrec fun x : ℕ =>
-      Nat.rfind fun s => (Part.some (decide (x ∈ (stageN s).2.1)) : Part Bool) :=
+  have hrf : Partrec fun x : ℕ ↦
+      Nat.rfind fun s ↦ (Part.some (decide (x ∈ (stageN s).2.1)) : Part Bool) :=
     Partrec.rfind hpart
-  refine ce_of_partrec_dom (Partrec.nat_iff.mp hrf) fun x => ?_
+  refine ce_of_partrec_dom (Partrec.nat_iff.mp hrf) fun x ↦ ?_
   rw [Nat.rfind_dom]
   constructor
   · intro hmem
     obtain ⟨s, hs⟩ := mem_limitSet.mp hmem
-    refine ⟨s, ?_, fun _ => trivial⟩
+    refine ⟨s, ?_, fun _ ↦ trivial⟩
     rw [Part.mem_some_iff, eq_comm, decide_eq_true_iff]
     rw [BstageF, List.mem_toFinset] at hs
     exact (mem_Blist_iff_stageN x s).mp hs

@@ -1,4 +1,8 @@
-/-
+import Mathlib.Computability.TuringDegree
+import OracleComputability.Composition
+import OracleComputability.MathlibBridge
+
+/-!
 # Bridge to Mathlib's oracle-computability model
 
 This file is intentionally additive: it does not change the project-local
@@ -6,9 +10,6 @@ oracle semantics.  It relates them to Mathlib's semantic oracle model from
 `Mathlib.Computability.TuringDegree`, where oracle computability is expressed
 by `RecursiveIn`.
 -/
-import Mathlib.Computability.TuringDegree
-import OracleComputability.Composition
-import OracleComputability.MathlibBridge
 
 namespace OracleComputability
 
@@ -17,7 +18,7 @@ open Nat.Partrec (Code)
 /-- The total partial function used by Mathlib to represent a Boolean oracle:
 on input `n`, return the project's numeric membership bit. -/
 def mathlibOracle (X : ℕ → Bool) : ℕ →. ℕ :=
-  fun n => Part.some (natOfBool (X n))
+  fun n ↦ Part.some (natOfBool (X n))
 
 /-- The Mathlib/semantic version of set Turing reducibility, specialized to
 characteristic functions of sets of naturals. -/
@@ -31,7 +32,7 @@ def LocallyRealizes (X : ℕ → Bool) (c : OracleCode) (f : ℕ →. ℕ) : Pro
   ∀ x y, Computes c X x y ↔ y ∈ f x
 
 theorem realizes_zero (X : ℕ → Bool) :
-    LocallyRealizes X .zero (fun _ => Part.some 0) := by
+    LocallyRealizes X .zero (fun _ ↦ Part.some 0) := by
   intro x y
   constructor
   · intro h
@@ -59,7 +60,7 @@ theorem realizes_succ (X : ℕ → Bool) :
     exact ⟨x + 1, ⟨x + 1, 0⟩, run_succ_step _ (by omega), rfl⟩
 
 theorem realizes_left (X : ℕ → Bool) :
-    LocallyRealizes X .left (fun n => Part.some n.unpair.1) := by
+    LocallyRealizes X .left (fun n ↦ Part.some n.unpair.1) := by
   intro x y
   constructor
   · intro h
@@ -73,7 +74,7 @@ theorem realizes_left (X : ℕ → Bool) :
     exact ⟨x + 1, ⟨x.unpair.1, 0⟩, run_left_step _ (by omega), rfl⟩
 
 theorem realizes_right (X : ℕ → Bool) :
-    LocallyRealizes X .right (fun n => Part.some n.unpair.2) := by
+    LocallyRealizes X .right (fun n ↦ Part.some n.unpair.2) := by
   intro x y
   constructor
   · intro h
@@ -108,7 +109,7 @@ theorem realizes_query (X : ℕ → Bool) :
 
 theorem realizes_pair {X : ℕ → Bool} {cf cg : OracleCode} {f g : ℕ →. ℕ}
     (hf : LocallyRealizes X cf f) (hg : LocallyRealizes X cg g) :
-    LocallyRealizes X (.pair cf cg) (fun n => Nat.pair <$> f n <*> g n) := by
+    LocallyRealizes X (.pair cf cg) (fun n ↦ Nat.pair <$> f n <*> g n) := by
   intro x y
   constructor
   · rintro ⟨k, d, hr, rfl⟩
@@ -149,7 +150,7 @@ theorem realizes_pair {X : ℕ → Bool} {cf cg : OracleCode} {f g : ℕ →. �
 
 theorem realizes_comp {X : ℕ → Bool} {cf cg : OracleCode} {f g : ℕ →. ℕ}
     (hf : LocallyRealizes X cf f) (hg : LocallyRealizes X cg g) :
-    LocallyRealizes X (.comp cf cg) (fun n => g n >>= f) := by
+    LocallyRealizes X (.comp cf cg) (fun n ↦ g n >>= f) := by
   intro x y
   constructor
   · rintro ⟨k, d, hr, rfl⟩
@@ -226,7 +227,7 @@ The value `RecursiveIn.prec` asks for, as an explicit recursion. -/
 
 def precPart (f g : ℕ →. ℕ) (a : ℕ) : ℕ → Part ℕ
   | 0 => f a
-  | n + 1 => (precPart f g a n) >>= fun i => g (Nat.pair a (Nat.pair n i))
+  | n + 1 => (precPart f g a n) >>= fun i ↦ g (Nat.pair a (Nat.pair n i))
 
 theorem computes_prec_iff {X : ℕ → Bool} {cf cg : OracleCode} {f g : ℕ →. ℕ}
     (hf : LocallyRealizes X cf f) (hg : LocallyRealizes X cg g) :
@@ -242,7 +243,7 @@ theorem computes_prec_iff {X : ℕ → Bool} {cf cg : OracleCode} {f g : ℕ →
     rw [computes_prec_succ]
     show (∃ i, Computes (.prec cf cg) X (Nat.pair a n) i ∧
       Computes cg X (Nat.pair a (Nat.pair n i)) y) ↔
-      y ∈ (precPart f g a n) >>= fun i => g (Nat.pair a (Nat.pair n i))
+      y ∈ (precPart f g a n) >>= fun i ↦ g (Nat.pair a (Nat.pair n i))
     simp only [Part.bind_eq_bind, Part.mem_bind_iff]
     constructor
     · rintro ⟨i, hi, hy⟩
@@ -252,7 +253,7 @@ theorem computes_prec_iff {X : ℕ → Bool} {cf cg : OracleCode} {f g : ℕ →
 
 theorem precPart_eq (f g : ℕ →. ℕ) (a n : ℕ) :
     precPart f g a n =
-      n.rec (f a) (fun y IH => IH >>= fun i => g (Nat.pair a (Nat.pair y i))) := by
+      n.rec (f a) (fun y IH ↦ IH >>= fun i ↦ g (Nat.pair a (Nat.pair y i))) := by
   induction n with
   | zero => rfl
   | succ n ih =>
@@ -263,9 +264,9 @@ theorem precPart_eq (f g : ℕ →. ℕ) (a n : ℕ) :
 theorem realizes_prec {X : ℕ → Bool} {cf cg : OracleCode} {f g : ℕ →. ℕ}
     (hf : LocallyRealizes X cf f) (hg : LocallyRealizes X cg g) :
     LocallyRealizes X (.prec cf cg)
-      (fun p =>
+      (fun p ↦
         let (a, n) := Nat.unpair p
-        n.rec (f a) fun y IH => do
+        n.rec (f a) fun y IH ↦ do
           let i ← IH
           g (Nat.pair a (Nat.pair y i))) := by
   intro x y
@@ -340,12 +341,12 @@ theorem rfind_forward {X : ℕ → Bool} {cf : OracleCode} {f : ℕ →. ℕ}
     · rw [if_pos h0, hun2] at hcont
       have hout : d₂.output = m := by rw [← RunResult.halt.inj hcont]
       rw [hout]
-      refine ⟨le_rfl, ?_, fun j h1 h2 => absurd h2 (by omega)⟩
+      refine ⟨le_rfl, ?_, fun j h1 h2 ↦ absurd h2 (by omega)⟩
       rw [h0] at hv
       exact hv
     · rw [if_neg h0, hun1, hun2] at hcont
       obtain ⟨hle, hz, hj⟩ := ih a (m + 1) d₂ hcont
-      refine ⟨by omega, hz, fun j h1 h2 => ?_⟩
+      refine ⟨by omega, hz, fun j h1 h2 ↦ ?_⟩
       rcases Nat.lt_or_ge j (m + 1) with hjm | hjm
       · have hjeq : j = m := by omega
         subst hjeq
@@ -368,15 +369,15 @@ theorem rfind_backward {X : ℕ → Bool} {cf : OracleCode} {f : ℕ →. ℕ}
     obtain ⟨v, hv, hv0⟩ := hj m le_rfl (by omega)
     have hrec : Computes (.rfind cf) X (Nat.pair a (m + 1)) (m + 1 + t) :=
       ih a (m + 1) (by rw [show m + 1 + t = m + (t + 1) by omega]; exact hz)
-        (fun j h1 h2 => hj j (by omega) (by omega))
+        (fun j h1 h2 ↦ hj j (by omega) (by omega))
     rw [show m + (t + 1) = m + 1 + t by omega]
     exact computes_rfind_step ((hf _ v).mpr hv) hv0 hrec
 
 /-! ### From the unfolded characterization to `Nat.rfind` -/
 
 theorem mem_map_true {f : ℕ →. ℕ} {w : ℕ} :
-    true ∈ ((fun m => decide (m = 0)) <$> f w : Part Bool) ↔ 0 ∈ f w := by
-  show true ∈ Part.map (fun m => decide (m = 0)) (f w) ↔ 0 ∈ f w
+    true ∈ ((fun m ↦ decide (m = 0)) <$> f w : Part Bool) ↔ 0 ∈ f w := by
+  show true ∈ Part.map (fun m ↦ decide (m = 0)) (f w) ↔ 0 ∈ f w
   rw [Part.mem_map_iff]
   constructor
   · rintro ⟨v, hv, hd⟩
@@ -386,8 +387,8 @@ theorem mem_map_true {f : ℕ →. ℕ} {w : ℕ} :
     exact ⟨0, h, by simp⟩
 
 theorem mem_map_false {f : ℕ →. ℕ} {w : ℕ} :
-    false ∈ ((fun m => decide (m = 0)) <$> f w : Part Bool) ↔ ∃ v, v ∈ f w ∧ v ≠ 0 := by
-  show false ∈ Part.map (fun m => decide (m = 0)) (f w) ↔ _
+    false ∈ ((fun m ↦ decide (m = 0)) <$> f w : Part Bool) ↔ ∃ v, v ∈ f w ∧ v ≠ 0 := by
+  show false ∈ Part.map (fun m ↦ decide (m = 0)) (f w) ↔ _
   rw [Part.mem_map_iff]
   constructor
   · rintro ⟨v, hv, hd⟩
@@ -397,9 +398,9 @@ theorem mem_map_false {f : ℕ →. ℕ} {w : ℕ} :
 
 /-- The partial function our *primed* `rfind` computes: search upward from
 the second component of the input, and report the absolute index found. -/
-def rfindPrimed (f : ℕ →. ℕ) : ℕ →. ℕ := fun x =>
-  (Nat.rfind fun n => (fun m => m = 0) <$> f (Nat.pair x.unpair.1 (x.unpair.2 + n))).map
-    (fun n => n + x.unpair.2)
+def rfindPrimed (f : ℕ →. ℕ) : ℕ →. ℕ := fun x ↦
+  (Nat.rfind fun n ↦ (fun m ↦ m = 0) <$> f (Nat.pair x.unpair.1 (x.unpair.2 + n))).map
+    (fun n ↦ n + x.unpair.2)
 
 theorem realizes_rfind_primed {X : ℕ → Bool} {cf : OracleCode} {f : ℕ →. ℕ}
     (hf : LocallyRealizes X cf f) :
@@ -454,9 +455,9 @@ theorem exists_locallyRealizes_of_partrec {f : ℕ →. ℕ} (hf : Nat.Partrec f
   exact ⟨embed cf, locallyRealizes_embed X cf⟩
 
 theorem exists_pairZero_code (X : ℕ → Bool) :
-    ∃ c, LocallyRealizes X c (fun a => Part.some (Nat.pair a 0)) := by
+    ∃ c, LocallyRealizes X c (fun a ↦ Part.some (Nat.pair a 0)) := by
   refine exists_locallyRealizes_of_partrec ?_ X
-  have hc : Computable fun a : ℕ => Nat.pair a 0 :=
+  have hc : Computable fun a : ℕ ↦ Nat.pair a 0 :=
     Primrec.to_comp (Primrec₂.natPair.comp Primrec.id (Primrec.const 0))
   exact Partrec.nat_iff.mp hc.partrec
 
@@ -465,17 +466,17 @@ theorem exists_pairZero_code (X : ℕ → Bool) :
 theorem exists_realizes_rfind {X : ℕ → Bool} {cf : OracleCode} {f : ℕ →. ℕ}
     (hf : LocallyRealizes X cf f) :
     ∃ c, LocallyRealizes X c
-      (fun a => Nat.rfind fun n => (fun m => m = 0) <$> f (Nat.pair a n)) := by
+      (fun a ↦ Nat.rfind fun n ↦ (fun m ↦ m = 0) <$> f (Nat.pair a n)) := by
   obtain ⟨c0, hc0⟩ := exists_pairZero_code X
   refine ⟨.comp (.rfind cf) c0, ?_⟩
   have h := realizes_comp (realizes_rfind_primed hf) hc0
-  have hfun : (fun a => (Part.some (Nat.pair a 0)) >>= rfindPrimed f)
-      = (fun a => Nat.rfind fun n => (fun m => m = 0) <$> f (Nat.pair a n)) := by
+  have hfun : (fun a ↦ (Part.some (Nat.pair a 0)) >>= rfindPrimed f)
+      = (fun a ↦ Nat.rfind fun n ↦ (fun m ↦ m = 0) <$> f (Nat.pair a n)) := by
     funext a
     simp only [Part.bind_eq_bind, Part.bind_some]
     unfold rfindPrimed
     simp only [Nat.unpair_pair, Nat.zero_add, Nat.add_zero]
-    exact Part.map_id' (fun _ => rfl) _
+    exact Part.map_id' (fun _ ↦ rfl) _
   rw [hfun] at h
   exact h
 
@@ -514,10 +515,10 @@ weak: the negative results transfer to the standard notion. -/
 theorem turingReducible_of_mathlib {A B : Set ℕ} (h : MathlibTuringReducible A B) :
     TuringReducible A B := by
   obtain ⟨c, hc⟩ := exists_code_of_recursiveIn h
-  exact ⟨c, fun x => (hc x (natOfBool (charFun A x))).mpr (Part.mem_some _)⟩
+  exact ⟨c, fun x ↦ (hc x (natOfBool (charFun A x))).mpr (Part.mem_some _)⟩
 
 /-- Contrapositive: a local non-reducibility is a genuine one. -/
 theorem not_mathlibTuringReducible {A B : Set ℕ} (h : ¬ TuringReducible A B) :
-    ¬ MathlibTuringReducible A B := fun hm => h (turingReducible_of_mathlib hm)
+    ¬ MathlibTuringReducible A B := fun hm ↦ h (turingReducible_of_mathlib hm)
 
 end OracleComputability

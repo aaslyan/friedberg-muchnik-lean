@@ -1,4 +1,4 @@
-/-
+/-!
 # Syntax of oracle programs
 
 This file defines *syntax only*: the inductive type of programs for a machine
@@ -29,22 +29,22 @@ An `OracleCode` containing no `query` node is an ordinary partial recursive
 program; `MathlibBridge.lean` makes that statement precise in both
 directions. -/
 inductive OracleCode : Type where
-  /-- The constant zero function `fun _ => 0`. -/
+  /-- The constant zero function `fun _ ↦ 0`. -/
   | zero
-  /-- The successor function `fun n => n + 1`. -/
+  /-- The successor function `fun n ↦ n + 1`. -/
   | succ
-  /-- First projection of a coded pair: `fun n => (Nat.unpair n).1`. -/
+  /-- First projection of a coded pair: `fun n ↦ (Nat.unpair n).1`. -/
   | left
-  /-- Second projection of a coded pair: `fun n => (Nat.unpair n).2`. -/
+  /-- Second projection of a coded pair: `fun n ↦ (Nat.unpair n).2`. -/
   | right
   /-- Oracle query: on input `n`, return `1` if `n` is in the oracle set and
   `0` if it is not.  Relative to *finite* oracle information (a snapshot
   string), a query beyond the end of the snapshot does not halt; see
   `FiniteEval.lean`. -/
   | query
-  /-- `pair f g` computes `fun n => Nat.pair (f n) (g n)`. -/
+  /-- `pair f g` computes `fun n ↦ Nat.pair (f n) (g n)`. -/
   | pair (f g : OracleCode)
-  /-- `comp f g` computes `fun n => f (g n)`. -/
+  /-- `comp f g` computes `fun n ↦ f (g n)`. -/
   | comp (f g : OracleCode)
   /-- Primitive recursion.  On input `Nat.pair a 0`, `prec f g` computes
   `f a`; on input `Nat.pair a (n + 1)` it computes

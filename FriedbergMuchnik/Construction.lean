@@ -1,4 +1,7 @@
-/-
+import OracleComputability.RunPrimrec
+import OracleComputability.Approximation
+
+/-!
 # The Friedberg–Muchnik stage construction
 
 The machine that enumerates the two sets.  Classical source: Soare,
@@ -32,8 +35,6 @@ encoded results), so the whole step function is built from primitive
 recursive pieces; that is what will make `A` and `B` computably
 enumerable.
 -/
-import OracleComputability.RunPrimrec
-import OracleComputability.Approximation
 
 namespace FriedbergMuchnik
 
@@ -128,7 +129,7 @@ end ConsState
 give attention to the least requirement requiring it (if any). -/
 def stepState (st : ConsState) (s : ℕ) : ConsState :=
   let st' : ConsState := { st with reqs := st.reqs ++ [ReqState.init] }
-  match (List.range st'.reqs.length).find? (fun i => st'.requiresAttention s i) with
+  match (List.range st'.reqs.length).find? (fun i ↦ st'.requiresAttention s i) with
   | none => st'
   | some i => st'.stepAt s i
 

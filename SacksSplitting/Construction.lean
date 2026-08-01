@@ -1,4 +1,6 @@
-/-
+import SacksSplitting.Requirements
+
+/-!
 # The splitting construction
 
 Classical source: Soare, *Recursively Enumerable Sets and Degrees*, VII.3
@@ -37,7 +39,6 @@ their union is the current stage of `A` — replace FM's ten-field
 `ConsInv`.  There is nothing here to keep fresh, distinct or unrestrained:
 the elements are not ours to choose.
 -/
-import SacksSplitting.Requirements
 
 namespace SacksSplitting
 
@@ -58,13 +59,13 @@ theorem getD_map_range {f : ℕ → ℕ} {n j : ℕ} :
 the larger of what it had and what its current agreement demands.  (The
 running maximum is essential; see the file docstring.) -/
 def newRestraints (ec : ℕ) (st : State) (s : ℕ) : List ℕ :=
-  (List.range (s + 1)).map fun j => max (st.2.2.getD j 0) (restraintAt ec st s j)
+  (List.range (s + 1)).map fun j ↦ max (st.2.2.getD j 0) (restraintAt ec st s j)
 
 /-- **The routing rule.**  A new element `x` is sent to the half *not*
 used as an oracle by the highest-priority requirement that restrains it;
 if nothing restrains it, to `A₀`. -/
 def routeTo (rs : List ℕ) (s x : ℕ) : ℕ :=
-  match (List.range (s + 1)).find? fun j => decide (x < rs.getD j 0) with
+  match (List.range (s + 1)).find? fun j ↦ decide (x < rs.getD j 0) with
   | none => 0
   | some j => if j % 2 = 0 then 1 else 0
 
@@ -79,8 +80,8 @@ numbers `new` already computed.  Splitting the step this way keeps the
 `Primrec` derivation in `CE.lean` shallow: the expensive `newRestraints`
 is evaluated once, outside the per-element predicate. -/
 def stepWith (rs new : List ℕ) (st : State) (s : ℕ) : State :=
-  (filterB (fun x => decide (routeTo rs s x = 0)) new ++ st.1,
-   filterB (fun x => decide (routeTo rs s x = 1)) new ++ st.2.1,
+  (filterB (fun x ↦ decide (routeTo rs s x = 0)) new ++ st.1,
+   filterB (fun x ↦ decide (routeTo rs s x = 1)) new ++ st.2.1,
    rs)
 
 /-- One stage: route each number that `A` enumerates at this stage, and
@@ -146,7 +147,7 @@ theorem Rest_mono {ec j s t : ℕ} (h : s ≤ t) : Rest ec s j ≤ Rest ec t j :
 `j % 2` are prepended, nothing is ever removed. -/
 theorem halfList_succ (ec j s : ℕ) :
     halfList ec j (s + 1) =
-      filterB (fun x => decide
+      filterB (fun x ↦ decide
           (routeTo (newRestraints ec (stageState ec s) s) s x = j % 2))
         (newAt ec s) ++ halfList ec j s := by
   unfold halfList oracleOf
@@ -175,7 +176,7 @@ theorem mem_halfF {ec j s x : ℕ} : x ∈ halfF ec j s ↔ x ∈ halfList ec j 
 
 theorem mem_halfSet {ec j x : ℕ} : x ∈ halfSet ec j ↔ ∃ s, x ∈ halfList ec j s := by
   rw [halfSet, mem_limitSet]
-  exact exists_congr fun _ => mem_halfF
+  exact exists_congr fun _ ↦ mem_halfF
 
 /-- The halves depend on the requirement index only through its parity. -/
 theorem halfSet_mod_two (ec j : ℕ) : halfSet ec (j % 2) = halfSet ec j := by
@@ -243,9 +244,9 @@ theorem union_halfSet (ec : ℕ) : halfSet ec 0 ∪ halfSet ec 1 = enumSet ec :=
   ext x
   constructor
   · rintro (h | h) <;> obtain ⟨s, hs⟩ := mem_halfSet.mp h
-    · exact mem_enumStageF.mpr ((stage_union ec s x).mp (Or.inl hs)) |> fun h' =>
+    · exact mem_enumStageF.mpr ((stage_union ec s x).mp (Or.inl hs)) |> fun h' ↦
         mem_limitSet.mpr ⟨s, h'⟩
-    · exact mem_enumStageF.mpr ((stage_union ec s x).mp (Or.inr hs)) |> fun h' =>
+    · exact mem_enumStageF.mpr ((stage_union ec s x).mp (Or.inr hs)) |> fun h' ↦
         mem_limitSet.mpr ⟨s, h'⟩
   · intro h
     obtain ⟨s, hs⟩ := mem_limitSet.mp h

@@ -1,4 +1,7 @@
-/-
+import Mathlib.Data.Nat.Pairing
+import OracleComputability.OracleCode
+
+/-!
 # Effective numbering of oracle programs
 
 Foundation gate items 1 and 5: an explicit bijection `ℕ ≃ OracleCode`
@@ -17,8 +20,6 @@ where `tag < 4` selects the constructor and `payload` codes the children via
 `Nat.pair`.  Sums of the form `4·p + t + 5` are written exactly that way so
 the `n + 5` pattern of the decoder matches syntactically in proofs.
 -/
-import Mathlib.Data.Nat.Pairing
-import OracleComputability.OracleCode
 
 namespace OracleComputability
 
@@ -156,10 +157,10 @@ theorem encodeCode_ofNatCode : ∀ n : ℕ, encodeCode (ofNatCode n) = n := by
 and its enumeration by `ofNatCode` is adequate for the project's `≤ᵀ`:
 quantifying requirements over all of `ℕ` covers every oracle program. -/
 theorem ofNatCode_surjective : Function.Surjective ofNatCode :=
-  fun c => ⟨encodeCode c, ofNatCode_encodeCode c⟩
+  fun c ↦ ⟨encodeCode c, ofNatCode_encodeCode c⟩
 
 theorem encodeCode_injective : Function.Injective encodeCode :=
-  fun c c' h => by
+  fun c c' h ↦ by
     have := ofNatCode_encodeCode c
     rw [h, ofNatCode_encodeCode c'] at this
     exact this.symm

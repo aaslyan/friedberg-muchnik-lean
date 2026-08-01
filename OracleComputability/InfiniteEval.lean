@@ -1,4 +1,6 @@
-/-
+import OracleComputability.Use
+
+/-!
 # Semantics against an infinite oracle
 
 Ordinary (unbounded) oracle computation is defined as the *existential
@@ -10,7 +12,6 @@ says this loses nothing: a computation converges against the total oracle
 initial segment of length the recorded use always suffices.  Both directions
 are immediate corollaries of the master use theorem `run_halt_mono`.
 -/
-import OracleComputability.Use
 
 namespace OracleComputability
 
@@ -30,7 +31,7 @@ theorem Computes.unique {c : OracleCode} {X : ℕ → Bool} {x y y' : ℕ}
 /-- The initial segment of length `u` of a total membership function, as a
 snapshot string: position `i < u` holds `X i`. -/
 def initialSegment (X : ℕ → Bool) (u : ℕ) : List Bool :=
-  List.ofFn fun i : Fin u => X i
+  List.ofFn fun i : Fin u ↦ X i
 
 @[simp] theorem initialSegment_length (X : ℕ → Bool) (u : ℕ) :
     (initialSegment X u).length = u := by
@@ -65,7 +66,7 @@ theorem computes_iff_initialSegment {c : OracleCode} {X : ℕ → Bool} {x y : �
   constructor
   · rintro ⟨k, d, h, rfl⟩
     refine ⟨k, d.use, d, ?_, rfl⟩
-    refine run_halt_mono le_rfl (fun i hi b hb => ?_) h
+    refine run_halt_mono le_rfl (fun i hi b hb ↦ ?_) h
     rw [PartOracle.ofFun_apply] at hb
     rw [PartOracle.ofSnapshot_apply, initialSegment_getElem? hi]
     exact hb

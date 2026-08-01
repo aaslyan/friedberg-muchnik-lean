@@ -1,4 +1,6 @@
-/-
+import OracleComputability
+
+/-!
 # The given c.e. set, as a computable stage enumeration
 
 Sacks splitting starts from a *given* c.e. set `A` and partitions it; the
@@ -24,7 +26,6 @@ only ever *produced* `CE` facts and never *consumed* one.
 Everything in this file is deliberately built from `nrun`, the numbered-code
 form of the evaluator, so that `CE.lean` can show it primitive recursive.
 -/
-import OracleComputability
 
 namespace SacksSplitting
 
@@ -38,7 +39,7 @@ every filtering step of the construction goes through this. -/
 /-- Keep the elements of `l` satisfying the Boolean predicate `p`.
 Written with `cond`, which is exactly the shape `Primrec.cond` consumes. -/
 def filterB (p : ℕ → Bool) (l : List ℕ) : List ℕ :=
-  l.foldr (fun a acc => cond (p a) (a :: acc) acc) []
+  l.foldr (fun a acc ↦ cond (p a) (a :: acc) acc) []
 
 @[simp] theorem filterB_nil (p : ℕ → Bool) : filterB p [] = [] := rfl
 
@@ -92,7 +93,7 @@ theorem haltsBy_mono {ec s s' x : ℕ} (h : s ≤ s') (hx : haltsBy ec s x = tru
 which program number `ec` has already halted with fuel `s`.  This is the
 `⊆`-monotone finite-stage approximation the splitting construction watches. -/
 def enumStage (ec s : ℕ) : List ℕ :=
-  filterB (fun x => haltsBy ec s x) (List.range s)
+  filterB (fun x ↦ haltsBy ec s x) (List.range s)
 
 theorem mem_enumStage {ec s x : ℕ} :
     x ∈ enumStage ec s ↔ x < s ∧ haltsBy ec s x = true := by
@@ -147,7 +148,7 @@ needs the numbers that appear at stage `s + 1` and not before. -/
 
 /-- The numbers entering the enumeration at stage `s + 1`. -/
 def newAt (ec s : ℕ) : List ℕ :=
-  filterB (fun x => !decide (x ∈ enumStage ec s)) (enumStage ec (s + 1))
+  filterB (fun x ↦ !decide (x ∈ enumStage ec s)) (enumStage ec (s + 1))
 
 theorem mem_newAt {ec s x : ℕ} :
     x ∈ newAt ec s ↔ x ∈ enumStage ec (s + 1) ∧ x ∉ enumStage ec s := by

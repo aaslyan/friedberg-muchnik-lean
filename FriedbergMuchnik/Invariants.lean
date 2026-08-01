@@ -1,4 +1,6 @@
-/-
+import FriedbergMuchnik.StageDynamics
+
+/-!
 # State invariants of the construction
 
 The ten facts that hold of every reachable construction state, proved by
@@ -24,7 +26,6 @@ satisfaction proofs can cite them by name:
   is exactly the use principle: anything enumerated later is `≥` the
   restraint, hence below the use nothing changed.
 -/
-import FriedbergMuchnik.StageDynamics
 
 namespace FriedbergMuchnik
 

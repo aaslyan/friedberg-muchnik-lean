@@ -1,4 +1,6 @@
-/-
+import SacksSplitting.CE
+
+/-!
 # Finite injury, and why the requirements are satisfiable
 
 This file is where Sacks and Friedberg–Muchnik genuinely part company.
@@ -20,7 +22,7 @@ order.  Writing `R(j, s)` for the cumulative restraint:
    restraint only if some *higher-priority* requirement also restrained it,
    hence only if it lies below a fixed bound `B`; and below a fixed bound
    only finitely much of `A` is ever enumerated — which is exactly FM's
-   `StageMono.stabilizesBelow`, reused verbatim.
+   `StageMono.stabilizes_below`, reused verbatim.
 
 2. **`unsatisfied_requirement_computes`** — *the one genuinely new piece of
    mathematics in this development.*  If `N_j` is never injured after some
@@ -40,7 +42,6 @@ Then `restraint_bounded` runs 1 → 2 → 3 by strong induction on the
 priority `j`, and `requirement_satisfied` reads off the conclusion.  As in
 FM, no closed-form injury bound is ever stated.
 -/
-import SacksSplitting.CE
 
 namespace SacksSplitting
 
@@ -55,7 +56,7 @@ theorem decide_enumStage_eq {ec s y : ℕ} (h : y ∈ enumStage ec s ↔ y ∈ e
     decide (y ∈ enumStage ec s) = charFun (enumSet ec) y := by
   by_cases hy : y ∈ enumSet ec
   · rw [decide_eq_true (h.mpr hy), charFun_eq_true.mpr hy]
-  · rw [decide_eq_false (fun hc => hy (h.mp hc)), charFun_eq_false.mpr hy]
+  · rw [decide_eq_false (fun hc ↦ hy (h.mp hc)), charFun_eq_false.mpr hy]
 
 theorem enumStage_iff_of_eq {ec s y : ℕ}
     (h : decide (y ∈ enumStage ec s) = charFun (enumSet ec) y) :
@@ -69,11 +70,11 @@ theorem enumStage_iff_of_eq {ec s y : ℕ}
     exact of_decide_eq_true h
 
 /-- The stage approximation of `A` settles below any fixed bound — FM's
-`StageMono.stabilizesBelow`, in the shape used repeatedly below. -/
+`StageMono.stabilizes_below`, in the shape used repeatedly below. -/
 theorem enumStage_stabilizes (ec u : ℕ) :
     ∃ s₀, ∀ s, s₀ ≤ s → ∀ n, n < u → (n ∈ enumStage ec s ↔ n ∈ enumSet ec) := by
-  obtain ⟨s₀, hs₀⟩ := (enumStageF_mono ec).stabilizesBelow u
-  exact ⟨s₀, fun s hs n hn => by
+  obtain ⟨s₀, hs₀⟩ := (enumStageF_mono ec).stabilizes_below u
+  exact ⟨s₀, fun s hs n hn ↦ by
     rw [← mem_enumStageF]; exact hs₀ s hs n hn⟩
 
 /-! ### Injury -/
@@ -106,7 +107,7 @@ theorem injured_by_higher {ec j s x : ℕ} (hj : j ≤ s)
     · exact absurd h hout
   have hjrs : x < rs.getD j 0 := by rwa [Rest_succ_eq] at hlt
   rw [routeTo] at hroute
-  cases hfind : (List.range (s + 1)).find? (fun k => decide (x < rs.getD k 0)) with
+  cases hfind : (List.range (s + 1)).find? (fun k ↦ decide (x < rs.getD k 0)) with
   | none =>
     rw [List.find?_eq_none] at hfind
     have := hfind j (List.mem_range.mpr (by omega))
@@ -135,11 +136,11 @@ theorem injured_by_higher {ec j s x : ℕ} (hj : j ≤ s)
 theorem uniform_bound {ec j : ℕ} (h : ∀ j', j' < j → ∃ B, ∀ s, Rest ec s j' ≤ B) :
     ∃ B, ∀ j', j' < j → ∀ s, Rest ec s j' ≤ B := by
   induction j with
-  | zero => exact ⟨0, fun j' hj' => absurd hj' (by omega)⟩
+  | zero => exact ⟨0, fun j' hj' ↦ absurd hj' (by omega)⟩
   | succ j ih =>
-    obtain ⟨B, hB⟩ := ih fun j' hj' => h j' (by omega)
+    obtain ⟨B, hB⟩ := ih fun j' hj' ↦ h j' (by omega)
     obtain ⟨B', hB'⟩ := h j (by omega)
-    refine ⟨max B B', fun j' hj' s => ?_⟩
+    refine ⟨max B B', fun j' hj' s ↦ ?_⟩
     rcases Nat.lt_or_ge j' j with h1 | h1
     · exact le_trans (hB j' h1 s) (le_max_left _ _)
     · have : j' = j := by omega
@@ -148,13 +149,13 @@ theorem uniform_bound {ec j : ℕ} (h : ∀ j', j' < j → ∃ B, ∀ s, Rest ec
 
 /-- **Injury finiteness.**  If every higher-priority restraint is bounded
 by `B`, then only numbers below `B` can ever injure `j`; and past the stage
-at which `A`'s enumeration settles below `B` (FM's `stabilizesBelow`), no
+at which `A`'s enumeration settles below `B` (FM's `stabilizes_below`), no
 such number enters at all. -/
 theorem noInjury_of_bounded {ec j B : ℕ}
     (hB : ∀ j', j' < j → ∀ s, Rest ec s j' ≤ B) :
     ∃ s₀, NoInjuryFrom ec j s₀ := by
   obtain ⟨t₀, ht₀⟩ := enumStage_stabilizes ec B
-  refine ⟨max t₀ j, fun t ht x hx hin => ?_⟩
+  refine ⟨max t₀ j, fun t ht x hx hin ↦ ?_⟩
   by_contra hout
   obtain ⟨j', hj', hxj'⟩ := injured_by_higher (by omega) hx hin hout
   have hxB : x < B := lt_of_lt_of_le hxj' (hB j' hj' (t + 1))
@@ -175,7 +176,7 @@ theorem restraint_respected {ec j s₀ : ℕ} (hinj : NoInjuryFrom ec j s₀)
     ∀ t, s ≤ t → ∀ n, n < u → n ∈ halfF ec j t → n ∈ halfF ec j s := by
   intro t ht
   induction t, ht using Nat.le_induction with
-  | base => exact fun n _ hn => hn
+  | base => exact fun n _ hn ↦ hn
   | succ t ht ih =>
     intro n hn hmem
     refine ih n hn ?_
@@ -225,7 +226,7 @@ theorem agree_eventually {ec j y : ℕ}
   subst ho
   obtain ⟨s₀, hs₀⟩ := run_halt_snapshot_of_limit (F := halfF ec j) (halfF_mono ec j) hrun
   obtain ⟨t₁, ht₁⟩ := enumStage_stabilizes ec (y + 1)
-  refine ⟨max (max s₀ t₁) (max k du), fun s hs => ?_⟩
+  refine ⟨max (max s₀ t₁) (max k du), fun s hs ↦ ?_⟩
   have h2 := hs₀ s (by omega)
   have h3 : run s (PartOracle.ofSnapshot (snapshotOf (halfList ec j s) s))
       (OracleCode.ofNatCode (j / 2)) y = .halt ⟨_, du⟩ :=
@@ -247,11 +248,11 @@ theorem agree_eventually_below {ec j : ℕ}
       (natOfBool (charFun (enumSet ec) y))) (n : ℕ) :
     ∃ S, ∀ s, S ≤ s → ∀ z, z < n → (agreeAt ec (stageState ec s) s j z).isSome = true := by
   induction n with
-  | zero => exact ⟨0, fun s _ z hz => absurd hz (by omega)⟩
+  | zero => exact ⟨0, fun s _ z hz ↦ absurd hz (by omega)⟩
   | succ n ih =>
     obtain ⟨S, hS⟩ := ih
     obtain ⟨S', hS'⟩ := agree_eventually (ec := ec) (j := j) (y := n) (hall n)
-    refine ⟨max S S', fun s hs z hz => ?_⟩
+    refine ⟨max S S', fun s hs z hz ↦ ?_⟩
     rcases Nat.lt_or_ge z n with h | h
     · exact hS s (by omega) z h
     · have : z = n := by omega
@@ -284,10 +285,10 @@ theorem unsatisfied_requirement_computes {ec j s₀ : ℕ} (hinj : NoInjuryFrom 
       (natOfBool (charFun (enumSet ec) y))) :
     ComputableSet (enumSet ec) := by
   refine computableSet_of_agreement (ec := ec) (j := j) (s₀ := max s₀ (j + 1))
-    (fun y => ?_) (fun y s hs hy => ?_)
+    (fun y ↦ ?_) (fun y s hs hy ↦ ?_)
   · obtain ⟨S, hS⟩ := agree_eventually_below hall (y + 1)
     refine ⟨max S (max (max s₀ (j + 1)) (y + 1)), by omega, ?_⟩
-    exact lt_lenAgree (by omega) fun z hz => hS _ (by omega) z (by omega)
+    exact lt_lenAgree (by omega) fun z hz ↦ hS _ (by omega) z (by omega)
   · have h1 := agree_computes hinj (le_trans (le_max_left _ _) hs)
       (by have := le_trans (le_max_right s₀ (j + 1)) hs; omega) hy
     exact enumStage_iff_of_eq (natOfBool_inj (Computes.unique h1 (hall y)))
@@ -341,14 +342,14 @@ theorem restraint_bounded_of {ec j s₀ : ℕ} (hinj : NoInjuryFrom ec j s₀)
   have hrest : ∀ s, s₁ ≤ s → restraintAt ec (stageState ec s) s j ≤ M := by
     intro s hs
     have hlens := hlen s hs
-    refine restraintAt_le fun y hy => ?_
+    refine restraintAt_le fun y hy ↦ ?_
     obtain ⟨u, hu⟩ := agreeAt_isSome_iff.mp (agreeAt_isSome_of_lt_lenAgree hy)
     have hlim := agree_run_limit hinj (show s₀ ≤ s by omega) (show j ≤ s by omega) hy hu
     have hue : u = limUse ec j y := use_eq_limUse hlim
     rw [hu, Option.getD_some, hue]
     exact Finset.le_sup (Finset.mem_range.mpr (by omega))
   -- hence the cumulative restraint is bounded
-  refine ⟨max (Rest ec s₁ j) M, fun s => ?_⟩
+  refine ⟨max (Rest ec s₁ j) M, fun s ↦ ?_⟩
   rcases Nat.lt_or_ge s s₁ with h | h
   · exact le_trans (Rest_mono (by omega)) (le_max_left _ _)
   · induction s, h using Nat.le_induction with
@@ -370,18 +371,18 @@ theorem restraint_bounded (hA : ¬ ComputableSet (enumSet ec)) (j : ℕ) :
     ∃ B, ∀ s, Rest ec s j ≤ B := by
   induction j using Nat.strong_induction_on with
   | _ j IH =>
-    obtain ⟨B, hB⟩ := uniform_bound fun j' hj' => IH j' hj'
+    obtain ⟨B, hB⟩ := uniform_bound fun j' hj' ↦ IH j' hj'
     obtain ⟨s₀, hinj⟩ := noInjury_of_bounded hB
-    exact restraint_bounded_of hinj fun hall => hA (unsatisfied_requirement_computes hinj hall)
+    exact restraint_bounded_of hinj fun hall ↦ hA (unsatisfied_requirement_computes hinj hall)
 
 /-- **Every requirement is satisfied**: no program computes `χ_A` from
 either half.  (FM's `R_satisfied` / `S_satisfied`.) -/
 theorem requirement_satisfied (hA : ¬ ComputableSet (enumSet ec)) (j : ℕ) :
     ¬ ∀ y, Computes (OracleCode.ofNatCode (j / 2)) (charFun (halfSet ec j)) y
       (natOfBool (charFun (enumSet ec) y)) := by
-  obtain ⟨B, hB⟩ := uniform_bound fun j' (_ : j' < j) => restraint_bounded hA j'
+  obtain ⟨B, hB⟩ := uniform_bound fun j' (_ : j' < j) ↦ restraint_bounded hA j'
   obtain ⟨s₀, hinj⟩ := noInjury_of_bounded hB
-  exact fun hall => hA (unsatisfied_requirement_computes hinj hall)
+  exact fun hall ↦ hA (unsatisfied_requirement_computes hinj hall)
 
 end
 

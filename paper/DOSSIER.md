@@ -27,14 +27,14 @@ oleans supplied by `lake exe cache get`.
 
 ### 1.1 The two statements, exactly as formalized
 
-`[VERIFIED-LEAN]` `FriedbergMuchnik/Main.lean:29`:
+`[VERIFIED-LEAN]` `FriedbergMuchnik/Main.lean:30`:
 
 ```lean
 theorem friedberg_muchnik :
     ∃ A B : Set ℕ, CE A ∧ CE B ∧ ¬ (A ≤ᵀ B) ∧ ¬ (B ≤ᵀ A)
 ```
 
-`[VERIFIED-LEAN]` `SacksSplitting/Main.lean:56`:
+`[VERIFIED-LEAN]` `SacksSplitting/Main.lean:57`:
 
 ```lean
 theorem sacks_splitting :
@@ -118,13 +118,13 @@ are pure existence-of-a-stabilization-stage statements.
 
 `[VERIFIED-LEAN]` The priority order is the natural order on requirement
 indices, and in both constructions it is realised by the *same* lemma:
-`OracleComputability/Priority.lean:22`,
+`OracleComputability/Priority.lean:23`,
 `range_find?_least : (List.range n).find? p = some i → p i = true ∧ i < n ∧ ∀ j < i, p j = false`.
 
 `[VERIFIED-LEAN]` The two uses differ: Friedberg–Muchnik picks the least
-requirement that *requires attention* (`FriedbergMuchnik/StageDynamics.lean:37`,
+requirement that *requires attention* (`FriedbergMuchnik/StageDynamics.lean:38`,
 `attended`); Sacks picks the least requirement whose *restraint* covers an
-incoming number (`SacksSplitting/Construction.lean:66`, `routeTo`).
+incoming number (`SacksSplitting/Construction.lean:67`, `routeTo`).
 
 ### 1.6 Incomparability
 
@@ -133,7 +133,7 @@ negations of the project's `≤ᵀ`; there is no degree structure, no quotient,
 and no order in the development.
 
 `[VERIFIED-LEAN]` Non-computability of both Friedberg–Muchnik sets is
-derived, not assumed: `FriedbergMuchnik/Main.lean:36,39`,
+derived, not assumed: `FriedbergMuchnik/Main.lean:37,40`,
 `Aset_not_computable`, `Bset_not_computable`, each one line from
 `ComputableSet.turingReducible`.
 
@@ -152,13 +152,13 @@ additionally makes the two halves **low** and allows the non-reducibility to
 be stated for a separate given non-computable set `C`.
 
 `[VERIFIED-LEAN]` The formalized statement takes `C := A` and drops lowness.
-`SacksSplitting/Main.lean:20–22` records this scope decision explicitly:
+`SacksSplitting/Main.lean:22–24` records this scope decision explicitly:
 "this is the splitting-with-non-reducibility core. The full Sacks Splitting
 Theorem also makes the halves *low*, which needs the infinite-injury
 machinery and is deliberately out of scope here."
 
 `[VERIFIED-LEAN]` The split is proved non-degenerate: `halfSet_ne`
-(`SacksSplitting/Main.lean:68`) shows neither half equals `A`, using
+(`SacksSplitting/Main.lean:69`) shows neither half equals `A`, using
 reflexivity of `≤ᵀ`.
 
 `[VERIFIED-LEAN]` Non-vacuity is proved, not assumed:
@@ -174,10 +174,10 @@ depends on `Classical.choice` (Part 5.1).
 
 `[VERIFIED-LEAN]` Specific classical steps: `charFun` is a `noncomputable
 def` using `Classical` decidability of set membership
-(`OracleComputability/Reducibility.lean:26–29`); `SacksSplitting.limUse` is
+(`OracleComputability/Reducibility.lean:27–30`); `SacksSplitting.limUse` is
 a `noncomputable def` built with `Classical.choose`
-(`SacksSplitting/FiniteInjury.lean:297–306`); `Classical.not_forall` is used
-at `SacksSplitting/FiniteInjury.lean:327`. There are exactly two
+(`SacksSplitting/FiniteInjury.lean:298–307`); `Classical.not_forall` is used
+at `SacksSplitting/FiniteInjury.lean:328`. There are exactly two
 `noncomputable` declarations in the whole project.
 
 ### 1.9 Where oracle computation enters
@@ -188,14 +188,14 @@ Kleene's schemata — `zero`, `succ`, `left`, `right`, `pair`, `comp`, `prec`,
 for membership.
 
 `[VERIFIED-LEAN]` `run : ℕ → PartOracle → OracleCode → ℕ → RunResult`
-(`OracleComputability/FiniteEval.lean:137`) is a fuel-bounded evaluator
+(`OracleComputability/FiniteEval.lean:138`) is a fuel-bounded evaluator
 against a *partial* oracle `PartOracle := ℕ → Option Bool`, with three
 outcomes: `halt ⟨output, use⟩`, `stuck` (oracle could not answer), `timeout`
 (fuel exhausted). `use` is a **strict** upper bound on queried positions;
 query-free halting runs record `use = 0`.
 
 `[VERIFIED-LEAN]` The master lemma is `run_halt_mono`
-(`OracleComputability/Use.lean:170`), whose elaborated statement is:
+(`OracleComputability/Use.lean:171`), whose elaborated statement is:
 
 ```
 ∀ {k k' O O' c x d}, k ≤ k' →
@@ -209,21 +209,21 @@ positions `< d.use` where `O` had no information are unconstrained too.
 ### 1.10 Relationship with Turing reducibility
 
 `[VERIFIED-LEAN]` `≤ᵀ` is reflexive (`TuringReducible.refl`,
-`Reducibility.lean:70`) and transitive (`TuringReducible.trans`,
-`Composition.lean:183`, by query substitution `subst`), with a `Trans`
+`Reducibility.lean:71`) and transitive (`TuringReducible.trans`,
+`Composition.lean:184`, by query substitution `subst`), with a `Trans`
 instance (line 196); i.e. a preorder.
 
 `[VERIFIED-LEAN]` Computable sets reduce to every oracle
-(`ComputableSet.turingReducible`, `Reducibility.lean:78`).
+(`ComputableSet.turingReducible`, `Reducibility.lean:79`).
 
 `[VERIFIED-LEAN]` The numbering `ℕ ≃ OracleCode` is a proved bijection
-(`ofNatCode_encodeCode`, `encodeCode_ofNatCode`, `Numbering.lean:75,125`), so
+(`ofNatCode_encodeCode`, `encodeCode_ofNatCode`, `Numbering.lean:76,126`), so
 quantifying requirements over `ℕ` covers every program — this is what turns
 "for every `e`" into "for every reduction".
 
 `[VERIFIED-LEAN]` The relation is connected to Mathlib's oracle model in one
 direction: `turingReducible_of_mathlib : MathlibTuringReducible A B → A ≤ᵀ B`
-(`MathlibOracleBridge.lean:514`), by induction over `RecursiveIn` with one
+(`MathlibOracleBridge.lean:515`), by induction over `RecursiveIn` with one
 `OracleCode` per constructor. Contrapositive: `not_mathlibTuringReducible`
 (line 520). The converse inclusion is **not** proved `[VERIFIED-LEAN]`.
 
@@ -232,9 +232,9 @@ direction: `turingReducible_of_mathlib : MathlibTuringReducible A B → A ≤ᵀ
 `[VERIFIED-LEAN]` `CE` is the halting-domain definition (`A = W_e`) with the
 empty oracle, and c.e.-ness of every constructed set is proved from the
 construction's computability, not assumed: `ce_Aset`, `ce_Bset`
-(`FriedbergMuchnik/CE.lean:528,551`), `ce_halfSet` (`SacksSplitting/CE.lean:315`).
+(`FriedbergMuchnik/CE.lean:529,552`), `ce_halfSet` (`SacksSplitting/CE.lean:316`).
 
-`[VERIFIED-LEAN]` `ce_eq_enumSet` (`SacksSplitting/Basic.lean:137`) converts
+`[VERIFIED-LEAN]` `ce_eq_enumSet` (`SacksSplitting/Basic.lean:138`) converts
 the existential `CE A` into an explicit monotone stage enumeration
 `enumSet ec`, which is what the splitting machine watches.
 
@@ -486,54 +486,54 @@ OracleComputability, FriedbergMuchnik, SacksSplitting ← PriorityArguments
 | `OracleComputability/Reducibility.lean` | 94 | `≤ᵀ`, `CE`, `ComputableSet` |
 | `OracleComputability/Composition.lean` | 199 | transitivity via query substitution |
 | `OracleComputability/MathlibBridge.lean` | 242 | ordinary computability into the model |
-| `OracleComputability/MathlibOracleBridge.lean` | 523 | Mathlib `RecursiveIn` → `OracleCode` |
-| `OracleComputability/RunPrimrec.lean` | 597 | `nrun_primrec` |
+| `OracleComputability/MathlibOracleBridge.lean` | 524 | Mathlib `RecursiveIn` → `OracleCode` |
+| `OracleComputability/RunPrimrec.lean` | 598 | `nrun_primrec` |
 | `OracleComputability/Priority.lean` | 50 | least-index selection |
 | `OracleComputability/Approximation.lean` | 239 | monotone stages, snapshots, restraint |
 | `OracleComputability/PrimrecTools.lean` | 66 | three generic `Primrec` helpers |
 | `OracleComputability.lean` | 60 | library root |
 | `FriedbergMuchnik/Construction.lean` | 243 | the stage machine |
 | `FriedbergMuchnik/StageDynamics.lean` | 217 | attention, leastness, step trichotomy |
-| `FriedbergMuchnik/Invariants.lean` | 386 | the ten-field `ConsInv` |
+| `FriedbergMuchnik/Invariants.lean` | 387 | the ten-field `ConsInv` |
 | `FriedbergMuchnik/FiniteInjury.lean` | 225 | rank argument, `quiet_above` |
 | `FriedbergMuchnik/Requirements.lean` | 289 | `R_satisfied`, `S_satisfied`, both non-reducibilities |
-| `FriedbergMuchnik/CE.lean` | 573 | shadow implementation, `Primrec`, `ce_Aset`/`ce_Bset` |
+| `FriedbergMuchnik/CE.lean` | 574 | shadow implementation, `Primrec`, `ce_Aset`/`ce_Bset` |
 | `FriedbergMuchnik/Main.lean` | 42 | the theorem |
 | `FriedbergMuchnik.lean` | 27 | library root |
 | `SacksSplitting/Basic.lean` | 170 | `CE A` → explicit stage enumeration |
 | `SacksSplitting/Requirements.lean` | 233 | agreement test, agreement length, restraint |
 | `SacksSplitting/Construction.lean` | 267 | routing machine, two invariants |
-| `SacksSplitting/CE.lean` | 399 | `Primrec` derivation, `ce_halfSet`, decision procedure |
-| `SacksSplitting/FiniteInjury.lean` | 388 | the three-part priority induction |
+| `SacksSplitting/CE.lean` | 400 | `Primrec` derivation, `ce_halfSet`, decision procedure |
+| `SacksSplitting/FiniteInjury.lean` | 389 | the three-part priority induction |
 | `SacksSplitting/Main.lean` | 75 | the theorem |
 | `SacksSplitting.lean` | 16 | library root |
-| `PriorityArguments.lean` | 83 | the two theorems composed |
+| `PriorityArguments.lean` | 84 | the two theorems composed |
 
 ### 3.4 Representation of oracles
 
-* `PartOracle := ℕ → Option Bool` (`FiniteEval.lean:57`) — one type for both
+* `PartOracle := ℕ → Option Bool` (`FiniteEval.lean:58`) — one type for both
   total oracles and finite snapshots.
 * `PartOracle.ofFun (X : ℕ → Bool)`, `PartOracle.ofSnapshot (σ : List Bool)`,
   `PartOracle.empty` (lines 62, 66, 70).
-* `PartOracle.Consistent O X := ∀ i b, O i = some b → X i = b` (`Use.lean:199`).
+* `PartOracle.Consistent O X := ∀ i b, O i = some b → X i = b` (`Use.lean:200`).
 * A query the oracle cannot answer yields `RunResult.stuck`, which is
   distinct from `timeout` — insufficient information is *not* divergence
-  (`FiniteEval.lean:42–51`).
+  (`FiniteEval.lean:43–52`).
 
 ### 3.5 Representation of reductions
 
-* `Computes c X x y := ∃ k d, run k (PartOracle.ofFun X) c x = .halt d ∧ d.output = y` (`InfiniteEval.lean:20`).
+* `Computes c X x y := ∃ k d, run k (PartOracle.ofFun X) c x = .halt d ∧ d.output = y` (`InfiniteEval.lean:21`).
 * `Computes.unique` (line 24) — one output per input, via `run_halt_unique`.
 * `TuringReducible` quantifies `∀ x` outside the existential over the code,
-  so the reduction must be total (`Reducibility.lean:49`).
+  so the reduction must be total (`Reducibility.lean:50`).
 * `subst (q : OracleCode) : OracleCode → OracleCode` replaces every `query`
-  node by `q` (`Composition.lean:26`); `subst_run_aux` (line 42) is the
+  node by `q` (`Composition.lean:27`); `subst_run_aux` (line 42) is the
   simulation; `TuringReducible.trans` (line 183) is the corollary.
 
 ### 3.6 Representation of enumerable sets
 
 * `StageMono F := ∀ s, F s ⊆ F (s + 1)` for `F : ℕ → Finset ℕ`
-  (`Approximation.lean:37`); `limitSet F := {n | ∃ s, n ∈ F s}` (line 42).
+  (`Approximation.lean:38`); `limitSet F := {n | ∃ s, n ∈ F s}` (line 42).
 * `StageMono.stabilizesBelow` (line 63) — below any bound, membership agrees
   with the limit from some stage on; proved by induction on the bound, with
   no appeal to finiteness of the limit.
@@ -541,30 +541,30 @@ OracleComputability, FriedbergMuchnik, SacksSplitting ← PriorityArguments
   `snapshotOf (l : List ℕ) (u : ℕ)` (line 181) — `List Bool` is always
   derived, never primary.
 * Friedberg–Muchnik sets: `Aset := limitSet AstageF`, `Bset := limitSet BstageF`,
-  where `AstageF s := (stageState s).Alist.toFinset` (`Construction.lean:141–150`).
-* Sacks halves: `halfSet ec j := limitSet (halfF ec j)` (`Construction.lean:105`).
+  where `AstageF s := (stageState s).Alist.toFinset` (`FriedbergMuchnik/Construction.lean:142–151`).
+* Sacks halves: `halfSet ec j := limitSet (halfF ec j)` (`SacksSplitting/Construction.lean:106`).
 * Given set for Sacks: `enumStage ec s`, `enumStageF`, `enumSet ec`
-  (`Basic.lean:94,109,120`), with `ce_eq_enumSet` (line 137).
+  (`Basic.lean:95,110,121`), with `ce_eq_enumSet` (line 137).
 
 ### 3.7 Representation of requirements
 
-Friedberg–Muchnik (`Construction.lean:8–11`): requirement `2e` is
+Friedberg–Muchnik (`FriedbergMuchnik/Construction.lean:11–14`): requirement `2e` is
 `R_e : A ≠ Φ_e^B`; requirement `2e+1` is `S_e : B ≠ Φ_e^A`.
 
 ```lean
-structure ReqState where          -- Construction.lean:45
+structure ReqState where          -- FriedbergMuchnik/Construction.lean:46
   witness : Option ℕ
   acted : Bool
   restraint : ℕ
 
-structure ConsState where         -- Construction.lean:60
+structure ConsState where         -- FriedbergMuchnik/Construction.lean:61
   Alist : List ℕ
   Blist : List ℕ
   reqs : List ReqState
   fresh : ℕ
 ```
 
-Sacks (`Requirements.lean:52`): `abbrev State : Type := List ℕ × List ℕ × List ℕ`
+Sacks (`SacksSplitting/Requirements.lean:53`): `abbrev State : Type := List ℕ × List ℕ × List ℕ`
 — two half-enumerations and one cumulative restraint per requirement.
 Requirement `j` is `N_j : A ≠ Φ_{j/2}^{A_{j%2}}`.
 
@@ -572,41 +572,41 @@ Requirement `j` is `N_j : A ≠ Φ_{j/2}^{A_{j%2}}`.
 
 Friedberg–Muchnik:
 
-* `ConsState.requiresAttention st s i : Bool` (`Construction.lean:96`) — the
+* `ConsState.requiresAttention st s i : Bool` (`FriedbergMuchnik/Construction.lean:97`) — the
   record exists and either has no witness, or has an unacted witness whose
   diagonalizing computation has appeared.
-* `attended s : Option ℕ` (`StageDynamics.lean:37`) — the least such index.
-* `ConsState.stepAt` (`Construction.lean:108`): appointment consumes the
+* `attended s : Option ℕ` (`StageDynamics.lean:38`) — the least such index.
+* `ConsState.stepAt` (`FriedbergMuchnik/Construction.lean:109`): appointment consumes the
   freshness counter; **action** enumerates the witness, records the
   computation's use as restraint, and replaces every lower-priority record by
   `ReqState.init` — that replacement *is* the injury.
-* `step_cases` (`StageDynamics.lean:109`) — a hypothesis-free trichotomy:
+* `step_cases` (`StageDynamics.lean:110`) — a hypothesis-free trichotomy:
   every stage is idle, appointment, or action.
 
 Sacks:
 
-* `restraintAt` (`Requirements.lean:197`) — the largest use among currently
+* `restraintAt` (`SacksSplitting/Requirements.lean:198`) — the largest use among currently
   agreeing computations.
-* `newRestraints` (`Construction.lean:60`) — `R(j, s+1) = max (R(j,s)) (restraintAt … s j)`,
+* `newRestraints` (`SacksSplitting/Construction.lean:61`) — `R(j, s+1) = max (R(j,s)) (restraintAt … s j)`,
   a **running maximum** kept in the state.
-* `routeTo` (`Construction.lean:66`) — a new element `x` goes to half
+* `routeTo` (`SacksSplitting/Construction.lean:67`) — a new element `x` goes to half
   `1 - j % 2` for the least `j` with `x < R(j,s)`, else to half `0`. Injury
   to `j` is exactly an element below `R(j,s)` entering `j`'s own half because
   a higher-priority opposite-parity requirement claimed it
-  (`injured_by_higher`, `FiniteInjury.lean:98`).
+  (`injured_by_higher`, `SacksSplitting/FiniteInjury.lean:99`).
 
 ### 3.9 Construction stages
 
-* `stageState : ℕ → ConsState` (`FriedbergMuchnik/Construction.lean:136`),
+* `stageState : ℕ → ConsState` (`FriedbergMuchnik/Construction.lean:137`),
   `stageState 0 = ⟨[], [], [], 0⟩`, `stageState (s+1) = stepState (stageState s) s`.
   Requirement `i`'s record is born at stage `i + 1`; `reqs_length s : (stageState s).reqs.length = s` (line 201).
-* `SacksSplitting.stageState : ℕ → ℕ → State` (`SacksSplitting/Construction.lean:92`).
+* `SacksSplitting.stageState : ℕ → ℕ → State` (`SacksSplitting/Construction.lean:93`).
 * One requirement receives attention per Friedberg–Muchnik stage; a Sacks
   stage attends none and routes all newly arrived elements.
 
 ### 3.10 Important invariants
 
-`ConsInv` (`Invariants.lean:92`) — ten fields, verbatim field names:
+`ConsInv` (`Invariants.lean:93`) — ten fields, verbatim field names:
 `freshA`, `freshB`, `freshW`, `freshR`, `coh`, `distinct`, `wit_ge`,
 `unacted_out`, `acted_in`, `acted_comp`. Established for every reachable
 state by `consInv_stage : ∀ s, ConsInv (stageState s)` (line 372), via
@@ -617,23 +617,23 @@ transition of `step_cases`.
 run still halts with output `0` and use equal to its restraint against a
 snapshot of the *current* oracle list.
 
-Sacks invariants (`Construction.lean:193,221,242,256`): `stage_union`,
+Sacks invariants (`SacksSplitting/Construction.lean:194,222,243,257`): `stage_union`,
 `stage_disjoint`, `union_halfSet`, `disjoint_halfSet` — the halves stay
 disjoint and their union is the current stage of `A`.
 
 ### 3.11 Termination arguments
 
-* `run` — `termination_by k _ c _ => (k, sizeOf c)` (`FiniteEval.lean:166`);
+* `run` — `termination_by k _ c _ => (k, sizeOf c)` (`FiniteEval.lean:167`);
   fuel decreases exactly at the recursive calls of `prec` and `rfind`,
   deliberately mirroring Mathlib's `evaln`.
-* `run_halt_mono_aux` — same measure `(k, sizeOf c)` (`Use.lean:163`).
-* `subst_run_aux` — same measure (`Composition.lean:178`).
-* `run_embed_aux` — same measure (`MathlibBridge.lean:186`).
+* `run_halt_mono_aux` — same measure `(k, sizeOf c)` (`Use.lean:164`).
+* `subst_run_aux` — same measure (`Composition.lean:179`).
+* `run_embed_aux` — same measure (`MathlibBridge.lean:187`).
 * `ofNatCode` — `termination_by n => n`, `decreasing_by all_goals omega`
-  (`Numbering.lean:57`).
+  (`Numbering.lean:58`).
 * `lenAux`, `restAux` (Sacks) — structural recursion on an explicit bound,
   chosen so that `Primrec.nat_rec` applies unchanged
-  (`Requirements.lean:105,187` and the file docstring).
+  (`SacksSplitting/Requirements.lean:106,188` and the file docstring).
 * No `partial def`, no `unsafe`, no `decreasing_by sorry` anywhere.
 
 ### 3.12 Axiom footprint
@@ -740,7 +740,7 @@ theorems are classical results from 1956/57 and 1963.
 `[VERIFIED-LEAN]` The one lemma the repository itself flags as having no
 textbook-visible analogue in the Friedberg–Muchnik proof is
 `SacksSplitting.unsatisfied_requirement_computes`
-(`SacksSplitting/FiniteInjury.lean:282`):
+(`SacksSplitting/FiniteInjury.lean:283`):
 
 ```
 NoInjuryFrom ec j s₀ →
@@ -838,13 +838,13 @@ of which 7 are code sites and 2 are the words "Classical source:" in the
 
 | Site | Use |
 |---|---|
-| `OracleComputability/Reducibility.lean:26` | `open Classical in` before `charFun` |
-| `OracleComputability/Reducibility.lean:32` | `open Classical in` before `charFun_eq_true` |
-| `OracleComputability/Reducibility.lean:37` | `open Classical in` before `charFun_eq_false` |
-| `SacksSplitting/FiniteInjury.lean:297` | `open Classical in` before `limUse` |
-| `SacksSplitting/FiniteInjury.lean:306` | `Classical.choose h` inside `limUse` |
-| `SacksSplitting/FiniteInjury.lean:315` | `Classical.choose_spec` in `use_eq_limUse` |
-| `SacksSplitting/FiniteInjury.lean:327` | `Classical.not_forall` in `restraint_bounded_of` |
+| `OracleComputability/Reducibility.lean:27` | `open Classical in` before `charFun` |
+| `OracleComputability/Reducibility.lean:33` | `open Classical in` before `charFun_eq_true` |
+| `OracleComputability/Reducibility.lean:38` | `open Classical in` before `charFun_eq_false` |
+| `SacksSplitting/FiniteInjury.lean:298` | `open Classical in` before `limUse` |
+| `SacksSplitting/FiniteInjury.lean:307` | `Classical.choose h` inside `limUse` |
+| `SacksSplitting/FiniteInjury.lean:316` | `Classical.choose_spec` in `use_eq_limUse` |
+| `SacksSplitting/FiniteInjury.lean:328` | `Classical.not_forall` in `restraint_bounded_of` |
 
 `[MEASURED]` Tactics that appeal to classical reasoning: `by_cases` 50
 occurrences; `by_contra` 8 occurrences (`FriedbergMuchnik/Requirements.lean` 2,
@@ -856,10 +856,10 @@ occurrences; `by_contra` 8 occurrences (`FriedbergMuchnik/Requirements.lean` 2,
 `[VERIFIED-LEAN]` Exactly two `noncomputable` declarations exist in the whole
 project:
 
-* `OracleComputability.charFun` (`Reducibility.lean:29`) — specification-level
+* `OracleComputability.charFun` (`Reducibility.lean:30`) — specification-level
   only; it appears in the *statements* of `TuringReducible`, `Computes`,
   `ComputableSet`, never inside a construction.
-* `SacksSplitting.limUse` (`FiniteInjury.lean:303`) — proof-level only; it
+* `SacksSplitting.limUse` (`SacksSplitting/FiniteInjury.lean:304`) — proof-level only; it
   appears in the verification (`restraint_bounded_of`), never in the
   construction.
 
@@ -915,33 +915,33 @@ sources and marked as such.
 ### 6.1 Representation choices that were made, and why
 
 **Stages as `⊆`-monotone `Finset`s, not prefix-monotone strings.**
-`Approximation.lean:8–12` and `Reducibility.lean:77–79` record the reason:
+`Approximation.lean:12–16` and `Reducibility.lean:78–80` record the reason:
 had stage sequences been prefix-monotone Boolean strings, the limits would be
 computable, and `ComputableSet.turingReducible` would then have handed back
 exactly the reduction the theorem denies. The comment calls this "the sanity
 theorem that killed the prefix-monotone-string design."
 
-**Recording the use in the result type.** `FiniteEval.lean:16–19`: recording
+**Recording the use in the result type.** `FiniteEval.lean:19–22`: recording
 `use` "is what makes the use principle a statement about data the
 construction can actually inspect". `SacksSplitting/STATUS.md` Part 3 reports
 this decision paying off in a theorem it was not designed for: `run_halt_unique`
 is what makes "the use of the limit computation at `y`" a well-defined number
 (`limUse`), which is what bounds the Sacks restraint.
 
-**A partial oracle with an explicit `stuck`.** `FiniteEval.lean:44–51`:
+**A partial oracle with an explicit `stuck`.** `FiniteEval.lean:45–52`:
 insufficient oracle information is distinguished from divergence; "more
 oracle information may turn this into `halt`; more fuel alone cannot."
 
-**Matching Mathlib's fuel discipline.** `MathlibBridge.lean:24–27`: the
+**Matching Mathlib's fuel discipline.** `MathlibBridge.lean:28–31`: the
 deliberate match "is what makes `run_embed` a single structural induction
 rather than a simulation argument with fuel translation."
 
-**Codes as numbers in the `Primrec` layer.** `RunPrimrec.lean:12–19`: two
+**Codes as numbers in the `Primrec` layer.** `RunPrimrec.lean:16–23`: two
 simplifications over Mathlib's `primrec_evaln` — no `Primcodable OracleCode`
 instance is needed because branching on a code is arithmetic on its number,
 and results are encoded as naturals so memo tables are `List ℕ`.
 
-**Cumulative restraint (Sacks).** `SacksSplitting/Construction.lean:22–30`:
+**Cumulative restraint (Sacks).** `SacksSplitting/Construction.lean:24–32`:
 the raw stage restraint is *not* monotone, because the agreement length drops
 whenever a number below it enters `A`; "a restraint that can drop protects
 nothing", so the state keeps a running maximum. This is described as the one
@@ -949,7 +949,7 @@ place where the finite-injury pattern had to be adapted rather than
 instantiated.
 
 **Plain tuple state (Sacks) vs. custom structures (Friedberg–Muchnik).**
-`SacksSplitting/Requirements.lean:47–50`: `State` is `List ℕ × List ℕ × List ℕ`
+`SacksSplitting/Requirements.lean:48–51`: `State` is `List ℕ × List ℕ × List ℕ`
 so `Primcodable` is automatic.
 
 ### 6.2 Alternatives that failed
@@ -963,15 +963,15 @@ confine each tuple-sized comparison to its own lemma.
 
 `[VERIFIED-LEAN]` The residue of that failure is visible in the sources: 11
 raised `maxHeartbeats` budgets, the largest being 16 000 000 (80× default) on
-`primrec_reqAttN` (`FriedbergMuchnik/CE.lean:303`).
+`primrec_reqAttN` (`FriedbergMuchnik/CE.lean:304`).
 
 ### 6.3 Proof bottlenecks
 
-`[MEASURED]` `FriedbergMuchnik/CE.lean` costs 106 s of the 122 s clean-build
-wall clock. `SacksSplitting/CE.lean` costs 12 s. Every other module is
+`[MEASURED]` `FriedbergMuchnik/CE.lean` costs 104 s of the 118 s clean-build
+wall clock. `SacksSplitting/CE.lean` costs 11 s. Every other module is
 ≤ 2.6 s.
 
-`[ENGINEERING]` `FriedbergMuchnik/CE.lean:8–16` states the cause: `ConsState`
+`[ENGINEERING]` `FriedbergMuchnik/CE.lean:12–20` states the cause: `ConsState`
 and `ReqState` are custom structures with no `Primcodable` instance, so the
 file carries a **shadow implementation** on plain tuples (`St`, `RS`, `encSt`,
 named builders `idleSt`/`appointSt`/`actSt`), a simulation theorem
@@ -980,7 +980,7 @@ named builders `idleSt`/`appointSt`/`actSt`), a simulation theorem
 take-cons-replicate as maps over `List.range`.
 
 `[VERIFIED-LEAN]` The Sacks file has no shadow layer at all: its state is a
-tuple from the outset (`SacksSplitting/CE.lean:16–26`).
+tuple from the outset (`SacksSplitting/CE.lean:18–28`).
 `SacksSplitting/STATUS.md:213–216` records the counterfactual estimate that
 rewriting `ConsState` as a tuple today "would delete roughly half of its
 `CE.lean`" — that is an estimate, `[OPEN]` as a measured claim.
@@ -992,16 +992,16 @@ rewriting `ConsState` as a tuple today "would delete roughly half of its
 combinator library. `omega` carries most of the arithmetic in `Numbering.lean`
 (the `4·p + t + 5` coding arithmetic) and in the rank argument.
 
-`[VERIFIED-LEAN]` `Numbering.lean:15–18` notes a syntactic accommodation made
+`[VERIFIED-LEAN]` `Numbering.lean:18–21` notes a syntactic accommodation made
 for automation: sums are written exactly as `4·payload + tag + 5` so that the
 decoder's `n + 5` pattern matches syntactically in proofs.
 
-`[VERIFIED-LEAN]` `SacksSplitting/Basic.lean:33–40`: `List.filter` has no
+`[VERIFIED-LEAN]` `SacksSplitting/Basic.lean:34–41`: `List.filter` has no
 `Primrec` lemma in Mathlib but `List.foldr` does, so the development defines
 `filterB` as a `foldr` with `cond` — "exactly the shape `Primrec.cond`
 consumes" — and every filtering step goes through it.
 
-`[VERIFIED-LEAN]` `SacksSplitting/Requirements.lean:31–36`: `lenAgree` and
+`[VERIFIED-LEAN]` `SacksSplitting/Requirements.lean:33–38`: `lenAgree` and
 `restraintAt` are defined by explicit recursion on a bound rather than with
 `List.takeWhile`/`List.foldr`, specifically so that `CE.lean` can hand them to
 `Primrec.nat_rec` unchanged.
@@ -1011,12 +1011,12 @@ consumes" — and every filtering step goes through it.
 `[VERIFIED-LEAN]` `run_halt_limit_of_restraint` was already stated generically
 in the stage sequence `F`, so the Sacks restraint argument reuses it verbatim
 with no generalization (`SacksSplitting/STATUS.md` Part 1, approximation-layer
-table, and `SacksSplitting/FiniteInjury.lean:173` `restraint_respected`).
+table, and `SacksSplitting/FiniteInjury.lean:174` `restraint_respected`).
 
 `[VERIFIED-LEAN]` `partrec_realized` acquired a consumer it never had in
 Friedberg–Muchnik: Sacks uses it to turn the "search for a stage of long
 agreement" decision procedure into an oracle-free `OracleCode`, i.e. to
-*produce* a `ComputableSet` (`SacksSplitting/CE.lean:343`,
+*produce* a `ComputableSet` (`SacksSplitting/CE.lean:344`,
 `computableSet_of_agreement`).
 
 `[VERIFIED-LEAN]` The Sacks development needed no analogue of the ten-field
@@ -1025,7 +1025,7 @@ are not chosen by the construction.
 
 ### 6.6 Unexpected complications
 
-`[VERIFIED-LEAN]` `MathlibOracleBridge.lean:112–121` (README) and the file
+`[VERIFIED-LEAN]` `MathlibOracleBridge.lean:113–122` (README) and the file
 itself: the `rfind` case of the transfer theorem is the hardest, because the
 local `rfind` is the *primed* form (searching upward from the input's second
 component, matching `Nat.Partrec.Code.rfind'`) while Mathlib's
@@ -1041,7 +1041,7 @@ Mathlib bridge (`exists_pairZero_code`, 456; `exists_realizes_rfind`, 465).
 distinguished explicitly at the sites that name the relation rather than using
 `≤ᵀ` notation (README, and `PriorityArguments.lean`'s explicit
 `OracleComputability.TuringReducible` qualifications in
-`FriedbergMuchnik/Requirements.lean:276,283`).
+`FriedbergMuchnik/Requirements.lean:277,284`).
 
 ### 6.7 Where Lean revealed specification bugs
 
@@ -1084,7 +1084,7 @@ and suggested stating it as a lemma. Grep confirms no such lemma exists;
 `acted = true` appears only inside `ConsInv`'s field types.
 
 `[VERIFIED-LEAN]` `ComputableSet A → CE A` is explicitly deferred and never
-proved (`Reducibility.lean:88–92`: "it is not needed for the Friedberg–Muchnik
+proved (`Reducibility.lean:89–93`: "it is not needed for the Friedberg–Muchnik
 theorem").
 
 ---
@@ -1117,11 +1117,11 @@ DOI registries, or the papers themselves. Discrepancies with the current
 
 `[OPEN]` **Soare section numbers not verified.** The repository asserts
 specific Soare correspondences in several docstrings — "Soare VII.2" for the
-use principle (`Use.lean:22`), "Soare VII.2" for Friedberg–Muchnik
-(`Construction.lean:4`, `README.md:143`), "Soare VII.2.1" for the
-requires-attention discipline (`Construction.lean:93`), "Soare VII.3" for
-Sacks splitting (`SacksSplitting/Construction.lean:4`), "Soare III.1" for
-transitivity (`Composition.lean:181`). None of these could be verified
+use principle (`Use.lean:24`), "Soare VII.2" for Friedberg–Muchnik
+(`FriedbergMuchnik/Construction.lean:7`, `README.md:143`), "Soare VII.2.1" for the
+requires-attention discipline (`FriedbergMuchnik/Construction.lean:94`), "Soare VII.3" for
+Sacks splitting (`SacksSplitting/Construction.lean:6`), "Soare III.1" for
+transitivity (`Composition.lean:182`). None of these could be verified
 online; the book's table of contents was not obtainable. Note also an internal
 tension: the use principle and Friedberg–Muchnik are both cited as VII.2,
 whereas the use principle is normally located in Soare's Chapter III
@@ -1139,9 +1139,9 @@ Environment as stated at the top. All figures `[MEASURED]` this session.
 | Unit | Value |
 |---|---|
 | Lean files (project, excluding `lakefile.lean`) | 30 |
-| Total lines of Lean | 6 499 |
+| Total lines of Lean | 6 528 |
 | Non-blank, non-comment lines (comments stripped by a nested-block-comment-aware parser) | 4 471 |
-| Blank lines | 683 |
+| Blank lines | 712 |
 | Comment/docstring lines | 1 345 (21 % of all lines) |
 | `lakefile.lean` | 36 lines |
 
@@ -1149,10 +1149,10 @@ Per library:
 
 | Library | Files | Lines | Code lines |
 |---|---:|---:|---:|
-| `OracleComputability` | 14 | 2 866 | 2 000 |
-| `FriedbergMuchnik` | 8 | 2 002 | 1 494 |
-| `SacksSplitting` | 7 | 1 548 | 948 |
-| `PriorityArguments` | 1 | 83 | 29 |
+| `OracleComputability` | 14 | 2 879 | 2 000 |
+| `FriedbergMuchnik` | 8 | 2 010 | 1 494 |
+| `SacksSplitting` | 7 | 1 555 | 948 |
+| `PriorityArguments` | 1 | 84 | 29 |
 
 ### 8.2 Declaration counts
 
@@ -1184,12 +1184,12 @@ in the environment (18 theorems, 29 definitions, 11 constructors/recursors).
 
 | File | Lines | Hand-written theorems |
 |---|---:|---:|
-| `OracleComputability/RunPrimrec.lean` | 597 | 12 |
-| `FriedbergMuchnik/CE.lean` | 573 | 23 |
-| `OracleComputability/MathlibOracleBridge.lean` | 523 | 26 |
-| `SacksSplitting/CE.lean` | 399 | 35 |
-| `SacksSplitting/FiniteInjury.lean` | 388 | 18 |
-| `FriedbergMuchnik/Invariants.lean` | 386 | 7 |
+| `OracleComputability/RunPrimrec.lean` | 598 | 12 |
+| `FriedbergMuchnik/CE.lean` | 574 | 23 |
+| `OracleComputability/MathlibOracleBridge.lean` | 524 | 26 |
+| `SacksSplitting/CE.lean` | 400 | 35 |
+| `SacksSplitting/FiniteInjury.lean` | 389 | 18 |
+| `FriedbergMuchnik/Invariants.lean` | 387 | 7 |
 
 ### 8.4 Build time
 
@@ -1198,18 +1198,18 @@ already present:
 
 ```
 Build completed successfully (829 jobs).
-lake build  146.78s user 20.22s system 137% cpu 2:01.82 total
+lake build  139.39s user 17.62s system 132% cpu 1:58.19 total
 ```
 
-An independent earlier run of the same command: `1:53.74 total`, 134.69 s
-user. A no-op `lake build` (everything up to date): 2.8 s.
+Two independent earlier runs of the same command: `2:01.82 total` (146.78 s
+user) and `1:53.74 total` (134.69 s user). A no-op `lake build` (everything up to date): 2.8 s.
 
 Per-module elaboration times from the clean build (all 30 project modules):
 
 | Module | Time |
 |---|---:|
-| `FriedbergMuchnik.CE` | 106 s |
-| `SacksSplitting.CE` | 12 s |
+| `FriedbergMuchnik.CE` | 104 s |
+| `SacksSplitting.CE` | 11 s |
 | `OracleComputability.FiniteEval` | 2.6 s |
 | `OracleComputability.Numbering` | 2.5 s |
 | `OracleComputability.Priority` | 2.4 s |
@@ -1298,8 +1298,8 @@ See Part 3.12: 37 declarations checked, all `[propext, Classical.choice, Quot.so
 13. `[VERIFIED-LEAN]` Non-vacuity of the Sacks statement is proved by applying
     it to the Friedberg–Muchnik set.
 14. `[MEASURED]` 6 499 lines of Lean across 30 files; 274 hand-written
-    theorems; clean build 122 s with Mathlib cached, of which
-    `FriedbergMuchnik/CE.lean` is 106 s.
+    theorems; clean build 118 s with Mathlib cached, of which
+    `FriedbergMuchnik/CE.lean` is 104 s.
 15. `[VERIFIED-PRIMARY]` Mathlib contains no priority-argument, finite-injury,
     or use-principle material, and its oracle file
     (`Computability/TuringDegree.lean`, Duve and Roth, 2025) has no use
@@ -1313,11 +1313,11 @@ See Part 3.12: 37 declarations checked, all `[propext, Classical.choice, Quot.so
 
 **Wrong as currently written in the repository — must be corrected:**
 
-1. `[VERIFIED-LEAN]` `OracleComputability/MathlibBridge.lean:4–5` says it is
+1. `[VERIFIED-LEAN]` `OracleComputability/MathlibBridge.lean:8–9` says it is
    "the **only** file of the project that imports Mathlib's computability
    library." False: `RunPrimrec.lean` imports `Mathlib.Computability.Primrec`
    and `MathlibOracleBridge.lean` imports `Mathlib.Computability.TuringDegree`.
-2. `[VERIFIED-LEAN]` `OracleComputability.lean:16–17` names
+2. `[VERIFIED-LEAN]` `OracleComputability.lean:30–31` names
    "`MathlibBridge.lean, RunPrimrec.lean` (the only two files importing Mathlib
    computability)". Also false, for the same reason — there are three.
 3. `[VERIFIED-PRIMARY]` `paper/references.bib` entry `cockett2018` has the

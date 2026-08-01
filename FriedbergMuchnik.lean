@@ -1,4 +1,13 @@
-/-
+import OracleComputability
+import FriedbergMuchnik.Construction
+import FriedbergMuchnik.StageDynamics
+import FriedbergMuchnik.FiniteInjury
+import FriedbergMuchnik.Invariants
+import FriedbergMuchnik.Requirements
+import FriedbergMuchnik.CE
+import FriedbergMuchnik.Main
+
+/-!
 Root module of the Friedberg–Muchnik formalization.
 
 The oracle model, the use principle, `≤ᵀ`/`CE`, the Mathlib bridge and the
@@ -17,11 +26,3 @@ the dependency direction.  What follows is only the priority argument:
 * `CE` — the constructed sets are computably enumerable;
 * `Main` — the theorem.
 -/
-import OracleComputability
-import FriedbergMuchnik.Construction
-import FriedbergMuchnik.StageDynamics
-import FriedbergMuchnik.FiniteInjury
-import FriedbergMuchnik.Invariants
-import FriedbergMuchnik.Requirements
-import FriedbergMuchnik.CE
-import FriedbergMuchnik.Main

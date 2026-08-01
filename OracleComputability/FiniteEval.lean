@@ -1,4 +1,7 @@
-/-
+import Mathlib.Data.Nat.Pairing
+import OracleComputability.OracleCode
+
+/-!
 # Step-indexed evaluation with finite oracle information
 
 This file gives `OracleCode` its operational semantics: a fuel-bounded
@@ -22,8 +25,6 @@ recursive calls of `prec` and `rfind`) deliberately mirrors Mathlib's
 `Nat.Partrec.Code.evaln`, so that `MathlibBridge.lean` can relate the two
 semantics by a single structural induction.
 -/
-import Mathlib.Data.Nat.Pairing
-import OracleComputability.OracleCode
 
 namespace OracleComputability
 
@@ -59,15 +60,15 @@ abbrev PartOracle : Type := ℕ → Option Bool
 namespace PartOracle
 
 /-- The everywhere-defined oracle of a total membership function. -/
-def ofFun (X : ℕ → Bool) : PartOracle := fun n => some (X n)
+def ofFun (X : ℕ → Bool) : PartOracle := fun n ↦ some (X n)
 
 /-- The finite oracle described by a snapshot string: position `i` is
 answered by `σ[i]` when `i < σ.length` and is unanswered otherwise. -/
-def ofSnapshot (σ : List Bool) : PartOracle := fun n => σ[n]?
+def ofSnapshot (σ : List Bool) : PartOracle := fun n ↦ σ[n]?
 
 /-- The empty oracle: no information at all.  Used to define *unrelativized*
 computation (`CE`, `ComputableSet` in `Reducibility.lean`). -/
-def empty : PartOracle := fun _ => none
+def empty : PartOracle := fun _ ↦ none
 
 @[simp] theorem ofFun_apply (X : ℕ → Bool) (n : ℕ) : ofFun X n = some (X n) := rfl
 
@@ -148,18 +149,18 @@ def run : ℕ → PartOracle → OracleCode → ℕ → RunResult
         | some b => .halt ⟨cond b 1 0, x + 1⟩
         | none => .stuck
       | .pair f g =>
-        (run (k + 1) O f x).bind fun a =>
-          (run (k + 1) O g x).bind fun b => .halt ⟨Nat.pair a b, 0⟩
+        (run (k + 1) O f x).bind fun a ↦
+          (run (k + 1) O g x).bind fun b ↦ .halt ⟨Nat.pair a b, 0⟩
       | .comp f g =>
-        (run (k + 1) O g x).bind fun y => run (k + 1) O f y
+        (run (k + 1) O g x).bind fun y ↦ run (k + 1) O f y
       | .prec f g =>
         match x.unpair.2 with
         | 0 => run (k + 1) O f x.unpair.1
         | n + 1 =>
-          (run k O (.prec f g) (Nat.pair x.unpair.1 n)).bind fun y =>
+          (run k O (.prec f g) (Nat.pair x.unpair.1 n)).bind fun y ↦
             run (k + 1) O g (Nat.pair x.unpair.1 (Nat.pair n y))
       | .rfind f =>
-        (run (k + 1) O f x).bind fun y =>
+        (run (k + 1) O f x).bind fun y ↦
           if y = 0 then .halt ⟨x.unpair.2, 0⟩
           else run k O (.rfind f) (Nat.pair x.unpair.1 (x.unpair.2 + 1))
     else .timeout
@@ -209,13 +210,13 @@ theorem run_query_none {k x : ℕ} {O : PartOracle} (hx : x ≤ k)
 
 theorem run_pair_step {k x : ℕ} (O : PartOracle) (f g : OracleCode) (hx : x ≤ k) :
     run (k + 1) O (.pair f g) x =
-      (run (k + 1) O f x).bind fun a =>
-        (run (k + 1) O g x).bind fun b => .halt ⟨Nat.pair a b, 0⟩ := by
+      (run (k + 1) O f x).bind fun a ↦
+        (run (k + 1) O g x).bind fun b ↦ .halt ⟨Nat.pair a b, 0⟩ := by
   rw [run.eq_def]; simp [hx]
 
 theorem run_comp_step {k x : ℕ} (O : PartOracle) (f g : OracleCode) (hx : x ≤ k) :
     run (k + 1) O (.comp f g) x =
-      (run (k + 1) O g x).bind fun y => run (k + 1) O f y := by
+      (run (k + 1) O g x).bind fun y ↦ run (k + 1) O f y := by
   rw [run.eq_def]; simp [hx]
 
 theorem run_prec_zero_step {k x : ℕ} (O : PartOracle) (f g : OracleCode)
@@ -226,13 +227,13 @@ theorem run_prec_zero_step {k x : ℕ} (O : PartOracle) (f g : OracleCode)
 theorem run_prec_succ_step {k x n : ℕ} (O : PartOracle) (f g : OracleCode)
     (hx : x ≤ k) (hx2 : x.unpair.2 = n + 1) :
     run (k + 1) O (.prec f g) x =
-      (run k O (.prec f g) (Nat.pair x.unpair.1 n)).bind fun y =>
+      (run k O (.prec f g) (Nat.pair x.unpair.1 n)).bind fun y ↦
         run (k + 1) O g (Nat.pair x.unpair.1 (Nat.pair n y)) := by
   rw [run.eq_def]; simp [hx, hx2]
 
 theorem run_rfind_step {k x : ℕ} (O : PartOracle) (f : OracleCode) (hx : x ≤ k) :
     run (k + 1) O (.rfind f) x =
-      (run (k + 1) O f x).bind fun y =>
+      (run (k + 1) O f x).bind fun y ↦
         if y = 0 then .halt ⟨x.unpair.2, 0⟩
         else run k O (.rfind f) (Nat.pair x.unpair.1 (x.unpair.2 + 1)) := by
   rw [run.eq_def]; simp [hx]

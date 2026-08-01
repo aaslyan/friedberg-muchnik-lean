@@ -1,4 +1,6 @@
-/-
+import Mathlib.Data.List.Basic
+
+/-!
 # Least-index selection
 
 One lemma, but a shared one: `List.find?` over an initial segment of `ℕ`
@@ -13,7 +15,6 @@ requirement that *requires attention*, Sacks splitting to pick the
 highest-priority requirement whose *restraint* covers an incoming number —
 so it belongs to neither of them.
 -/
-import Mathlib.Data.List.Basic
 
 namespace OracleComputability
 

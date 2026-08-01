@@ -1,4 +1,7 @@
-/-
+import FriedbergMuchnik.FiniteInjury
+import FriedbergMuchnik.Invariants
+
+/-!
 # Satisfaction of the requirements
 
 Soare VII.2, the verification: every requirement is met by its stabilized
@@ -21,8 +24,6 @@ has a witness `x` (else the requirement would still require attention).
   a late enough stage the requirement *requires attention* — contradicting
   `stable_not_requires`.  Hence no reduction computes `χ_A` from `B`.
 -/
-import FriedbergMuchnik.FiniteInjury
-import FriedbergMuchnik.Invariants
 
 namespace FriedbergMuchnik
 
@@ -50,7 +51,7 @@ theorem restraint_respected_B {i s₁ : ℕ} {r : ReqState} (hi₁ : i < s₁)
     ∀ t, s₁ ≤ t → ∀ n, n < r.restraint → n ∈ BstageF t → n ∈ BstageF s₁ := by
   intro t ht
   induction t, ht using Nat.le_induction with
-  | base => exact fun n _ hn => hn
+  | base => exact fun n _ hn ↦ hn
   | succ t ht ih =>
     intro n hnu hmem
     rcases Blist_succ t with heq |
@@ -81,7 +82,7 @@ theorem restraint_respected_A {i s₁ : ℕ} {r : ReqState} (hi₁ : i < s₁)
     ∀ t, s₁ ≤ t → ∀ n, n < r.restraint → n ∈ AstageF t → n ∈ AstageF s₁ := by
   intro t ht
   induction t, ht using Nat.le_induction with
-  | base => exact fun n _ hn => hn
+  | base => exact fun n _ hn ↦ hn
   | succ t ht ih =>
     intro n hnu hmem
     rcases Alist_succ t with heq |
@@ -275,14 +276,14 @@ open scoped OracleComputability in
 kills it. -/
 theorem not_A_le_B : ¬ OracleComputability.TuringReducible Aset Bset := by
   rintro ⟨c, hc⟩
-  refine R_satisfied (OracleCode.encodeCode c) (fun x => ?_)
+  refine R_satisfied (OracleCode.encodeCode c) (fun x ↦ ?_)
   rw [OracleCode.ofNatCode_encodeCode]
   exact hc x
 
 /-- `B` is not Turing reducible to `A`. -/
 theorem not_B_le_A : ¬ OracleComputability.TuringReducible Bset Aset := by
   rintro ⟨c, hc⟩
-  refine S_satisfied (OracleCode.encodeCode c) (fun x => ?_)
+  refine S_satisfied (OracleCode.encodeCode c) (fun x ↦ ?_)
   rw [OracleCode.ofNatCode_encodeCode]
   exact hc x
 

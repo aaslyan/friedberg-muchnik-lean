@@ -1,4 +1,6 @@
-/-
+import OracleComputability.FiniteEval
+
+/-!
 # The use principle
 
 The master theorem of this file, `run_halt_mono`, is the single lemma that
@@ -28,7 +30,6 @@ Corollaries proved here:
   consistent with a total `X` is also a halting run against `X` itself;
 * `run_halt_unique` — determinism across fuels and consistent oracles.
 -/
-import OracleComputability.FiniteEval
 
 namespace OracleComputability
 
@@ -87,14 +88,14 @@ private theorem run_halt_mono_aux :
       subst hdr'
       have hf' : run (k' + 1) O' f x = .halt d₁ :=
         run_halt_mono_aux (k + 1) (k' + 1) O O' f x d₁ (by omega)
-          (fun i hi b hb => hO i (lt_of_lt_of_le hi (le_max_left _ _)) b hb) hf
+          (fun i hi b hb ↦ hO i (lt_of_lt_of_le hi (le_max_left _ _)) b hb) hf
       have hg' : run (k' + 1) O' g x = .halt d₂ :=
         run_halt_mono_aux (k + 1) (k' + 1) O O' g x d₂ (by omega)
-          (fun i hi b hb => hO i (lt_of_lt_of_le hi (le_max_right _ _)) b hb) hg
+          (fun i hi b hb ↦ hO i (lt_of_lt_of_le hi (le_max_right _ _)) b hb) hg
       have h2 :
           RunResult.bind (run (k' + 1) O' f x)
-            (fun a => RunResult.bind (run (k' + 1) O' g x)
-              (fun b => RunResult.halt ⟨Nat.pair a b, 0⟩)) =
+            (fun a ↦ RunResult.bind (run (k' + 1) O' g x)
+              (fun b ↦ RunResult.halt ⟨Nat.pair a b, 0⟩)) =
             .halt ⟨Nat.pair d₁.output d₂.output, max d₁.use (max d₂.use 0)⟩ :=
         RunResult.bind_halt (d₂ := ⟨Nat.pair d₁.output d₂.output, max d₂.use 0⟩) hf'
           (RunResult.bind_halt (d₂ := ⟨Nat.pair d₁.output d₂.output, 0⟩) hg' rfl)
@@ -105,10 +106,10 @@ private theorem run_halt_mono_aux :
       obtain ⟨d₁, d₂, hg, hf, rfl⟩ := RunResult.bind_eq_halt.mp h
       have hg' : run (k' + 1) O' g x = .halt d₁ :=
         run_halt_mono_aux (k + 1) (k' + 1) O O' g x d₁ (by omega)
-          (fun i hi b hb => hO i (lt_of_lt_of_le hi (le_max_left _ _)) b hb) hg
+          (fun i hi b hb ↦ hO i (lt_of_lt_of_le hi (le_max_left _ _)) b hb) hg
       have hf' : run (k' + 1) O' f d₁.output = .halt d₂ :=
         run_halt_mono_aux (k + 1) (k' + 1) O O' f d₁.output d₂ (by omega)
-          (fun i hi b hb => hO i (lt_of_lt_of_le hi (le_max_right _ _)) b hb) hf
+          (fun i hi b hb ↦ hO i (lt_of_lt_of_le hi (le_max_right _ _)) b hb) hf
       exact RunResult.bind_halt hg' hf'
     | prec f g =>
       cases hx2 : x.unpair.2 with
@@ -122,13 +123,13 @@ private theorem run_halt_mono_aux :
         obtain ⟨d₁, d₂, hp, hg, rfl⟩ := RunResult.bind_eq_halt.mp h
         have hp' : run k' O' (.prec f g) (Nat.pair x.unpair.1 n) = .halt d₁ :=
           run_halt_mono_aux k k' O O' (.prec f g) (Nat.pair x.unpair.1 n) d₁ hk'
-            (fun i hi b hb => hO i (lt_of_lt_of_le hi (le_max_left _ _)) b hb) hp
+            (fun i hi b hb ↦ hO i (lt_of_lt_of_le hi (le_max_left _ _)) b hb) hp
         have hg' :
             run (k' + 1) O' g (Nat.pair x.unpair.1 (Nat.pair n d₁.output)) =
               .halt d₂ :=
           run_halt_mono_aux (k + 1) (k' + 1) O O' g
             (Nat.pair x.unpair.1 (Nat.pair n d₁.output)) d₂ (by omega)
-            (fun i hi b hb => hO i (lt_of_lt_of_le hi (le_max_right _ _)) b hb) hg
+            (fun i hi b hb ↦ hO i (lt_of_lt_of_le hi (le_max_right _ _)) b hb) hg
         exact RunResult.bind_halt hp' hg'
     | rfind f =>
       rw [run_rfind_step O f hxk] at h
@@ -136,7 +137,7 @@ private theorem run_halt_mono_aux :
       obtain ⟨d₁, d₂, hf, hcont, rfl⟩ := RunResult.bind_eq_halt.mp h
       have hf' : run (k' + 1) O' f x = .halt d₁ :=
         run_halt_mono_aux (k + 1) (k' + 1) O O' f x d₁ (by omega)
-          (fun i hi b hb => hO i (lt_of_lt_of_le hi (le_max_left _ _)) b hb) hf
+          (fun i hi b hb ↦ hO i (lt_of_lt_of_le hi (le_max_left _ _)) b hb) hf
       have hcont₀ :
           (if d₁.output = 0 then RunResult.halt ⟨x.unpair.2, 0⟩
             else run k O (.rfind f) (Nat.pair x.unpair.1 (x.unpair.2 + 1))) =
@@ -154,7 +155,7 @@ private theorem run_halt_mono_aux :
               .halt d₂ :=
           run_halt_mono_aux k k' O O' (.rfind f)
             (Nat.pair x.unpair.1 (x.unpair.2 + 1)) d₂ hk'
-            (fun i hi b hb => hO i (lt_of_lt_of_le hi (le_max_right _ _)) b hb) hcont₀
+            (fun i hi b hb ↦ hO i (lt_of_lt_of_le hi (le_max_right _ _)) b hb) hcont₀
         refine RunResult.bind_halt hf' ?_
         show (if d₁.output = 0 then RunResult.halt ⟨x.unpair.2, 0⟩
           else run k' O' (.rfind f) (Nat.pair x.unpair.1 (x.unpair.2 + 1))) = _
@@ -179,7 +180,7 @@ oracle model). -/
 theorem run_halt_fuel_mono {k k' : ℕ} {O : PartOracle} {c : OracleCode} {x : ℕ}
     {d : HaltData} (hk : k ≤ k') (h : run k O c x = .halt d) :
     run k' O c x = .halt d :=
-  run_halt_mono hk (fun _ _ _ hb => hb) h
+  run_halt_mono hk (fun _ _ _ hb ↦ hb) h
 
 /-- More oracle information never changes a halting run: if `O'` answers
 every question `O` answers (identically), a run that halted against `O`
@@ -188,7 +189,7 @@ theorem run_halt_oracle_ext {k : ℕ} {O O' : PartOracle} {c : OracleCode} {x : 
     {d : HaltData} (hO : ∀ i b, O i = some b → O' i = some b)
     (h : run k O c x = .halt d) :
     run k O' c x = .halt d :=
-  run_halt_mono le_rfl (fun i _ b hb => hO i b hb) h
+  run_halt_mono le_rfl (fun i _ b hb ↦ hO i b hb) h
 
 namespace PartOracle
 
@@ -200,7 +201,7 @@ def Consistent (O : PartOracle) (X : ℕ → Bool) : Prop :=
   ∀ i b, O i = some b → X i = b
 
 theorem consistent_ofFun (X : ℕ → Bool) : (ofFun X).Consistent X :=
-  fun _ _ h => Option.some.inj h
+  fun _ _ h ↦ Option.some.inj h
 
 theorem consistent_empty (X : ℕ → Bool) : empty.Consistent X := by
   intro i b h
@@ -215,7 +216,7 @@ theorem run_halt_of_consistent {k : ℕ} {O : PartOracle} {X : ℕ → Bool}
     (h : run k O c x = .halt d) :
     run k (PartOracle.ofFun X) c x = .halt d :=
   run_halt_mono le_rfl
-    (fun i _ b hb => by rw [PartOracle.ofFun_apply, hO i b hb]) h
+    (fun i _ b hb ↦ by rw [PartOracle.ofFun_apply, hO i b hb]) h
 
 /-- **Determinism across consistent oracles.**  Two halting runs of the same
 program on the same input, against possibly different fuels and possibly

@@ -1,4 +1,6 @@
-/-
+import SacksSplitting.FiniteInjury
+
+/-!
 # The Sacks Splitting Theorem
 
 Final assembly.  Everything is stated in `FriedbergMuchnik`'s own
@@ -21,7 +23,6 @@ Scope note: this is the splitting-with-non-reducibility core.  The full
 Sacks Splitting Theorem also makes the halves *low*, which needs the
 infinite-injury machinery and is deliberately out of scope here.
 -/
-import SacksSplitting.FiniteInjury
 
 namespace SacksSplitting
 
@@ -38,7 +39,7 @@ theorem not_reducible_half {ec i : ℕ} (hA : ¬ ComputableSet (enumSet ec))
   have hhalf : halfSet ec (2 * OracleCode.encodeCode c + i) = halfSet ec i := by
     rw [← halfSet_mod_two ec (2 * OracleCode.encodeCode c + i),
       show (2 * OracleCode.encodeCode c + i) % 2 = i by omega]
-  refine requirement_satisfied hA (2 * OracleCode.encodeCode c + i) fun y => ?_
+  refine requirement_satisfied hA (2 * OracleCode.encodeCode c + i) fun y ↦ ?_
   rw [hdiv, hhalf, OracleCode.ofNatCode_encodeCode]
   exact hc y
 

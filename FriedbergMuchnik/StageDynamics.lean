@@ -1,4 +1,7 @@
-/-
+import OracleComputability.Priority
+import FriedbergMuchnik.Construction
+
+/-!
 # Stage dynamics of the construction
 
 The specification layer over `Construction.lean`: which requirement
@@ -17,8 +20,6 @@ In textbook terms this file is the "construction" half of Soare VII.2's
 bookkeeping: everything here is about single stages; the induction over
 stages (finite injury) lives in `FiniteInjury.lean`.
 -/
-import OracleComputability.Priority
-import FriedbergMuchnik.Construction
 
 namespace FriedbergMuchnik
 
@@ -35,7 +36,7 @@ def preState (s : ℕ) : ConsState :=
 /-- The requirement that receives attention at stage `s + 1`, if any:
 the least index requiring attention. -/
 def attended (s : ℕ) : Option ℕ :=
-  (List.range (preState s).reqs.length).find? fun i =>
+  (List.range (preState s).reqs.length).find? fun i ↦
     (preState s).requiresAttention s i
 
 /-- The stage step, phrased through `attended`. -/

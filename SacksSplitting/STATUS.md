@@ -54,7 +54,7 @@ Sacks needs its own version, with the reason stated.
 | FM component | Verdict | Notes |
 |---|---|---|
 | `StageMono`, `limitSet`, `StageMono.subset_of_le` | **as-is** | Instantiated three times: for `A`'s own enumeration and for each half. |
-| `StageMono.stabilizesBelow` | **as-is** | The workhorse of injury finiteness: below a fixed bound only finitely much ever happens, so past some stage no injury below that bound can occur. |
+| `StageMono.stabilizes_below` | **as-is** | The workhorse of injury finiteness: below a fixed bound only finitely much ever happens, so past some stage no injury below that bound can occur. |
 | `snapshot`, `snapshot_getElem?`, `ofSnapshot_snapshot_some` | **as-is** | |
 | **`run_halt_limit_of_restraint`** | **as-is** | This is the lemma the brief hoped could be reused directly for the restraint argument, and it can be, verbatim: its statement is already generic in the stage sequence `F`, so it applies to the Sacks halves with no generalization. Sacks is a pure preservation argument, so this single lemma carries more of the proof here than it does in FM. |
 | `run_halt_snapshot_of_limit` | **as-is** | The "true stage" step: a limit computation is visible from some stage on. |

@@ -1,4 +1,6 @@
-/-
+import OracleComputability.Reducibility
+
+/-!
 # Closure of `≤ᵀ` under composition: transitivity
 
 The reducibility-hygiene result that makes the project's `≤ᵀ`
@@ -17,7 +19,6 @@ need their own fuel), which is why the simulation produces *some* fuel
 bound rather than preserving the original one; outputs — the only thing
 `Computes` cares about — are preserved on the nose.
 -/
-import OracleComputability.Reducibility
 
 namespace OracleComputability
 
@@ -185,11 +186,11 @@ theorem TuringReducible.trans {A B C : Set ℕ}
     TuringReducible A C := by
   obtain ⟨c₁, h₁⟩ := hab
   obtain ⟨c₂, h₂⟩ := hbc
-  refine ⟨subst c₂ c₁, fun x => ?_⟩
+  refine ⟨subst c₂ c₁, fun x ↦ ?_⟩
   obtain ⟨k, d, hk, hout⟩ := h₁ x
   obtain ⟨k', d', h', hout'⟩ :=
     subst_run_aux (charFun B) (charFun C) c₂
-      (fun n => h₂ n) k c₁ x d hk
+      (fun n ↦ h₂ n) k c₁ x d hk
   exact ⟨k', d', h', by rw [hout', hout]⟩
 
 /-- With `TuringReducible.refl`, the project's `≤ᵀ` is a preorder. -/

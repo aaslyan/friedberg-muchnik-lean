@@ -1,4 +1,6 @@
-/-
+import SacksSplitting.Basic
+
+/-!
 # The splitting requirements: agreement length and restraint
 
 Requirement `N_j`, for `e = j / 2` and `i = j % 2`, is
@@ -35,7 +37,6 @@ facts each needs (`_isSome_of_lt` / `le_restAux`, and their converses) are
 short inductions, and so that `CE.lean` can hand them to `Primrec.nat_rec`
 unchanged.
 -/
-import SacksSplitting.Basic
 
 namespace SacksSplitting
 
@@ -164,7 +165,7 @@ theorem lenAux_eq_of_all {ec : ℕ} {st : State} {s j n : ℕ}
   induction n with
   | zero => rfl
   | succ n ih =>
-    have hn : lenAux ec st s j n = n := ih fun y hy => h y (by omega)
+    have hn : lenAux ec st s j n = n := ih fun y hy ↦ h y (by omega)
     show (if lenAux ec st s j n = n ∧ (agreeAt ec st s j n).isSome = true
       then n + 1 else lenAux ec st s j n) = n + 1
     rw [if_pos ⟨hn, h n (by omega)⟩]
@@ -175,7 +176,7 @@ theorem lt_lenAgree {ec : ℕ} {st : State} {s j y : ℕ} (hy : y < s)
     (h : ∀ z, z ≤ y → (agreeAt ec st s j z).isSome = true) :
     y < lenAgree ec st s j := by
   have h1 : lenAux ec st s j (y + 1) = y + 1 :=
-    lenAux_eq_of_all fun z hz => h z (by omega)
+    lenAux_eq_of_all fun z hz ↦ h z (by omega)
   have h2 : lenAux ec st s j (y + 1) ≤ lenAgree ec st s j :=
     lenAux_mono ec st s j (by omega)
   omega
@@ -216,7 +217,7 @@ theorem restAux_le {ec : ℕ} {st : State} {s j n M : ℕ}
   | zero => exact Nat.zero_le M
   | succ n ih =>
     show max ((agreeAt ec st s j n).getD 0) (restAux ec st s j n) ≤ M
-    exact max_le (h n (by omega)) (ih fun y hy => h y (by omega))
+    exact max_le (h n (by omega)) (ih fun y hy ↦ h y (by omega))
 
 /-- Every use protected at stage `s` is below the restraint. -/
 theorem use_le_restraintAt {ec : ℕ} {st : State} {s j y u : ℕ}

@@ -1,4 +1,8 @@
-/-
+import OracleComputability
+import FriedbergMuchnik
+import SacksSplitting
+
+/-!
 # Two finite-injury priority arguments over one oracle model
 
 The root module, and the one place where the two theorems meet.
@@ -25,9 +29,6 @@ below: Friedberg–Muchnik produces a set that is c.e. and non-computable,
 which is precisely the hypothesis Sacks splitting consumes.  So the first
 theorem supplies a witness that the second is not vacuous.
 -/
-import OracleComputability
-import FriedbergMuchnik
-import SacksSplitting
 
 namespace PriorityArguments
 

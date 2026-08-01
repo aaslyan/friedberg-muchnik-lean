@@ -1,4 +1,18 @@
-/-
+import OracleComputability.OracleCode
+import OracleComputability.FiniteEval
+import OracleComputability.Use
+import OracleComputability.InfiniteEval
+import OracleComputability.Numbering
+import OracleComputability.Reducibility
+import OracleComputability.Composition
+import OracleComputability.MathlibOracleBridge
+import OracleComputability.MathlibBridge
+import OracleComputability.RunPrimrec
+import OracleComputability.Priority
+import OracleComputability.Approximation
+import OracleComputability.PrimrecTools
+
+/-!
 # Oracle computability: the shared foundation
 
 This library is the part of the development that is not about any
@@ -45,16 +59,3 @@ Contents:
   mechanism** (`run_halt_limit_of_restraint`), the lemma both priority
   arguments turn on.
 -/
-import OracleComputability.OracleCode
-import OracleComputability.FiniteEval
-import OracleComputability.Use
-import OracleComputability.InfiniteEval
-import OracleComputability.Numbering
-import OracleComputability.Reducibility
-import OracleComputability.Composition
-import OracleComputability.MathlibOracleBridge
-import OracleComputability.MathlibBridge
-import OracleComputability.RunPrimrec
-import OracleComputability.Priority
-import OracleComputability.Approximation
-import OracleComputability.PrimrecTools

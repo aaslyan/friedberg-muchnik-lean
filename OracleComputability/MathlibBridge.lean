@@ -1,4 +1,8 @@
-/-
+import Mathlib.Computability.PartrecCode
+import OracleComputability.Use
+import OracleComputability.Reducibility
+
+/-!
 # The Mathlib bridge
 
 Foundation gate items 2–4.  This is the **only** file of the project that
@@ -25,9 +29,6 @@ guard, same placement of fuel decrements) is what makes `run_embed` a
 single structural induction rather than a simulation argument with fuel
 translation.
 -/
-import Mathlib.Computability.PartrecCode
-import OracleComputability.Use
-import OracleComputability.Reducibility
 
 namespace OracleComputability
 
@@ -68,7 +69,7 @@ theorem evaln_eq_none_of_gt {k x : ℕ} {c : Code} (hx : ¬ x ≤ k) :
     omega
 
 private theorem guard_bind_pos {p : Prop} [Decidable p] (hp : p) {α : Type}
-    (o : Option α) : (Bind.bind (guard p) fun _ : Unit => o) = o := by
+    (o : Option α) : (Bind.bind (guard p) fun _ : Unit ↦ o) = o := by
   simp [guard, hp]
 
 /-- Both sides of the embedding correspondence time out above the input
@@ -109,9 +110,9 @@ private theorem run_embed_aux :
   | k + 1, O, Code.pair cf cg, x => by
     by_cases hx : x ≤ k
     · have IHf : ∀ z, run (k + 1) O (embed cf) z = ofEvaln (Code.evaln (k + 1) cf z) :=
-        fun z => run_embed_aux (k + 1) O cf z
+        fun z ↦ run_embed_aux (k + 1) O cf z
       have IHg : ∀ z, run (k + 1) O (embed cg) z = ofEvaln (Code.evaln (k + 1) cg z) :=
-        fun z => run_embed_aux (k + 1) O cg z
+        fun z ↦ run_embed_aux (k + 1) O cg z
       rw [show embed (.pair cf cg) = .pair (embed cf) (embed cg) from rfl,
         run_pair_step O _ _ hx, Code.evaln]
       simp only [IHf, IHg, guard_bind_pos hx]
@@ -125,9 +126,9 @@ private theorem run_embed_aux :
   | k + 1, O, Code.comp cf cg, x => by
     by_cases hx : x ≤ k
     · have IHf : ∀ z, run (k + 1) O (embed cf) z = ofEvaln (Code.evaln (k + 1) cf z) :=
-        fun z => run_embed_aux (k + 1) O cf z
+        fun z ↦ run_embed_aux (k + 1) O cf z
       have IHg : ∀ z, run (k + 1) O (embed cg) z = ofEvaln (Code.evaln (k + 1) cg z) :=
-        fun z => run_embed_aux (k + 1) O cg z
+        fun z ↦ run_embed_aux (k + 1) O cg z
       rw [show embed (.comp cf cg) = .comp (embed cf) (embed cg) from rfl,
         run_comp_step O _ _ hx, Code.evaln]
       simp only [IHf, IHg, guard_bind_pos hx]
@@ -141,12 +142,12 @@ private theorem run_embed_aux :
   | k + 1, O, Code.prec cf cg, x => by
     by_cases hx : x ≤ k
     · have IHf : ∀ z, run (k + 1) O (embed cf) z = ofEvaln (Code.evaln (k + 1) cf z) :=
-        fun z => run_embed_aux (k + 1) O cf z
+        fun z ↦ run_embed_aux (k + 1) O cf z
       have IHg : ∀ z, run (k + 1) O (embed cg) z = ofEvaln (Code.evaln (k + 1) cg z) :=
-        fun z => run_embed_aux (k + 1) O cg z
+        fun z ↦ run_embed_aux (k + 1) O cg z
       have IHp : ∀ z, run k O (.prec (embed cf) (embed cg)) z =
           ofEvaln (Code.evaln k (.prec cf cg) z) :=
-        fun z => run_embed_aux k O (.prec cf cg) z
+        fun z ↦ run_embed_aux k O (.prec cf cg) z
       rw [show embed (.prec cf cg) = .prec (embed cf) (embed cg) from rfl]
       cases hx2 : x.unpair.2 with
       | zero =>
@@ -166,10 +167,10 @@ private theorem run_embed_aux :
   | k + 1, O, Code.rfind' cf, x => by
     by_cases hx : x ≤ k
     · have IHf : ∀ z, run (k + 1) O (embed cf) z = ofEvaln (Code.evaln (k + 1) cf z) :=
-        fun z => run_embed_aux (k + 1) O cf z
+        fun z ↦ run_embed_aux (k + 1) O cf z
       have IHrec : ∀ z, run k O (.rfind (embed cf)) z =
           ofEvaln (Code.evaln k (.rfind' cf) z) :=
-        fun z => run_embed_aux k O (.rfind' cf) z
+        fun z ↦ run_embed_aux k O (.rfind' cf) z
       rw [show embed (.rfind' cf) = .rfind (embed cf) from rfl,
         run_rfind_step O _ hx, Code.evaln]
       simp only [IHf, IHrec, guard_bind_pos hx, Nat.unpaired, Nat.pair_unpair]
@@ -201,7 +202,7 @@ theorem partrec_realized {f : ℕ →. ℕ} (hf : Nat.Partrec f) :
     ∃ c : OracleCode, ∀ (O : PartOracle) (x y : ℕ),
       y ∈ f x ↔ ∃ k, run k O c x = .halt ⟨y, 0⟩ := by
   obtain ⟨cf, rfl⟩ := Code.exists_code.mp hf
-  refine ⟨embed cf, fun O x y => ?_⟩
+  refine ⟨embed cf, fun O x y ↦ ?_⟩
   rw [Code.evaln_complete]
   constructor
   · rintro ⟨k, hk⟩
@@ -223,7 +224,7 @@ library) to certify that its two limit sets are c.e. -/
 theorem ce_of_partrec_dom {f : ℕ →. ℕ} (hf : Nat.Partrec f) {A : Set ℕ}
     (hA : ∀ x, x ∈ A ↔ (f x).Dom) : CE A := by
   obtain ⟨cf, rfl⟩ := Code.exists_code.mp hf
-  refine ⟨embed cf, fun x => ?_⟩
+  refine ⟨embed cf, fun x ↦ ?_⟩
   rw [hA x]
   constructor
   · intro hdom
