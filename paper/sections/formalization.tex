@@ -1,0 +1,343 @@
+\section{The Formalization and Its Key Decisions}
+\label{sec:formalization}
+
+The development is four Lean libraries.  \texttt{OracleComputability} fixes
+a machine model of oracle computation and proves the facts any priority
+argument over that model needs.  \texttt{FriedbergMuchnik} and
+\texttt{SacksSplitting} are built on it, and neither imports the other;
+Lake enforces this, so building either from a clean tree compiles no module
+of the other.  \texttt{PriorityArguments} is a single root module joining
+them.  The two headline theorems are:
+
+\begin{lstlisting}
+theorem friedberg_muchnik :
+    exists A B : Set Nat,
+      CE A /\ CE B /\ not (A <=T B) /\ not (B <=T A)
+
+theorem sacks_splitting :
+    forall A : Set Nat, CE A -> not (ComputableSet A) ->
+      exists A0 A1, CE A0 /\ CE A1 /\ Disjoint A0 A1
+        /\ A0 union A1 = A
+        /\ not (A <=T A0) /\ not (A <=T A1)
+\end{lstlisting}
+
+The vocabulary --- \texttt{CE}, \texttt{ComputableSet}, and the relation
+displayed as $\leT$ --- is defined in the shared library and imported by
+both clients, not redefined, so the two theorems are stated in one
+language.
+
+\subsection{Deciding What Is Primary}
+
+\paragraph{A finitary oracle model.}
+The development does not start from a semantic type of oracle functionals.
+Doing so would require an oracle-machine model, continuity or compactness
+theorems, extraction of finite uses from semantic computations, and a
+connection between functionals and executable indices --- all before the
+first requirement could be stated.  Instead \emph{finite execution is
+primary}.  The evaluator runs a concrete program for bounded fuel against a
+partial oracle $\N \to \mathtt{Option}\ \mathtt{Bool}$, and returns one of
+three outcomes: it halted, recording both its output and the use; it got
+\emph{stuck}, having asked a question the finite oracle could not answer;
+or it ran out of fuel.  Distinguishing the last two matters, because they
+are repaired by different things --- more oracle information, or more
+resources --- and a priority construction reacts to them differently.
+Infinite computation is then defined as existence of a finite successful
+run against a total oracle.
+
+Recording the use inside the result, rather than recovering it afterwards
+by a continuity argument, is the decision the rest of the development rests
+on.  It makes the use principle a statement about data the construction can
+inspect at a stage.  The principle itself, \texttt{run\_halt\_mono}, says
+that a halting bounded run survives more fuel and any oracle that preserves
+the answers it actually used.  The hypothesis is one-sided and deliberately
+weak: positions at or above the recorded use are unconstrained, and so are
+positions below the use where the original oracle had no information.  That
+weakness is exactly what a restraint can deliver.
+
+\paragraph{Finite sets, not Boolean prefixes.}
+Evolving \ce.\ approximations are monotone finite sets, with Boolean lists
+appearing only as bounded snapshots supplied to one computation:
+
+\begin{lstlisting}
+def StageMono (F : Nat -> Finset Nat) : Prop :=
+  forall s, F s subset F (s + 1)
+
+def limitSet (F : Nat -> Finset Nat) : Set Nat :=
+  {n | exists s, n in F s}
+\end{lstlisting}
+
+The alternative --- representing an approximation as a prefix-monotone
+Boolean string, where each bit is fixed once it appears --- is not merely
+inconvenient, it proves the wrong theorem.  Fixing bits makes the limit
+sets decidable, and the development proves that a decidable set reduces to
+every oracle.  A prefix-monotone construction would therefore have handed
+back precisely the reduction the theorem denies.  The two representations
+coexist because they carry different information: a stage set may
+accumulate new positive information at any later stage, while a snapshot
+merely answers finitely many questions for one bounded run.
+
+\paragraph{Where Mathlib enters, and where it does not.}
+Ordinary, non-oracle computability is imported; oracle computability is
+built locally.  Exactly three files import Mathlib's computability library:
+one for the primitive-recursive closure theorems used to show the stage
+functions computable, one embedding Mathlib's partial-recursive codes into
+the query-free fragment of our language, and one relating our reducibility
+to Mathlib's own oracle model.  The local oracle semantics --- the program
+syntax, the evaluator, the use principle, the reducibility vocabulary, the
+approximation layer --- mention Mathlib's codes nowhere, so changes to
+Mathlib's internal coding decisions cannot reach them; the clients meet
+Mathlib only where they must, in discharging computability of their stage
+functions.  This
+boundary lets the construction reason about explicit finite uses while
+still reusing Mathlib's closure library \cite{carneiro2019,mathlibPartrec}.
+
+\paragraph{Reducibility vocabulary.}
+The central definition is that $A \leT B$ holds when some local oracle
+program computes the characteristic function of $A$, on every input, from
+the total characteristic function of $B$:
+
+\begin{lstlisting}
+def TuringReducible (A B : Set Nat) : Prop :=
+  exists c : OracleCode,
+    forall x : Nat,
+      Computes c (charFun B) x (natOfBool (charFun A x))
+\end{lstlisting}
+
+Reflexivity, transitivity (by substituting one program for every query node
+of another), and the fact that decidable sets reduce to every oracle are
+all proved, so the relation is a preorder with the expected bottom
+behaviour.  The program numbering is proved to be a bijection between $\N$
+and the code type, which is what turns ``for every index $e$'' into ``for
+every reduction'': the final diagonalization takes an arbitrary candidate
+program, passes to its index, and lets the corresponding requirement kill
+it.
+
+\subsection{What Transferred to the Second Theorem, and What Did Not}
+\label{sec:transfer}
+
+The foundation was built for one theorem.  To test whether it was a
+foundation rather than scaffolding, we formalized a second finite-injury
+theorem against it and recorded, component by component and before writing
+any of the second construction, what we expected to reuse.
+
+\paragraph{The foundation transferred whole.}
+Every component of the machine model, the use principle, the reducibility
+vocabulary, the Mathlib bridge and the approximation layer was imported and
+used unchanged.  Two items are worth naming.
+
+The restraint lemma --- a computation seen halting against a stage snapshot
+survives to the limit provided nothing below its recorded use is enumerated
+later --- was already stated generically in the stage sequence rather than
+in terms of the first construction's sets.  The preservation argument at
+the heart of Sacks splitting therefore reuses it verbatim.  This was the
+open question the reuse inventory was written to answer, and the answer is
+clean.
+
+More interestingly, the determinism lemma \texttt{run\_halt\_unique} carries
+more weight in the second theorem than in the first.  In
+Friedberg--Muchnik it says only that a computation has one output.  In
+Sacks it is what makes \emph{the use of the limit computation at $y$} a
+well-defined number, and that number is what bounds the restraint function.
+Recording the use rather than only the output was a decision taken for the
+first theorem, for reasons internal to it; it paid for a theorem it was not
+designed for.  That is the strongest evidence we have that the foundation
+generalizes.
+
+\paragraph{The priority layer transferred not at all.}
+The Friedberg--Muchnik injury argument counts \emph{events}.  A
+requirement's record carries a rank in $\{0,1,2\}$ --- has it a witness,
+has it acted --- receiving attention raises the rank strictly, and only
+injury from above resets it.  So once the stronger requirements go quiet, a
+requirement acts at most twice more.  This is the explicit progress measure
+the informal proof does not supply, and it is small enough that the
+induction along priority is arithmetic.
+
+A splitting requirement generates no events.  It never acts: the elements
+are not ours to choose, they arrive from the enumeration of the given set,
+and the construction only decides which half each one joins.  Its restraint
+moves continuously with the length of agreement between the reduction and
+the set being split, so there is no discrete step to count and no rank to
+raise.  The replacement is a three-part simultaneous induction along the
+priority order: bounded restraints below $j$ give finite injury to $j$;
+finite injury to $j$ gives satisfaction of $j$; satisfaction of $j$ bounds
+$j$'s restraint.
+
+The two arguments share a shape --- induction along the priority order, no
+closed-form injury bound --- and no content.  The two files have no
+declaration in common.  We looked for a common generalization worth stating
+and did not find one, and we record that as a negative result about reuse
+rather than as a defect of the first development's design: ``finite
+injury'' names a family of arguments, not a single lemma one can prove once
+and instantiate.
+
+One further difference is forced by the mathematics rather than by taste.
+The splitting restraint must be \emph{cumulative}, kept in the state as a
+running maximum.  The raw stage restraint is not monotone --- the length of
+agreement drops whenever a number below it enters the set --- and a
+restraint that can drop protects nothing, since a computation frozen at one
+stage could be destroyed later merely because its requirement had
+temporarily stopped asking.  Friedberg--Muchnik needs no such device, its
+restraint being written once, when a requirement acts.
+
+\paragraph{Where the hypothesis is spent.}
+Sacks splitting takes a hypothesis Friedberg--Muchnik does not have: the
+set being split is not decidable.  The step that consumes it is the one
+place where the second development required an argument with no analogue in
+the first.  If a requirement is never injured after some stage and its
+reduction nevertheless computes the characteristic function of $A$
+everywhere, then $A$ is decidable: to decide $y \in A$, search for a stage
+past the last injury whose length of agreement exceeds $y$, and report
+whether $y$ is in the approximation at that stage.  Such a stage exists
+because the reduction is total; the answer is correct because past the last
+injury the agreeing computation is frozen by the restraint lemma, so it
+\emph{is} the true value; and the search is effective because the whole
+construction is primitive recursive.  Since $A$ is not decidable, no
+requirement can be in that situation, so every requirement is satisfied.
+
+Friedberg--Muchnik has no counterpart.  Its requirements are satisfiable
+because their witnesses are fresh, which is a property of the construction;
+a splitting requirement is satisfiable only because of a property of the
+\emph{given} set.  We describe this as a step of the classical proof made
+explicit rather than as new mathematics: it is the point at which a
+textbook appeal to non-computability becomes a decision procedure that has
+to be exhibited and shown effective.
+
+\paragraph{What the second theorem cost.}
+The shared foundation is roughly 2{,}870 lines; the Friedberg--Muchnik
+client is roughly 2{,}000 and the Sacks client roughly 1{,}550.  The ratio
+is the point: the expensive part --- model, evaluator, use principle,
+Mathlib bridge, approximation layer --- was already present, and the second
+theorem paid only for its own strategy.
+
+Two components of the first development turned out to be artifacts of its
+own design rather than necessities.  Its ten-field state invariant exists
+to keep freely chosen witnesses fresh, distinct, and clear of
+higher-priority restraints; a construction that does not choose its
+elements needs none of it, and the two invariants that remain --- the
+halves stay disjoint, and their union is the current stage of the given set
+--- are one induction.  And its computability layer needs a shadow
+implementation on plain tuples, because its state types are custom
+structures with no \texttt{Primcodable} instance; defining the splitting
+state as a tuple from the outset removes that layer, its simulation
+theorem, and its list-surgery lemmas entirely.
+
+The exercise also found two defects that only a second client could find.
+Three generic helpers about primitive recursion had been declared
+\texttt{private} inside the first development's computability file.
+Nothing in them mentions either construction --- they are what any stage
+function needs in order to be shown computable --- but \texttt{private}
+made them invisible downstream.  Nothing needed generalizing; they needed
+exporting.  Separately, the first development's root module imported a file
+that did not exist, so a clean checkout did not build at all.  Its own
+build never noticed, because the file was present locally.  Both are
+invisible until someone tries to build on the code.
+
+\subsection{Analytic, and Bridged Rather Than Asserted}
+\label{sec:related}
+
+Post's problem has been mechanized before, and the contrast is a design
+decision rather than a survey obligation.  Zeng, Forster and Kirst
+formalize a solution in Coq \cite{zeng2024post}, building on the synthetic
+oracle computability of Forster, Kirst and M\"uck
+\cite{forster2023oracle}.  Their setting is \emph{synthetic}: one works in
+the Calculus of Inductive Constructions and takes every function
+$\N\to\N$ to be computable by axiom, so there is no object-level machine
+model and none of the details it brings.  That is a deliberate and
+effective choice, and it answers the standard complaint that explicit
+models of computation drown a computability proof in bookkeeping that stays
+invisible on paper.  Two points of their work bear directly on ours: the
+solution they formalize is Soare's low simple set, which their abstract
+explicitly contrasts with ``the full Friedberg--Muchnik theorem
+constructing two incomparable predicates''; and the same abstract records
+that Bauer posed a synthetic proof of Friedberg--Muchnik as a challenge.
+
+The present development is \emph{analytic}, and pays the cost the synthetic
+approach avoids.  What is bought is that every informal appeal to
+``preserve the computation below its use'' becomes an application of one
+lemma about one evaluator, and that the resulting reducibility relation can
+be compared with an external one by proof rather than by fiat.  Neither
+approach dominates; they answer different questions about the same theorem.
+
+That comparison is the last design decision.  Mathlib contains a model of
+oracle computability \cite{mathlibTuringDegree}: an inductive relation
+\texttt{RecursiveIn} on partial functions, Turing reducibility and
+equivalence, and degrees as the quotient with a partial-order instance.  It
+does not contain a use principle, oracle-relative step-indexed evaluation,
+oracle-relative computable enumerability, or the jump, and it is not
+connected to Mathlib's computably enumerable predicates, which live in a
+separate file developed for the unrelativized theory.  The two libraries
+are complementary: Mathlib has the degree \emph{structure} we do not build,
+and we supply the finite-computation machinery it lacks.
+
+So we prove the connection instead of assuming it.  A bridge file
+establishes that every reduction in Mathlib's model is realized by a
+program of our language, by induction over \texttt{RecursiveIn} with one
+program per constructor.  This is the direction that matters: both of our
+conclusions are \emph{negations} of reducibility, so the risk to guard
+against is that our relation admits too few reductions and thereby makes
+the negations cheap.  It does not, and both theorems are consequently
+restated over Mathlib's relation.  The converse inclusion is not needed for
+these results and is not proved.
+
+Two priority claims, stated with the caution they deserve.  We are not
+aware of another formalization of Post's problem in an analytic setting
+with an explicit oracle machine model, nor of another in Lean; the
+synthetic precedent above is the closest.  We are also not aware of any
+formalization of the Sacks Splitting Theorem in any proof assistant.  Both
+claims rest on a literature and repository search rather than an exhaustive
+one, and neither is load-bearing for the technical content of this paper.
+
+\subsection{The Shape of the Implementation}
+
+The details of the machinery are tabulated in
+Appendix~\ref{app:map}; what follows is the shape.
+
+The program language is Kleene's schemata --- zero, successor, the two
+projections, pairing, composition, primitive recursion and unbounded search
+--- plus one oracle primitive, \texttt{query}, which asks whether its input
+is in the oracle set.  A code with no \texttt{query} node is an ordinary
+partial recursive program; the bridge embeds every Mathlib partial-recursive
+code into that fragment and proves the embedding semantics-preserving, which
+is the direction the construction consumes.  The evaluator's fuel discipline
+deliberately copies
+Mathlib's \texttt{evaln}, which is what lets the embedding be proved by a
+single structural induction rather than by a simulation with fuel
+translation.  The whole evaluator is proved primitive recursive, in the
+form in which the construction consumes it: numbered codes in, encoded
+results out.
+
+The Friedberg--Muchnik construction keeps two enumeration lists, one record
+per requirement holding a witness, an acted flag and a restraint, and a
+freshness counter dominating everything mentioned so far.  At each stage
+the least requirement requiring attention receives it: with no witness it
+is given the counter's value; with an unacted witness whose diagonalizing
+computation has appeared within the stage's resources, it acts ---
+enumerating the witness, recording the computation's use as its restraint,
+and resetting every weaker record.  A hypothesis-free case analysis proves
+that every stage is exactly one of idle, appointment, or action, so no
+execution path can escape the verification.  Ten invariants, proved
+together by induction over those three transitions, carry the properties
+the satisfaction proof cites by name, of which the load-bearing one says
+that an acted requirement's diagonalizing computation still halts against
+the current stage.
+
+The splitting construction is smaller for a structural reason: it makes no
+positive moves.  A stage takes the numbers the given set's own enumeration
+has just produced and routes each to the half not being used as an oracle
+by the strongest requirement that restrains it, defaulting to the first
+half when nothing restrains it.  Two invariants suffice: the halves stay
+disjoint, and their union is the current stage of the given set.
+
+The computable-enumerability obligation is discharged the same way in both
+developments and is the most expensive part of each.  The stage function is
+shown primitive recursive using Mathlib's closure library, an unbounded
+search over stages turns it into a partial recursive semi-decider, and the
+bridge converts that into the project's \texttt{CE}.  For
+Friedberg--Muchnik this requires the shadow tuple implementation and a
+simulation theorem tying it to the real machine, and it dominates the build:
+one file accounts for roughly seven eighths of the project's compile time.
+The instructive failure along the way was assembling that derivation as a
+single large combinator term, which made failed unifications fall back into
+the pairing encodings and left the elaborator symbolically evaluating
+arithmetic for tens of millions of heartbeats.  Confining each
+tuple-sized comparison to its own lemma fixed it.

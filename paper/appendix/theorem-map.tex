@@ -1,34 +1,180 @@
 \section{Textbook-to-Lean Map}
+\label{app:map}
+
+The tables below name, for each concept of the informal proofs, the Lean
+declaration that carries it and the file it lives in.  File paths are
+relative to the repository root.  Together with
+Appendix~\ref{app:facts} they replace the file-by-file walkthrough that
+would otherwise occupy the body of the paper.
+
+\subsection{Shared foundation: \texttt{OracleComputability/}}
 
 \begin{table}[h]
 \centering
 \small
-\begin{tabular}{llll}
+\begin{tabular}{lll}
 \toprule
-Textbook concept & Lean representation & Main declaration & File \\
+Concept & Declaration & File \\
 \midrule
-Oracle program & program syntax & \texttt{OracleCode} & \texttt{OracleComputability/OracleCode.lean} \\
-Finite computation & bounded evaluator & \texttt{run} & \texttt{OracleComputability/FiniteEval.lean} \\
-Output/use & halting data & \texttt{HaltData} & \texttt{OracleComputability/FiniteEval.lean} \\
-Use preservation & agreement below use & \texttt{run\_halt\_mono} & \texttt{OracleComputability/Use.lean} \\
-Infinite computation & existential finite run & \texttt{Computes} & \texttt{OracleComputability/InfiniteEval.lean} \\
-Program enumeration & code numbering & \texttt{ofNatCode\_encodeCode} & \texttt{OracleComputability/Numbering.lean} \\
-c.e. approximation & monotone stages & \texttt{StageMono} & \texttt{Approximation.lean} \\
-Limit set & union of stages & \texttt{limitSet} & \texttt{Approximation.lean} \\
-Requirement state & strategy record & \texttt{ReqState} & \texttt{Construction.lean} \\
-Witness & strategy field & \texttt{witness} & \texttt{Construction.lean} \\
-Restraint & strategy field & \texttt{restraint} & \texttt{Construction.lean} \\
-Attention & stage predicate & \texttt{requiresAttention} & \texttt{Construction.lean} \\
-Priority action & deterministic step & \texttt{stepAt}, \texttt{stepState} & \texttt{Construction.lean} \\
-No upward injury & record preservation & \texttt{reqs\_getElem?\_succ\_of\_lt} & \texttt{StageDynamics.lean} \\
-Invariant package & construction invariant & \texttt{ConsInv}, \texttt{consInv\_stage} & \texttt{Invariants.lean} \\
-Finite injury & eventual quietness & \texttt{quiet\_above} & \texttt{FiniteInjury.lean} \\
-Stabilization & final record & \texttt{exists\_stable} & \texttt{FiniteInjury.lean} \\
-Diagonalization & requirement satisfaction & \texttt{R\_satisfied}, \texttt{S\_satisfied} & \texttt{Requirements.lean} \\
-c.e. limit set & semidecision & \texttt{ce\_Aset}, \texttt{ce\_Bset} & \texttt{CE.lean} \\
-Final theorem & assembly & \texttt{friedberg\_muchnik} & \texttt{Main.lean} \\
+Oracle program & \texttt{OracleCode} & \texttt{OracleCode.lean} \\
+Partial oracle & \texttt{PartOracle}, \texttt{ofFun}, \texttt{ofSnapshot} & \texttt{FiniteEval.lean} \\
+Bounded computation & \texttt{run} & \texttt{FiniteEval.lean} \\
+Output and use & \texttt{HaltData} & \texttt{FiniteEval.lean} \\
+Convergence / no information / no fuel & \texttt{RunResult} & \texttt{FiniteEval.lean} \\
+Input guard & \texttt{run\_halt\_input\_lt} & \texttt{FiniteEval.lean} \\
+\textbf{Use principle} & \texttt{run\_halt\_mono} & \texttt{Use.lean} \\
+More fuel is harmless & \texttt{run\_halt\_fuel\_mono} & \texttt{Use.lean} \\
+More oracle information is harmless & \texttt{run\_halt\_oracle\_ext} & \texttt{Use.lean} \\
+Determinism across oracles & \texttt{run\_halt\_unique} & \texttt{Use.lean} \\
+Infinite computation & \texttt{Computes} & \texttt{InfiniteEval.lean} \\
+One output per input & \texttt{Computes.unique} & \texttt{InfiniteEval.lean} \\
+Finite~$\leftrightarrow$~infinite & \texttt{computes\_iff\_initialSegment} & \texttt{InfiniteEval.lean} \\
+Program numbering & \texttt{encodeCode}, \texttt{ofNatCode} & \texttt{Numbering.lean} \\
+Enumeration adequacy & \texttt{ofNatCode\_encodeCode} & \texttt{Numbering.lean} \\
+Numbering is onto $\N$ & \texttt{encodeCode\_ofNatCode} & \texttt{Numbering.lean} \\
+Turing reducibility & \texttt{TuringReducible} & \texttt{Reducibility.lean} \\
+Computable enumerability & \texttt{CE} & \texttt{Reducibility.lean} \\
+Decidable set & \texttt{ComputableSet} & \texttt{Reducibility.lean} \\
+Characteristic function & \texttt{charFun} & \texttt{Reducibility.lean} \\
+$\leT$ is reflexive & \texttt{TuringReducible.refl} & \texttt{Reducibility.lean} \\
+Decidable reduces to everything & \texttt{ComputableSet.turingReducible} & \texttt{Reducibility.lean} \\
+Query substitution & \texttt{subst} & \texttt{Composition.lean} \\
+$\leT$ is transitive & \texttt{TuringReducible.trans} & \texttt{Composition.lean} \\
+Ordinary code embedding & \texttt{embed}, \texttt{run\_embed} & \texttt{MathlibBridge.lean} \\
+Mathlib functions realized & \texttt{partrec\_realized} & \texttt{MathlibBridge.lean} \\
+Semi-decider gives \texttt{CE} & \texttt{ce\_of\_partrec\_dom} & \texttt{MathlibBridge.lean} \\
+Mathlib's oracle relation & \texttt{MathlibTuringReducible} & \texttt{MathlibOracleBridge.lean} \\
+Realization of a Mathlib reduction & \texttt{LocallyRealizes} & \texttt{MathlibOracleBridge.lean} \\
+Induction over \texttt{RecursiveIn} & \texttt{exists\_code\_of\_recursiveIn} & \texttt{MathlibOracleBridge.lean} \\
+\textbf{Transfer theorem} & \texttt{turingReducible\_of\_mathlib} & \texttt{MathlibOracleBridge.lean} \\
+Negative results transfer & \texttt{not\_mathlibTuringReducible} & \texttt{MathlibOracleBridge.lean} \\
+Evaluator on numbered codes & \texttt{nrun} & \texttt{RunPrimrec.lean} \\
+Evaluator is primitive recursive & \texttt{nrun\_primrec} & \texttt{RunPrimrec.lean} \\
+Least index with a property & \texttt{range\_find?\_least} & \texttt{Priority.lean} \\
+\ce.\ approximation & \texttt{StageMono} & \texttt{Approximation.lean} \\
+Limit set & \texttt{limitSet} & \texttt{Approximation.lean} \\
+Settling below a bound & \texttt{StageMono.stabilizesBelow} & \texttt{Approximation.lean} \\
+Oracle snapshot & \texttt{snapshot}, \texttt{snapshotOf} & \texttt{Approximation.lean} \\
+\textbf{Restraint preserves a computation} & \texttt{run\_halt\_limit\_of\_restraint} & \texttt{Approximation.lean} \\
+A true computation becomes visible & \texttt{run\_halt\_snapshot\_of\_limit} & \texttt{Approximation.lean} \\
+Generic \texttt{Primrec} helpers & \texttt{primrec\_find?}, \texttt{primrec\_memDecide}, & \texttt{PrimrecTools.lean} \\
+ & \texttt{primrec\_snapshotOf} & \\
 \bottomrule
 \end{tabular}
-\caption{Mapping between textbook proof concepts and Lean declarations.}
+\caption{The shared foundation.}
 \end{table}
 
+\clearpage
+
+\subsection{Friedberg--Muchnik: \texttt{FriedbergMuchnik/}}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lll}
+\toprule
+Concept & Declaration & File \\
+\midrule
+Strategy record & \texttt{ReqState} & \texttt{Construction.lean} \\
+Witness, acted flag, restraint & \texttt{witness}, \texttt{acted}, \texttt{restraint} & \texttt{Construction.lean} \\
+Construction state & \texttt{ConsState} & \texttt{Construction.lean} \\
+Bounded convergence test & \texttt{convCheck} & \texttt{Construction.lean} \\
+Requires attention & \texttt{requiresAttention} & \texttt{Construction.lean} \\
+Appointment and action & \texttt{stepAt} & \texttt{Construction.lean} \\
+One stage & \texttt{stepState} & \texttt{Construction.lean} \\
+The construction & \texttt{stageState} & \texttt{Construction.lean} \\
+Stage approximations & \texttt{AstageF}, \texttt{BstageF} & \texttt{Construction.lean} \\
+The two sets & \texttt{Aset}, \texttt{Bset} & \texttt{Construction.lean} \\
+Enumeration is monotone & \texttt{AstageF\_mono}, \texttt{BstageF\_mono} & \texttt{Construction.lean} \\
+The attended requirement & \texttt{attended} & \texttt{StageDynamics.lean} \\
+Priority discipline & \texttt{attended\_least} & \texttt{StageDynamics.lean} \\
+Idle / appoint / act trichotomy & \texttt{step\_cases} & \texttt{StageDynamics.lean} \\
+No injury upward & \texttt{reqs\_getElem?\_succ\_of\_lt} & \texttt{StageDynamics.lean} \\
+Only an action enumerates & \texttt{Alist\_succ}, \texttt{Blist\_succ} & \texttt{StageDynamics.lean} \\
+Freshness never decreases & \texttt{fresh\_mono} & \texttt{StageDynamics.lean} \\
+The ten invariants & \texttt{ConsInv} & \texttt{Invariants.lean} \\
+Invariants hold at every stage & \texttt{consInv\_stage} & \texttt{Invariants.lean} \\
+Preserved computation & \texttt{ConsInv.acted\_comp} & \texttt{Invariants.lean} \\
+Witnesses clear higher restraints & \texttt{ConsInv.wit\_ge} & \texttt{Invariants.lean} \\
+\textbf{Progress measure} & \texttt{rank}, \texttt{reqRank} & \texttt{FiniteInjury.lean} \\
+Rank is bounded by 2 & \texttt{rank\_le\_two} & \texttt{FiniteInjury.lean} \\
+Attention raises rank & \texttt{reqRank\_incr} & \texttt{FiniteInjury.lean} \\
+Quiet interval freezes a record & \texttt{record\_stable\_of} & \texttt{FiniteInjury.lean} \\
+\textbf{Finite injury} & \texttt{quiet\_above} & \texttt{FiniteInjury.lean} \\
+Stabilization package & \texttt{exists\_stable} & \texttt{FiniteInjury.lean} \\
+Stable means never asks again & \texttt{stable\_not\_requires} & \texttt{FiniteInjury.lean} \\
+Restraint is respected & \texttt{restraint\_respected\_A/\_B} & \texttt{Requirements.lean} \\
+Requirements satisfied & \texttt{R\_satisfied}, \texttt{S\_satisfied} & \texttt{Requirements.lean} \\
+The two non-reducibilities & \texttt{not\_A\_le\_B}, \texttt{not\_B\_le\_A} & \texttt{Requirements.lean} \\
+Shadow implementation & \texttt{St}, \texttt{RS}, \texttt{encSt}, \texttt{stageN} & \texttt{CE.lean} \\
+Simulation theorem & \texttt{encSt\_stage} & \texttt{CE.lean} \\
+The sets are \ce. & \texttt{ce\_Aset}, \texttt{ce\_Bset} & \texttt{CE.lean} \\
+\textbf{The theorem} & \texttt{friedberg\_muchnik} & \texttt{Main.lean} \\
+Neither set is decidable & \texttt{Aset\_not\_computable}, & \texttt{Main.lean} \\
+ & \texttt{Bset\_not\_computable} & \\
+\bottomrule
+\end{tabular}
+\caption{The first priority argument.}
+\end{table}
+
+\clearpage
+
+\subsection{Sacks splitting: \texttt{SacksSplitting/}}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lll}
+\toprule
+Concept & Declaration & File \\
+\midrule
+The given set as watchable stages & \texttt{enumStage}, \texttt{enumSet} & \texttt{Basic.lean} \\
+\texttt{CE} gives such an enumeration & \texttt{ce\_eq\_enumSet} & \texttt{Basic.lean} \\
+Newly arrived elements & \texttt{newAt} & \texttt{Basic.lean} \\
+Primitive-recursive filtering & \texttt{filterB} & \texttt{Basic.lean} \\
+Construction state (a tuple) & \texttt{State} & \texttt{Requirements.lean} \\
+Which half a requirement watches & \texttt{oracleOf} & \texttt{Requirements.lean} \\
+Bounded agreement test & \texttt{agreeAt} & \texttt{Requirements.lean} \\
+Length of agreement & \texttt{lenAgree} & \texttt{Requirements.lean} \\
+Stage restraint & \texttt{restraintAt} & \texttt{Requirements.lean} \\
+\textbf{Cumulative restraint} & \texttt{newRestraints}, \texttt{Rest} & \texttt{Construction.lean} \\
+\textbf{Routing rule} & \texttt{routeTo} & \texttt{Construction.lean} \\
+One stage & \texttt{step}, \texttt{stageState} & \texttt{Construction.lean} \\
+The two halves & \texttt{halfList}, \texttt{halfF}, \texttt{halfSet} & \texttt{Construction.lean} \\
+Halves are disjoint & \texttt{disjoint\_halfSet} & \texttt{Construction.lean} \\
+Halves reassemble the set & \texttt{union\_halfSet} & \texttt{Construction.lean} \\
+Construction is computable & \texttt{primrec\_stageState} & \texttt{CE.lean} \\
+The halves are \ce. & \texttt{ce\_halfSet} & \texttt{CE.lean} \\
+The decision procedure & \texttt{computableSet\_of\_agreement} & \texttt{CE.lean} \\
+Injury comes from above & \texttt{injured\_by\_higher} & \texttt{FiniteInjury.lean} \\
+Bounded below $\Rightarrow$ finite injury & \texttt{noInjury\_of\_bounded} & \texttt{FiniteInjury.lean} \\
+Restraint is respected & \texttt{restraint\_respected} & \texttt{FiniteInjury.lean} \\
+\textbf{Where the hypothesis is spent} & \texttt{unsatisfied\_requirement\_computes} & \texttt{FiniteInjury.lean} \\
+Use of the limit computation & \texttt{limUse} & \texttt{FiniteInjury.lean} \\
+Satisfied $\Rightarrow$ bounded restraint & \texttt{restraint\_bounded\_of} & \texttt{FiniteInjury.lean} \\
+\textbf{The priority induction} & \texttt{restraint\_bounded} & \texttt{FiniteInjury.lean} \\
+Requirements satisfied & \texttt{requirement\_satisfied} & \texttt{FiniteInjury.lean} \\
+Neither half computes the set & \texttt{not\_reducible\_half} & \texttt{Main.lean} \\
+\textbf{The theorem} & \texttt{sacks\_splitting} & \texttt{Main.lean} \\
+The split is non-degenerate & \texttt{halfSet\_ne} & \texttt{Main.lean} \\
+\bottomrule
+\end{tabular}
+\caption{The second priority argument.}
+\end{table}
+
+\subsection{Where the two meet: \texttt{PriorityArguments.lean}}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{ll}
+\toprule
+Concept & Declaration \\
+\midrule
+Sacks splitting is not vacuous & \texttt{friedbergMuchnik\_set\_splits} \\
+Friedberg--Muchnik over Mathlib's model & \texttt{friedberg\_muchnik\_mathlib} \\
+Sacks splitting over Mathlib's model & \texttt{sacks\_splitting\_mathlib} \\
+\bottomrule
+\end{tabular}
+\caption{The only declarations depending on both priority arguments.}
+\end{table}

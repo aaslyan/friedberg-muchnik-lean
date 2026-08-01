@@ -1,4 +1,5 @@
 \section{Artifact Reproduction}
+\label{app:artifact}
 
 The repository is available at:
 
@@ -6,7 +7,7 @@ The repository is available at:
 https://github.com/aaslyan/friedberg-muchnik-lean
 \end{verbatim}
 
-A fresh build should use:
+A fresh build:
 
 \begin{verbatim}
 git clone https://github.com/aaslyan/friedberg-muchnik-lean
@@ -15,39 +16,76 @@ lake exe cache get
 lake build
 \end{verbatim}
 
-To check the final theorem and axiom footprint:
+The first command fetches Mathlib's compiled artifacts; on a cold machine
+it downloads several gigabytes.  With them present, \texttt{lake build}
+compiles the four project libraries in about two minutes and reports
+\texttt{Build completed successfully (829 jobs)}.
+
+To check the two theorems and their axiom footprints:
 
 \begin{verbatim}
-cat >/tmp/check_fm.lean <<'EOF'
-import FriedbergMuchnik.Main
+cat >/tmp/check.lean <<'EOF'
+import PriorityArguments
 
 #check FriedbergMuchnik.friedberg_muchnik
+#check SacksSplitting.sacks_splitting
 #print axioms FriedbergMuchnik.friedberg_muchnik
+#print axioms SacksSplitting.sacks_splitting
+#print axioms PriorityArguments.friedberg_muchnik_mathlib
+#print axioms PriorityArguments.sacks_splitting_mathlib
 EOF
 
-lake env lean /tmp/check_fm.lean
+lake env lean /tmp/check.lean
 \end{verbatim}
 
-At drafting time this reported:
+This reports the two theorem statements followed by four identical axiom
+lines:
 
 \begin{verbatim}
-FriedbergMuchnik.friedberg_muchnik :
-  exists A B,
-    FriedbergMuchnik.CE A /\
-      FriedbergMuchnik.CE B /\
-        not FriedbergMuchnik.TuringReducible A B /\
-        not FriedbergMuchnik.TuringReducible B A
 'FriedbergMuchnik.friedberg_muchnik' depends on axioms:
+  [propext, Classical.choice, Quot.sound]
+'SacksSplitting.sacks_splitting' depends on axioms:
+  [propext, Classical.choice, Quot.sound]
+'PriorityArguments.friedberg_muchnik_mathlib' depends on axioms:
+  [propext, Classical.choice, Quot.sound]
+'PriorityArguments.sacks_splitting_mathlib' depends on axioms:
   [propext, Classical.choice, Quot.sound]
 \end{verbatim}
 
-To search for common proof escape hatches:
+To confirm that the libraries are siblings --- that neither priority
+argument depends on the other --- build either alone from a clean tree and
+observe that no module of the other is compiled:
 
 \begin{verbatim}
-rg -n "sorry|admit|axiom|unsafe|opaque|extern|implemented_by|native_decide" \
-  FriedbergMuchnik FriedbergMuchnik.lean lakefile.lean README.md STATUS.md
+lake build SacksSplitting
 \end{verbatim}
 
-At drafting time this command found only documentation mentions of
-\texttt{sorry}/\texttt{axiom}, not source declarations.
+To search for proof escape hatches across the project sources:
 
+\begin{verbatim}
+grep -rnE "sorry|admit|native_decide|unsafe|^axiom |partial def" \
+  --include='*.lean' \
+  OracleComputability FriedbergMuchnik SacksSplitting \
+  PriorityArguments.lean
+\end{verbatim}
+
+This produces no output.  To run the constructions rather than only
+type-check them:
+
+\begin{verbatim}
+cat >/tmp/exec.lean <<'EOF'
+import PriorityArguments
+
+#eval (FriedbergMuchnik.stageState 20).Alist
+#eval (FriedbergMuchnik.stageState 20).Blist
+#eval SacksSplitting.enumStage 0 8
+#eval (SacksSplitting.stageState 0 8).1
+EOF
+
+lake env lean /tmp/exec.lean
+\end{verbatim}
+
+The repository additionally carries a fact dossier,
+\texttt{paper/DOSSIER.md}, recording the evidence behind each claim in this
+paper --- what was read from source, what was measured, what was verified
+against primary literature, and what remains open.

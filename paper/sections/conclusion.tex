@@ -1,25 +1,48 @@
 \section{Conclusion}
+\label{sec:conclusion}
 
-The formalization demonstrates that a classical finite-injury priority
-argument can be represented directly in Lean 4.  The proof turns informal
-temporal reasoning into finite executable stages, explicit state
-components, preserved invariants, recorded semantic uses, bounded progress,
-and machine-checked stabilization.
+Two classical finite-injury priority arguments are formalized in Lean 4
+over one explicitly finitary model of oracle computation.  The informal
+temporal reasoning of the textbook proofs --- choose a fresh witness, wait
+for convergence, restrain below the use, initialize what is weaker, argue
+that the stronger requirements eventually go quiet --- becomes finite
+executable stages, explicit state components, recorded uses, preserved
+invariants, a bounded progress measure, and an induction along priority.
+The constructions are not merely type-checked but executable: the stage
+machines run, and produce the witnesses, restraints and enumerations the
+proofs reason about.
 
-The central methodological lesson is that priority arguments are not
-inherently beyond current interactive theorem provers, but they require
-representations that expose finite information.  In this development,
-finite oracle snapshots coexist with monotone positive stage sets;
-successful computations carry their own uses; finite stage semantics and
-infinite oracle semantics are bridged by explicit theorems; and finite
-injury is reduced to a small rank argument after higher priorities become
-quiet.
+The methodological lesson is about representation.  Priority arguments are
+not beyond current provers, but they require representations that expose
+finite information at exactly the points where the informal proof appeals
+to it.  Recording the use inside the evaluator's result, rather than
+recovering it after the fact, is what makes restraint a manipulable object;
+keeping approximations as monotone finite sets rather than prefix-fixed
+Boolean strings is what keeps the limit sets from being decidable and the
+theorem from being false.
 
-The final theorem establishes two computably enumerable limit sets which
-are mutually nonreducible in the project's oracle-machine model.  Extending
-the local reducibility relation with transitivity and connecting it to
-other relative-computability semantics would make the degree-theoretic
-interpretation fully internal.  Even in its present form, the artifact
-provides a detailed machine-checked account of the finite-injury method and
-a basis for further formalized computability theory.
+The second lesson is the one we did not expect, and it is negative.  A
+foundation built for one priority argument served a second one completely
+--- including a lemma whose importance in the second theorem exceeds its
+importance in the first --- while the priority layer itself transferred not
+at all, and no generalization of it appears to be worth stating.  ``Finite
+injury'' names a family of arguments related by shape, not a lemma one
+proves once.  A useful reusable priority framework, if there is one, will
+have to abstract requirements, strategies, priority order, initialization
+and progress measures at a level neither of these two developments
+currently occupies; we regard that as open rather than as routine
+engineering.
 
+The natural next target is infinite injury.  It is what the omitted
+conclusion of the Sacks Splitting Theorem needs --- lowness of the two
+halves --- and it is the first place where the finite progress measure that
+made the first theorem tractable is unavailable in principle rather than by
+accident of design.  The other loose ends are smaller.  Transitivity of the
+local reducibility relation, listed as future work in an earlier draft of
+this development, is now proved by query substitution, so the relation is a
+preorder; what remains is that the bridge to Mathlib's oracle model is
+proved in one direction only, which suffices for the negative results here
+but not for a general transfer, and that no degree structure --- the
+quotient, the jump, completeness --- is formalized, so the classical
+reading of these theorems as statements about degrees remains external to
+the artifact.

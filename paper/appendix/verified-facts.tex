@@ -1,0 +1,77 @@
+\section{Verified Artifact Facts}
+\label{app:facts}
+
+Every figure below was measured against the repository, on a clean build,
+rather than asserted.  Measurements are from an Apple M5 (10 cores, 32~GB)
+with Mathlib's compiled artifacts supplied by \texttt{lake exe cache get}.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{ll}
+\toprule
+Item & Value \\
+\midrule
+Lean toolchain & \texttt{leanprover/lean4:v4.26.0} \\
+Mathlib version & \texttt{v4.26.0} \\
+Mathlib revision & \texttt{2df2f0150c275ad53cb3c90f7c98ec15a56a1a67} \\
+Lake libraries & 4 \\
+Lean files & 30 \\
+Lines of Lean & 6{,}499 \\
+Lines excluding comments and blanks & 4{,}471 \\
+Hand-written \texttt{theorem} declarations & 274 \\
+Hand-written \texttt{def}/\texttt{abbrev} declarations & 90 \\
+\texttt{lake build} & succeeds, 829 jobs \\
+Clean build, Mathlib cached & 2\,min 2\,s \\
+Slowest module (\texttt{FriedbergMuchnik/CE.lean}) & 106\,s \\
+Declarations checked with \texttt{\#print axioms} & 37 \\
+Axiom footprint, all 37 & \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound} \\
+Axioms declared by the development & 0 \\
+\texttt{sorry} / \texttt{admit} & 0 \\
+\texttt{native\_decide} / \texttt{unsafe} / \texttt{partial def} & 0 \\
+\texttt{noncomputable} declarations & 2 \\
+Declarations with raised \texttt{maxHeartbeats} & 11 \\
+Repository license & none \\
+CI workflow & none \\
+\bottomrule
+\end{tabular}
+\caption{Artifact facts, measured at the revision described in
+Appendix~\ref{app:artifact}.}
+\end{table}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lrrr}
+\toprule
+Library & Files & Lines & Code lines \\
+\midrule
+\texttt{OracleComputability} & 14 & 2{,}866 & 2{,}000 \\
+\texttt{FriedbergMuchnik} & 8 & 2{,}002 & 1{,}494 \\
+\texttt{SacksSplitting} & 7 & 1{,}548 & 948 \\
+\texttt{PriorityArguments} & 1 & 83 & 29 \\
+\bottomrule
+\end{tabular}
+\caption{Size by library.  ``Code lines'' excludes comments and blanks.}
+\end{table}
+
+The two \texttt{noncomputable} declarations are the classical
+characteristic function \texttt{charFun}, which appears only in the
+statements of the reducibility vocabulary, and \texttt{limUse}, which
+appears only in the verification of the second theorem.  Neither occurs in
+a construction.  The raised heartbeat budgets are elaboration limits in the
+two computable-enumerability files and cannot affect the axiom footprint,
+which is the ground truth that no logical shortcut was taken.
+
+\paragraph{The constructions run.}
+Both stage machines are executable Lean functions, and evaluating them is a
+stronger check than the absence of \texttt{sorry}: it shows the definitions
+are not vacuously satisfiable stubs.  Evaluating the Friedberg--Muchnik
+machine --- the one the priority proof reasons about, not the shadow
+implementation used for the computability proof --- at stage 20 gives
+enumerations $\{12,8,6,4,0\}$ and $\{13,10,1\}$ for the two sets, a
+freshness counter of $14$, and strategy records in which requirements 8 and
+10 hold restraints 9 and 11 respectively.  Evaluating the splitting machine
+on the code that halts everywhere routes the first eight elements into a
+single half, all restraints remaining zero, since a reduction that always
+answers zero never agrees with a set that is accumulating members.

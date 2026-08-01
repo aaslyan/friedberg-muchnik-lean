@@ -1336,6 +1336,15 @@ See Part 3.12: 37 declarations checked, all `[propext, Classical.choice, Quot.so
 7. `[VERIFIED-LEAN]` `README.md:156–159` says the paper "does not yet cover the
    second theorem or the foundation/clients split". Stale: commit `23a6da0`
    added `paper/sections/second-theorem.tex` and rewrote the abstract.
+7a. `[VERIFIED-LEAN]` `OracleComputability/OracleCode.lean:28–30` says that an
+   `OracleCode` with no `query` node is an ordinary partial recursive program
+   and that "`MathlibBridge.lean` makes that statement precise in both
+   directions." Only one direction exists. `MathlibBridge.lean` provides
+   `embed : Code → OracleCode` with `run_embed` and `partrec_realized`
+   (Mathlib → local); there is no map from the query-free fragment back to
+   `Nat.Partrec.Code` and no theorem characterizing that fragment. Verified by
+   reading the file's full declaration list and by grep for a converse
+   construction. Do not repeat the "both directions" claim.
 
 **Stale paper text — will be wrong if published as is:**
 

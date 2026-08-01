@@ -1,65 +1,174 @@
 \section{Introduction}
+\label{sec:intro}
 
-Post's problem asks whether there is a computably enumerable set whose
-Turing degree is neither computable nor complete.  Friedberg and Muchnik
-answered this question independently by constructing two computably
-enumerable sets of incomparable degree \cite{friedberg1957,muchnik1956}.
-The method introduced in these proofs, now called the priority method, is
-one of the defining proof techniques of classical computability theory.
+\subsection{Two Kinds of Set}
 
-Priority arguments are difficult formalization targets because their
-textbook presentation relies on disciplined but informal temporal
-reasoning.  A proof says to choose a fresh witness, wait until a computation
-converges, preserve the computation by restraining future enumeration below
-its use, initialize lower-priority strategies when a stronger strategy
-acts, and then argue that higher-priority strategies eventually stop
-acting.  In a proof assistant these phrases must become explicit data and
-theorems: a state component for witnesses and restraints, a decidable
-attention predicate, a deterministic transition function, a preserved
-invariant, and an induction proving eventual stability.
+Call a set of natural numbers \emph{decidable} if some algorithm, given a
+number, answers yes or no and always terminates.  Call it \emph{computably
+enumerable}, or \ce., if some algorithm lists its members --- possibly
+forever, in no particular order, with no promise about when any given
+member appears.  Every decidable set is \ce.; the converse fails, and the
+standard witness is the halting problem, the set of programs that
+eventually stop.  One can list the halting programs by running all of them
+a step at a time and reporting each as it stops.  One cannot decide
+membership, because a program that has not stopped yet may stop later, and
+nothing in the enumeration says which.
 
-This paper describes a Lean 4 formalization of the Friedberg--Muchnik
-theorem.  The central contribution is not a new mathematical proof of the
-classical theorem, but a machine-checked account of the finite-injury
-method in which finite oracle computations, uses, restraints,
-initialization, attention, injury, eventual stability, and effective stage
-construction are all represented directly.  The development is organized
-around a project-local oracle-machine model, with Mathlib used only for
-ordinary primitive-recursive and partial-recursive closure obligations.
+The asymmetry is the subject.  A \ce.\ set carries \emph{positive}
+information that accumulates: a number may join the set at some stage of
+the enumeration, and once it joins it never leaves.  Negative information
+never becomes final.  Every construction in this paper is a way of
+exploiting that asymmetry, and every difficulty in formalizing one comes
+from the same place.
 
-The final theorem is:
+To compare sets we relativize.  Give an algorithm a free subroutine --- an
+\emph{oracle} --- that answers membership questions about a set $B$.  If
+some such algorithm decides $A$, write $A \leT B$: $A$ is \emph{Turing
+reducible} to $B$, meaning $A$ is no harder than $B$.  A halting oracle
+computation asks its oracle only finitely many questions, all below some
+bound called the \emph{use} of that computation.  This finiteness is the
+one lever the whole theory turns on, and we return to it below.
 
-\begin{lstlisting}
-theorem friedberg_muchnik :
-    exists A B : Set Nat,
-      CE A /\ CE B /\ not (A <=T B) /\ not (B <=T A)
-\end{lstlisting}
+Reducibility sorts sets into layers of difficulty.  At the bottom sit the
+decidable sets, reducible to everything.  Near the top sits the halting
+problem, to which every \ce.\ set reduces.
 
-In the actual Lean source the relation is named
-\texttt{TuringReducible} and displayed with scoped notation
-\texttt{\(\leq\)\textsuperscript{T}}.  The theorem is proved by taking the
-two limit sets \texttt{Aset} and \texttt{Bset}, proving them c.e. in
-\texttt{CE.lean}, and proving the two nonreducibilities in
-\texttt{Requirements.lean}.
+\subsection{Post's Problem}
 
-The contributions are:
+In 1944 Post asked what lies between \cite{post1944}.  Is every \ce.\ set
+either decidable or as hard as the halting problem, or is there something
+strictly in the middle?
 
-\begin{enumerate}
-\item an explicit finite oracle semantics with output and use tracking;
-\item a verified agreement-below-use preservation theorem;
-\item a complete stage-by-stage formalization of the Friedberg--Muchnik
-  priority construction;
-\item a finite-injury proof based on a formal rank and induction over
-  priority;
-\item a computability proof showing that the limiting sets are genuinely
-  c.e.; and
-\item a final theorem stated in set-theoretic computability vocabulary.
-\end{enumerate}
+The question resisted for twelve years.  It was settled in 1956--57, by
+Friedberg and by Muchnik independently \cite{friedberg1957,muchnik1956},
+and settled in a strong form: there are two \ce.\ sets $A$ and $B$ with
+$A \not\leT B$ and $B \not\leT A$.  Neither can decide the other, so
+neither is decidable and neither is as hard as the halting problem.  The
+middle is not merely occupied; it is occupied by incomparable things.
 
-The paper is careful about the scope of the local reducibility relation.
-The final theorem proves mutual nonreducibility in the project's
-oracle-machine model.  Reflexivity, the effective program numbering, and
-basic sanity lemmas are proved, but transitivity of the local reducibility
-relation is not currently part of the repository.  We therefore treat the
-full internal development of Turing degrees as future work.
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[>=Stealth, every node/.style={font=\small}]
+  \node (bot) at (0,0) {$\emptyset$ \ (the decidable sets)};
+  \node (a) at (-2.2,1.7) {$A$};
+  \node (b) at (2.2,1.7) {$B$};
+  \node (top) at (0,3.4) {$K$ \ (the halting problem)};
+  \draw (bot) -- (a);
+  \draw (bot) -- (b);
+  \draw (a) -- (top);
+  \draw (b) -- (top);
+  \node at (0,1.7) {\textit{no line}};
+\end{tikzpicture}
+\caption{The classical picture behind Post's problem: $A$ and $B$ sit
+strictly between the decidable sets and the halting problem, and neither
+reduces to the other.  The formalization reported here proves the two
+missing edges --- $A\not\leT B$ and $B\not\leT A$ --- and proves that
+neither set is decidable.  The halting problem itself does not appear in
+the development, so the vertical placement in this diagram is classical
+background rather than formalized content; see
+Section~\ref{sec:scope}.}
+\label{fig:degrees}
+\end{figure}
 
+A second classical result concerns how a \ce.\ set can be taken apart.
+Sacks proved in 1963 that any \ce.\ set that is not decidable splits into
+two disjoint \ce.\ pieces, neither of which can decide the whole
+\cite{sacks1963}.  Nothing is thrown away --- the pieces reassemble to the
+original --- and yet each piece has strictly less power than the set it
+came from.  Both halves of the difficulty are genuinely present, and
+neither half carries it alone.
+
+\subsection{Why These Proofs Are Hard to Formalize}
+
+Both results are proved by the same technique, introduced in the solution
+of Post's problem and now called the \emph{priority method}.  It is worth
+saying what the technique does before saying why it resists formalization.
+
+To make $A \not\leT B$, one must defeat every candidate reduction.  Number
+the oracle programs $\Phi_0, \Phi_1, \dots$ and impose one requirement per
+program: $R_e$ says that $\Phi_e$ with oracle $B$ does not decide $A$.
+Defeating a single $\Phi_e$ is easy in isolation.  Pick a number $x$ that
+nothing else cares about --- a \emph{fresh witness} --- and keep it out of
+$A$.  Watch $\Phi_e$ with oracle $B$ run on input $x$.  If it never
+converges, it never decides $A$ and the requirement is met for free.  If it
+converges and says ``$x \notin A$'', put $x$ into $A$.  Now the computation
+is wrong, and the requirement is met by contradiction.
+
+The difficulty is that the computation was run against $B$ \emph{as it
+stood at that stage}, and $B$ is still being enumerated.  A later element
+entering $B$ could change the computation and rescue it.  Here the finite
+use is spent: the converging computation asked only finitely many questions
+of $B$, so it suffices to \emph{restrain} $B$ below that use --- to promise
+that no number smaller than the use will ever be enumerated into $B$.  The
+computation is then frozen for good, and the diagonalization holds.
+
+But restraints conflict.  A requirement that has promised to keep numbers
+out of $B$ obstructs the requirements that want to put numbers in.  The
+resolution is the priority ordering: requirements are ranked, and when a
+higher-ranked one acts, every lower-ranked one is \emph{initialized} ---
+its witness is discarded and its restraint cancelled, and it starts over
+with a fresh witness chosen above the new restraint.  This is the
+\emph{injury}.  The proof then argues that injury is finite: a requirement
+is injured only by the finitely many stronger requirements above it, each
+of which acts only finitely often, so eventually every requirement is left
+alone forever and does its job.
+
+This is a beautiful argument and an awkward one to make precise.  Its
+content is carried by verbs in the future and past tense.  \emph{Choose a
+witness nothing else cares about} --- nothing else meaning which
+requirements, and cares in what sense, at which stage?  \emph{Wait until
+the computation converges} --- waiting is not an operation; the
+construction must at each stage make a decision from data it has, and
+``converges'' is not such a datum, only ``converges within the resources
+inspected so far''.  \emph{Restrain $B$ below the use} --- a promise about
+all future stages, made at one stage, which some later stage must be shown
+to keep.  \emph{Initialize everything weaker} --- an edit to unboundedly
+many strategy records at once.  \emph{Eventually the stronger ones go
+quiet} --- an induction along the priority order whose base case is that
+the strongest requirement is never injured at all, and whose step needs a
+measure of progress that no textbook states, because on paper it is
+obvious.
+
+In a proof assistant none of this can stay in the tense system.  Each
+phrase has to become a piece of data or a theorem about it.  ``Fresh''
+becomes a counter carried in the state and an invariant saying it dominates
+everything mentioned so far.  ``Waiting'' becomes a decidable test on a
+bounded execution, plus a separate theorem that a computation which really
+does converge is eventually seen by that test.  ``Restraint'' becomes a
+number in a record, plus a lemma that the enumeration respects it, plus the
+preservation theorem that converts respect into a frozen computation.
+``Initialize'' becomes an explicit rewriting of the strategy list.
+``Eventually quiet'' becomes an induction along priority carrying an
+explicit progress measure --- and finding that measure is real work, since
+the informal proof supplies none.
+
+That translation is the subject of this paper.  We report a Lean 4
+formalization of both theorems --- Friedberg--Muchnik and Sacks splitting
+in its splitting-with-non-reducibility form --- over one shared,
+explicitly finitary model of oracle computation, and we report what the
+translation cost and what it revealed.
+
+\subsection{What This Paper Claims}
+\label{sec:scope}
+
+Our finding is not that the theorems are provable; they were proved
+seventy years ago.  It is what happens when a second priority argument is
+built on the first one's foundation.  The foundation transferred
+completely, and one design decision made for the first theorem turned out
+to be the load-bearing one for the second.  The priority layer transferred
+not at all, and we argue that no generalization of it would have.  We
+report that as a negative result about reuse: ``finite injury'' names a
+family of arguments rather than a single reusable lemma.
+Section~\ref{sec:formalization} is about both halves of that finding.
+
+Two scope notes belong here rather than at the end.  First, what is
+formalized is incomparability together with non-computability: for the two
+constructed sets we prove $A \not\leT B$, $B \not\leT A$, and that neither
+is decidable.  The classical step from there to ``strictly between
+$\emptyset$ and the halting problem'' uses the fact that every \ce.\ set
+reduces to the halting problem, and the halting problem, the jump, and
+completeness do not appear in the development at all.  Figure~\ref{fig:degrees}
+therefore shows more than we prove, and is labelled accordingly.  Second,
+the full Sacks Splitting Theorem also makes the two halves \emph{low}; that
+conclusion needs infinite-injury machinery and is deliberately out of
+scope.  What we prove is the splitting-with-non-reducibility core.

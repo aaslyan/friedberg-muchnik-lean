@@ -48,7 +48,9 @@ Friedberg--Muchnik and Sacks Splitting in Lean 4}
 \date{}
 
 \newcommand{\N}{\mathbb{N}}
-\newcommand{\ce}{\mathrm{c.e.}}
+% Renders as "c.e." at every use site, which always writes \ce followed by
+% an explicit period (so that "\ce.\ set" spaces as a mid-sentence word).
+\newcommand{\ce}{\ensuremath{\mathrm{c.e}}}
 \newcommand{\leT}{\leq_T}
 
 \begin{document}
@@ -59,16 +61,7 @@ Friedberg--Muchnik and Sacks Splitting in Lean 4}
 \end{abstract}
 
 \input{sections/introduction}
-\input{sections/background}
-\input{sections/design}
-\input{sections/oracle-semantics}
-\input{sections/construction}
-\input{sections/finite-injury}
-\input{sections/computable-enumerability}
-\input{sections/second-theorem}
-\input{sections/evaluation}
-\input{sections/related-work}
-\input{sections/limitations}
+\input{sections/formalization}
 \input{sections/conclusion}
 
 \bibliographystyle{plain}
@@ -76,7 +69,7 @@ Friedberg--Muchnik and Sacks Splitting in Lean 4}
 
 \appendix
 \input{appendix/theorem-map}
+\input{appendix/verified-facts}
 \input{appendix/artifact}
 
 \end{document}
-
